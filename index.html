@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fusebypass.fun</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Roboto:wght@700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Design Tokens --------------------------------------- */
+        :root {
+            --on: 0;
+
+            /* Lamp colours � all driven by --on (0 = off, 1 = on) */
+            --opening: hsl(0, 0%, calc((18 + var(--on) * 68) * 1%));
+            --base-top: hsl(0, 0%, calc((30 + var(--on) * 38) * 1%));
+            --base-side: hsl(0, 0%, calc((15 + var(--on) * 35) * 1%));
+            --post: hsl(0, 0%, calc((18 + var(--on) * 35) * 1%));
+            --shade-l: hsl(0, 0%, calc((28 + var(--on) * 55) * 1%));
+            --shade-m: hsl(0, 0%, calc((16 + var(--on) * 32) * 1%));
+            --shade-d: hsl(0, 0%, calc((9 + var(--on) * 18) * 1%));
+            --blend-a: hsla(0, 0%, calc((45 + var(--on) * 50) * 1%), 0.85);
+            --blend-b: hsla(0, 0%, calc((18 + var(--on) * 28) * 1%), 0.25);
+            --blend-c: hsla(0, 0%, calc((18 + var(--on) * 28) * 1%), 0.50);
+            --glow-a: hsla(0, 0%, calc((40 + var(--on) * 55) * 1%), 0.85);
+            --cord-l: calc((38 + var(--on) * 52) * 1%);
+
+            /* App palette */
+            --bg: #000000;
+            --pm: #ffffff;
+            --pg: #080808;
+            --pb: #ffffff;
+            --pu: #ffffff;
+            --acc: #fcfcfc;
+            --tp: #ffffff;
+            --tm: #fffeff;
+            --glass: rgba(0, 0, 0, 0.65);
+            --border: rgb(252, 251, 251);
+            --ibg: rgba(146, 144, 144, 0.342);
+            --ibr: rgb(255, 254, 255);
+
+            /* Motion */
+            --ease-spring: 0.88s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* --- Reset ------------------------------------------------ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- Base ------------------------------------------------- */
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+        }
+
+        /* Pages fill the full viewport */
+        .page {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #page-account.active {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #page-home.active,
+        #page-tos.active,
+        #page-store.active {
+            align-items: flex-start;
+            overflow-y: auto;
+        }
+
+        /* Ambient room glow � only visible on account page */
+        #page-account::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 50% 65% at 60% 50%,
+                    rgba(255, 255, 255, 0.25) 0%,
+                    rgba(180, 180, 180, 0.15) 52%,
+                    transparent 75%);
+            opacity: var(--on);
+            transition: opacity .9s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Layout ----------------------------------------------- */
+        .scene {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 80px;
+        }
+
+        /* --- Lamp SVG --------------------------------------------- */
+        .lamp {
+            height: 46vmin;
+            min-height: 300px;
+            max-height: 420px;
+            overflow: visible !important;
+            flex-shrink: 0;
+        }
+
+        /* Cord colour driven by --cord-l */
+        .lamp-cord {
+            stroke: hsl(0, 0%, var(--cord-l));
+            transition: stroke .1s;
+        }
+
+        .lamp-light {
+            opacity: var(--on);
+        }
+
+        /* SVG fill helpers � resolved from CSS variables */
+        .fill-opening {
+            fill: var(--opening);
+        }
+
+        .fill-base-top {
+            fill: var(--base-top);
+        }
+
+        .fill-base-side {
+            fill: var(--base-side);
+        }
+
+        .fill-post {
+            fill: var(--post);
+        }
+
+        .fill-shade {
+            fill: var(--shade-d);
+        }
+
+        /* Hit zone for cord drag */
+        .lamp-hit {
+            cursor: grab;
+            fill: transparent;
+        }
+
+        .lamp-hit:active {
+            cursor: grabbing;
+        }
+
+        /* --- Login Card ------------------------------------------- */
+        .card {
+            width: 320px;
+            padding: 32px 28px 28px;
+            background: var(--glass);
+            backdrop-filter: blur(28px) saturate(1.5);
+            -webkit-backdrop-filter: blur(28px) saturate(1.5);
+            border-radius: 22px;
+            border: 1px solid var(--border);
+            box-shadow: 0 22px 56px rgba(0, 0, 0, .72);
+            opacity: 0;
+            transform: scale(.90) translateX(12px);
+            transition:
+                opacity var(--ease-spring),
+                transform var(--ease-spring),
+                border-color var(--ease-spring),
+                box-shadow var(--ease-spring);
+            pointer-events: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle glass gloss */
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 22px;
+            background: linear-gradient(138deg, rgba(255, 255, 255, .05) 0%, transparent 55%);
+            pointer-events: none;
+        }
+
+        .card.is-active {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            pointer-events: auto;
+            border-color: rgb(255, 255, 255);
+            box-shadow:
+                0 22px 56px rgba(0, 0, 0, .65),
+                0 0 44px 3px rgba(252, 251, 252, 0.692),
+                0 0 80px 12px rgba(250, 250, 250, 0.753);
+        }
+
+        /* Brand */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 0;
+            background: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+
+        .brand-icon svg {
+            width: 15px;
+            height: 15px;
+            fill: #fff;
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.10rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            background: linear-gradient(130deg, var(--pu), var(--pb) 55%, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+
+        .brand-tag {
+            font-size: .59rem;
+            color: var(--tm);
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        /* Headings */
+        .card-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--tp);
+            margin-bottom: 3px;
+        }
+
+        .card-sub {
+            font-size: .72rem;
+            color: var(--tm);
+            margin-bottom: 18px;
+        }
+
+        .card-sep {
+            width: 26px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--pg), transparent);
+            border-radius: 2px;
+            margin-bottom: 16px;
+        }
+
+        /* Fields */
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            display: block;
+            font-size: .64rem;
+            font-weight: 500;
+            color: var(--tm);
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .field-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 11px;
+            color: var(--tm);
+            pointer-events: none;
+            display: flex;
+            transition: color .28s;
+        }
+
+        .field-wrap:focus-within .field-icon {
+            color: var(--acc);
+        }
+
+        .field-wrap input {
+            width: 100%;
+            padding: 10px 11px 10px 35px;
+            background: var(--ibg);
+            border: 1px solid var(--ibr);
+            border-radius: 10px;
+            color: var(--tp);
+            font-family: 'Montserrat', sans-serif;
+            font-size: .84rem;
+            outline: none;
+            transition: border-color .28s, box-shadow .28s, background .28s;
+        }
+
+        .field-wrap input::placeholder {
+            color: rgba(160, 126, 192, .26);
+        }
+
+        .field-wrap input:focus {
+            border-color: var(--acc);
+            background: rgba(248, 247, 248, 0.767);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+        }
+
+        .field-toggle {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--tm);
+            display: flex;
+            transition: color .25s;
+            padding: 0;
+        }
+
+        .field-toggle:hover {
+            color: var(--acc);
+        }
+
+        /* Forgot link */
+        .forgot {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -4px;
+            margin-bottom: 16px;
+        }
+
+        .forgot a {
+            font-size: .67rem;
+            color: var(--pb);
+            text-decoration: none;
+            transition: color .22s;
+        }
+
+        .forgot a:hover {
+            color: var(--pu);
+        }
+
+        /* Submit */
+        .btn-submit {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, var(--pm), var(--pg));
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: .87rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform .18s, box-shadow .28s;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 45%;
+            height: 200%;
+            background: rgba(255, 255, 255, .13);
+            transform: skewX(-20deg);
+            transition: left .42s ease;
+        }
+
+        .btn-submit:hover::after {
+            left: 115%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgb(250, 250, 250);
+        }
+
+        .btn-submit:active {
+            transform: scale(.98);
+        }
+
+        /* Sign-up nudge */
+        .signup {
+            text-align: center;
+            margin-top: 14px;
+            font-size: .72rem;
+            color: var(--tm);
+        }
+
+        .signup a {
+            color: var(--pb);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color .22s;
+        }
+
+        .signup a:hover {
+            color: var(--pu);
+        }
+
+        /* Shake on empty submit */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-6px);
+            }
+
+            40% {
+                transform: translateX(6px);
+            }
+
+            60% {
+                transform: translateX(-4px);
+            }
+
+            80% {
+                transform: translateX(4px);
+            }
+        }
+        /* -- Dock Navbar -- */
+        .nav-dock-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            padding: 8px 14px;
+            z-index: 9998;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        .logo-sphere {
+            width: 38px;
+            height: 38px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 6px;
+            flex-shrink: 0;
+            overflow: visible;
+            background: none;
+            box-shadow: none;
+        }
+
+        .logo-sphere img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+        }
+
+        .nav-item {
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.45);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .nav-item i {
+            font-size: 0.95rem;
+            transition: transform 0.25s ease;
+        }
+
+        .nav-item .label {
+            font-size: 0.8rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item:hover i,
+        .nav-item.active i {
+            transform: translateY(-1px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.12);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+
+        /* -- Scanner Rows -- */
+        .scanner-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.2s ease;
+            cursor: default;
+        }
+
+        .scanner-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .scanner-icon-box {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .badge-undetected {
+            background: rgba(253, 1, 1, 0.452);
+            color: #ff0800;
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* -- Intro Overlay -- */
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        #intro-logo {
+            position: absolute;
+            width: min(420px, 70vw);
+            height: min(420px, 70vw);
+            object-fit: contain;
+            opacity: 0;
+            filter: blur(40px);
+            transition: opacity 3s ease, filter 3s ease;
+            pointer-events: none;
+            z-index: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #intro-logo.visible {
+            opacity: 0.18;
+            filter: blur(0px);
+        }
+
+        #intro-overlay > .intro-line,
+        #intro-overlay > #typed-line3 {
+            position: relative;
+            z-index: 1;
+        }
+
+        #intro-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .intro-line {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+            text-align: center;
+            min-height: 1.3em;
+        }
+
+        #typed-line2 {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        #typed-line3 {
+            font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-transform: none;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.3rem;
+        }
+
+        .intro-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1em;
+            background: #fff;
+            margin-left: 3px;
+            vertical-align: middle;
+            animation: blink 0.7s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* -- Discord Login Button -- */
+        .divider-or {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 12px;
+        }
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.12);
+        }
+        .divider-text {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .btn-discord {
+            width: 100%;
+            padding: 11px;
+            background: #5865F2;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: .87rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 20px rgba(88, 101, 242, 0.35);
+        }
+        .btn-discord:hover {
+            background: #4752C4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgba(88, 101, 242, 0.55);
+        }
+        .btn-discord:active {
+            transform: scale(0.98);
+        }
+
+        /* -- Discord User Widget (top-left) -- */
+        #discord-user-widget {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(10, 10, 10, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(88, 101, 242, 0.4);
+            border-radius: 999px;
+            padding: 7px 14px 7px 7px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.15);
+            animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes widgetSlideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        #discord-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #5865F2;
+            flex-shrink: 0;
+        }
+        #discord-user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        #discord-username {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+        #discord-tag {
+            font-size: 0.65rem;
+            color: #5865F2;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.04em;
+        }
+        #discord-logout {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255,255,255,0.35);
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin-left: 2px;
+            transition: color 0.2s ease;
+        }
+        #discord-logout:hover {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* -- Register Modal -- */
+        #register-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        #register-modal-overlay.open {
+            display: flex;
+            animation: fadeInOverlay 0.25s ease;
+        }
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        #register-modal {
+            width: 320px;
+            padding: 32px 28px 28px;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 20px;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            box-shadow: 0 22px 56px rgba(0,0,0,0.65);
+            animation: slideUpModal 0.3s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes slideUpModal {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- -- Discord User Profile Widget -- -->
+    <div id="discord-user-widget" style="display:none;">
+        <img id="discord-avatar" src="" alt="avatar">
+        <div id="discord-user-info">
+            <span id="discord-username"></span>
+            <span id="discord-tag"></span>
+        </div>
+        <button id="discord-logout" title="Sign out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+    </div>
+
+    <!-- -- Intro Typewriter Overlay -- -->
+    <div id="intro-overlay">
+        <img id="intro-logo" src="images/fuse-logo.png" alt="Fuse.gg">
+        <div class="intro-line" id="typed-line1"><span class="typed"></span></div>
+        <div class="intro-line" id="typed-line2"><span class="typed"></span></div>
+        <div class="intro-line" id="typed-line3"><span class="typed"></span><span class="intro-cursor" id="typed-cursor"></span></div>
+    </div>
+
+    <!-- -- PAGE: Sign In -- -->
+    <div class="page active" id="page-sign-in">
+    <div class="scene">
+
+        <!-- ------------------------------------------
+       LAMP
+  ------------------------------------------ -->
+        <svg class="lamp" viewBox="0 0 333 484" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+            <!-- Shade opening ellipse -->
+            <ellipse class="fill-opening" cx="165" cy="220" rx="130" ry="20" />
+            <ellipse cx="165" cy="220" rx="130" ry="20" fill="url(#grad-opening)" style="opacity:calc(1 - var(--on))" />
+
+            <!-- Base -->
+            <path class="fill-base-side"
+                d="M165 464c44.183 0 80-8.954 80-20v-14h-22.869c-14.519-3.703-34.752-6-57.131-6-22.379 0-42.612 2.297-57.131 6H85v14c0 11.046 35.817 20 80 20z" />
+            <path
+                d="M165 464c44.183 0 80-8.954 80-20v-14h-22.869c-14.519-3.703-34.752-6-57.131-6-22.379 0-42.612 2.297-57.131 6H85v14c0 11.046 35.817 20 80 20z"
+                fill="url(#grad-side)" />
+            <ellipse class="fill-base-top" cx="165" cy="430" rx="80" ry="20" />
+            <ellipse cx="165" cy="430" rx="80" ry="20" fill="url(#grad-base)" />
+
+            <!-- Post / stem -->
+            <path class="fill-post" d="M180 142h-30v286c0 3.866 6.716 7 15 7 8.284 0 15-3.134 15-7V142z" />
+            <path d="M180 142h-30v286c0 3.866 6.716 7 15 7 8.284 0 15-3.134 15-7V142z" fill="url(#grad-post)" />
+
+            <!-- Pull cord -->
+            <path id="js-cord" class="lamp-cord" d="M124 190 L124 348" stroke-width="6" stroke-linecap="round" />
+
+            <!-- Light cone (visible only when on) -->
+            <path class="lamp-light" d="M290.5 193H39L0 463.5c0 11.046 75.478 20 165.5 20s167-11.954 167-23l-42-267.5z"
+                fill="url(#grad-light)" />
+
+            <!-- Shade body -->
+            <path class="fill-shade" fill-rule="evenodd" clip-rule="evenodd"
+                d="M164.859 0c55.229 0 100 8.954 100 20l29.859 199.06C291.529 208.451 234.609 200 164.859 200S38.189 208.451 35 219.06L64.859 20c0-11.046 44.772-20 100-20z" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M164.859 0c55.229 0 100 8.954 100 20l29.859 199.06C291.529 208.451 234.609 200 164.859 200S38.189 208.451 35 219.06L64.859 20c0-11.046 44.772-20 100-20z"
+                fill="url(#grad-shade)" />
+
+            <!-- Gradients -->
+            <defs>
+                <linearGradient id="grad-opening" x1="35" y1="220" x2="295" y2="220" gradientUnits="userSpaceOnUse">
+                    <stop />
+                    <stop offset="1" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="grad-base" x1="85" y1="444" x2="245" y2="444" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="var(--blend-a)" />
+                    <stop offset=".8" stop-color="var(--blend-b)" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="grad-side" x1="119" y1="430" x2="245" y2="430" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="var(--blend-c)" />
+                    <stop offset="1" stop-color="var(--blend-b)" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="grad-post" x1="150" y1="288" x2="180" y2="288" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="var(--blend-a)" />
+                    <stop offset="1" stop-color="var(--blend-b)" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="grad-light" x1="165.5" y1="218.5" x2="165.5" y2="340"
+                    gradientUnits="userSpaceOnUse">
+                    <stop stop-color="var(--glow-a)" stop-opacity=".10" />
+                    <stop offset="1" stop-color="var(--glow-a)" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="grad-shade" x1="56" y1="110" x2="295" y2="110" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="var(--shade-l)" stop-opacity=".8" />
+                    <stop offset="1" stop-color="var(--shade-m)" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+
+            <!-- Invisible hit zone for cord dragging -->
+            <circle id="js-hit" class="lamp-hit" cx="124" cy="348" r="60" />
+        </svg>
+
+        <!-- ------------------------------------------
+       LOGIN CARD
+  ------------------------------------------ -->
+        <div class="card" id="js-card">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="images/fuse-logo.png" alt="Fuse.gg" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                </div>
+                <div>
+                    <div class="brand-name">Fuse.gg</div>
+                    <div class="brand-tag">Welcome To The Most Powerful Bypass</div>
+                </div>
+            </div>
+
+            <h1 class="card-title">Welcome back</h1>
+            <p class="card-sub">Sign in and start bypassing</p>
+            <div class="card-sep"></div>
+
+            <button class="btn-discord" id="js-discord-login" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                Continue with Discord
+            </button>
+        </div>
+
+        <!-- -- Profile Popup (shown when logged in + lamp on) -- -->
+        <div class="card" id="discord-profile-popup">
+            <div class="brand">
+                <img id="popup-avatar" src="" alt="avatar" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #5865F2;flex-shrink:0;">
+                <div>
+                    <div class="brand-name" id="popup-username">Loading...</div>
+                    <div class="brand-tag" id="popup-tag" style="color:#5865F2;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;">Discord</div>
+                </div>
+            </div>
+
+            <div class="card-sep"></div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(88,101,242,0.08);border:1px solid rgba(88,101,242,0.2);border-radius:10px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="color:#5865F2;flex-shrink:0;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                    <span style="font-size:.78rem;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;">Signed in with Discord</span>
+                    <span style="margin-left:auto;width:8px;height:8px;background:#23a55a;border-radius:50%;flex-shrink:0;"></span>
+                </div>
+            </div>
+
+            <button class="btn-submit" id="popup-logout-btn" type="button" style="margin-top:18px;background:linear-gradient(135deg,#2a2a2a,#1a1a1a);box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+                Sign Out
+            </button>
+        </div>
+
+    </div>
+    </div><!-- end page-account -->
+
+    <!-- -- PAGE: Home -- -->
+    <div class="page" id="page-home">
+        <div style="width:100%; max-width:700px; padding:6rem 2rem 4rem; margin:0 auto;">
+
+            <!-- Available Products -->
+            <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Available Products</h2>
+            <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Currently available products & operational status of Fuse.gg.</p>
+
+            <div onclick="document.querySelector('[data-page=store]').click()" style="
+                background:rgba(255,255,255,0.04);
+                border:1px solid rgba(255,255,255,0.1);
+                border-radius:16px;
+                padding:1.2rem 1.5rem;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                cursor:pointer;
+                transition:all 0.2s ease;
+                margin-bottom:1rem;
+            " onmouseover="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.2)'"
+               onmouseout="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(255,255,255,0.1)'">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                    <div style="width:44px; height:44px; background:rgba(255,255,255,0.07); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <img src="images/fuse-logo.png" alt="Fuse.gg" style="width:28px; height:28px; object-fit:contain;">
+                    </div>
+                    <div>
+                        <div style="color:#fff; font-weight:600; font-size:1rem;">Fuse Private Version</div>
+                        <div style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Advanced Bypass Solution - Private Version</div>
+                    </div>
+                </div>
+                <span style="background:rgba(255, 0, 0, 0.411); color:#ff0000; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">UNDETECTED</span>
+            </div>
+
+            <div onclick="document.querySelector('[data-page=store]').click()" style="
+                background:rgba(255,255,255,0.04);
+                border:1px solid rgba(255,255,255,0.1);
+                border-radius:16px;
+                padding:1.2rem 1.5rem;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                cursor:pointer;
+                transition:all 0.2s ease;
+                margin-bottom:3rem;
+            " onmouseover="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.2)'"
+               onmouseout="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(255,255,255,0.1)'">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                    <div style="width:44px; height:44px; background:rgba(255,255,255,0.07); border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <img src="images/fuse-logo.png" alt="Fuse.gg" style="width:28px; height:28px; object-fit:contain;">
+                    </div>
+                    <div>
+                        <div style="color:#fff; font-weight:600; font-size:1rem;">Fuse Public Version</div>
+                        <div style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Advanced Bypass Solution - Public Version</div>
+                    </div>
+                </div>
+                <span style="background:rgba(255, 0, 0, 0.411); color:#ff0000; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">COMING SOON</span>
+            </div>
+
+            <!-- Scanner Status -->
+            <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Scanner Condition</h2>
+            <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Current detection status from scanners. This applies to all of our products.</p>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
+                <div class="scanner-row">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span style="color:#fff; font-size:0.95rem;">Ocean.ac</span>
+                    </div>
+                    <span class="badge-undetected">UNDETECTED</span>
+                </div>
+                <div class="scanner-row">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span style="color:#fff; font-size:0.95rem;">Storm.cc</span>
+                    </div>
+                    <span class="badge-undetected">UNDETECTED</span>
+                </div>
+                <div class="scanner-row">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span style="color:#fff; font-size:0.95rem;">Echo.ac</span>
+                    </div>
+                    <span class="badge-undetected">UNDETECTED</span>
+                </div>
+                <div class="scanner-row">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span style="color:#fff; font-size:0.95rem;">Napse.ac</span>
+                    </div>
+                    <span class="badge-undetected">UNDETECTED</span>
+                </div>
+                <div class="scanner-row">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span style="color:#fff; font-size:0.95rem;">Detect.ac</span>
+                    </div>
+                    <span class="badge-undetected">UNDETECTED</span>
+                </div>
+                <div class="scanner-row" style="border-bottom:none;">
+                    <div style="display:flex; align-items:center; gap:1rem;">
+                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <span style="color:#fff; font-size:0.95rem;">Async.ac</span>
+                    </div>
+                    <span class="badge-undetected">UNDETECTED</span>
+                </div>
+            </div>
+        </div>
+    </div><!-- end page-home -->
+
+    <!-- -- PAGE: Store -- -->
+    <div class="page" id="page-store">
+        <div style="display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:center; gap:1.5rem; min-height:100vh; padding:8rem 1.5rem 2rem; box-sizing:border-box; width:100%;">
+
+            <!-- Pricing Card -->
+            <div style="
+                background:#0d0d0d;
+                border:1px solid rgba(255,255,255,0.1);
+                border-radius:20px;
+                padding:2rem;
+                width:300px;
+                flex-shrink:0;
+            ">
+                <!-- Header -->
+                <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:1.5rem;">
+                    <span style="font-family:'Arial',sans-serif; font-size:1.4rem; font-weight:800; color:#fff;">Lifetime Access</span>
+                    <span style="color:rgba(255,255,255,0.35); font-size:0.85rem; line-height:1.3;">Private Version.</span>
+                </div>
+
+                <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
+
+                <!-- Price -->
+                <div style="font-family:'Roboto',monospace; font-size:2rem; color:#fff; margin-bottom:1.5rem; line-height:1.3;">120€ <span style="font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:400; color:rgba(255,255,255,0.35);">/ Lifetime</span></div>
+
+                <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
+
+                <!-- Features -->
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.85rem; margin-bottom:2rem;">
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Ultimate Bypass Utility
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Full Software Access
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Fully Undetected
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Fivem Bypasser Aura
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        24/7 Client Support
+                    </li>
+                </ul>
+
+                <!-- Button -->
+                <button onclick="window.open('https://discord.gg/fuse','_blank')" style="
+                    width:100%;
+                    padding:14px;
+                    background:#1a1a1a;
+                    color:#fff;
+                    font-family:'Syne',sans-serif;
+                    font-size:0.95rem;
+                    font-weight:700;
+                    border:1px solid rgba(255,255,255,0.1);
+                    border-radius:12px;
+                    cursor:pointer;
+                    transition:background 0.2s ease, transform 0.15s ease;
+                    letter-spacing:0.03em;
+                " onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='#1a1a1a'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
+                    Purchase Now
+                </button>
+            </div>
+
+            <!-- Pricing Card 2 -->
+            <div style="
+                background:#0d0d0d;
+                border:1px solid rgba(255,255,255,0.1);
+                border-radius:20px;
+                padding:2rem;
+                width:300px;
+                flex-shrink:0;
+            ">
+                <div style="display:flex; align-items:baseline; gap:0.75rem; margin-bottom:1.5rem;">
+                    <span style="font-family:'Arial',sans-serif; font-size:1.4rem; font-weight:800; color:#fff;">6 Months Access</span>
+                    <span style="color:rgba(255,255,255,0.35); font-size:0.85rem; line-height:1.3;">Private<br>Version.</span>
+                </div>
+
+                <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
+
+                <div style="font-family:'Roboto',monospace; font-size:2rem; color:#fff; margin-bottom:1.5rem; line-height:1.3;">80€ <span style="font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:400; color:rgba(255,255,255,0.35);">/ 6 Months</span></div>
+
+                <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
+
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.85rem; margin-bottom:2rem;">
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Ultimate Bypass Utility
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        6 Months Software Access
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Fully Undetected
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        Fivem Bypasser Aura
+                    </li>
+                    <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
+                        <img src="images/verify.png" alt="?" style="width:18px; height:18px; object-fit:contain; flex-shrink:0;">
+                        24/7 Client Support
+                    </li>
+                </ul>
+
+                <button onclick="window.open('https://discord.gg/fuse','_blank')" style="
+                    width:100%;
+                    padding:14px;
+                    background:#1a1a1a;
+                    color:#fff;
+                    font-family:'Syne',sans-serif;
+                    font-size:0.95rem;
+                    font-weight:700;
+                    border:1px solid rgba(255,255,255,0.1);
+                    border-radius:12px;
+                    cursor:pointer;
+                    transition:background 0.2s ease, transform 0.15s ease;
+                    letter-spacing:0.03em;
+                " onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='#1a1a1a'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
+                    Purchase Now
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- -- PAGE: TOS -- -->
+    <div class="page" id="page-tos">
+        <div style="max-width:700px; width:100%; padding:6rem 2rem 4rem; color:#fff; font-family:'DM Sans',sans-serif; margin:0 auto;">
+            <h1 style="font-family:'Roboto',sans-serif; font-size:2.2rem; margin-bottom:2.5rem;">Please Read Our Policy Terms</h1>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Reverse Engineering</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You may not decompile, disassemble, alter, or otherwise reverse engineer the software in any form. Any violation will result in a permanent ban and blacklisting.</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">No Refunds</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">All sales are final. Refunds are not provided for any reason, including detections, bans, or compatibility problems.</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Chargebacks</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Filing a chargeback will lead to:</p>
+                <ul style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
+                    <li>Permanent removal of your license</li>
+                    <li>A ban from all current and future services</li>
+                    <li>Reports being submitted to payment providers</li>
+                </ul>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Use at Your Own Risk</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We take no responsibility for bans or any other consequences. You acknowledge and accept all risks associated with using cheat software.</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">HWID Lock</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Licenses are locked to a single hardware ID. HWID resets are granted at our discretion and may be refused if misuse is suspected.</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Account Responsibility</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You are solely responsible for securing your account and license. Sharing, selling, or leaking your license will result in an immediate ban without notice.</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Prohibited Actions</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You must not:</p>
+                <ul style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
+                    <li>Share, sell, or redistribute the software</li>
+                    <li>Use the software for commercial purposes without authorization</li>
+                </ul>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Software Availability</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We do not guarantee uninterrupted service or undetected operation. Downtime, maintenance, or bans do not qualify for refunds.</p>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Agreement</h2>
+                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">By using this software, you agree to all terms listed above and accept full responsibility.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --------------------------------------------------------------
+           CORD PHYSICS
+           Physics-based cord drag. On sufficient pull ? toggleLight().
+           Cord is rendered as a cubic bezier from anchor to tassel tip.
+        -------------------------------------------------------------- */
+        const ROOT = document.documentElement;
+        const BODY = document.body;
+        const card = document.getElementById('js-card');
+        const cord = document.getElementById('js-cord');
+        const hit = document.getElementById('js-hit');
+        const lampEl = document.querySelector('.lamp');
+
+        // SVG anchor (top of cord) and tassel rest position
+        const AX = 124, AY = 190;
+        const REST_X = 124, REST_Y = 348;
+        const TRIGGER_DIST = 55;
+
+        let dragging = false;
+        let animating = false;
+        let lightOn = false;
+        let curX = REST_X, curY = REST_Y;
+
+        // Convert screen coords ? SVG coords
+        function toSVG(sx, sy) {
+            const pt = lampEl.createSVGPoint();
+            pt.x = sx; pt.y = sy;
+            return pt.matrixTransform(lampEl.getScreenCTM().inverse());
+        }
+
+        // Build a natural bezier path for the cord
+        function buildCord(tx, ty) {
+            const dx = tx - AX, dy = ty - AY;
+            const sag = Math.max(4, 30 - Math.hypot(dx, dy) * 0.06);
+            const c1x = AX + dx * 0.15 + sag, c1y = AY + dy * 0.30 + sag;
+            const c2x = AX + dx * 0.70 - sag * 0.3, c2y = AY + dy * 0.72 - sag * 0.2;
+            return `M${AX},${AY} C${c1x},${c1y} ${c2x},${c2y} ${tx},${ty}`;
+        }
+
+        function updateCord(tx, ty) {
+            curX = tx; curY = ty;
+            cord.setAttribute('d', buildCord(tx, ty));
+            const tension = Math.min(Math.hypot(tx - REST_X, ty - REST_Y) / 120, 1);
+            cord.style.stroke = `hsl(0, 0%, ${Math.round(38 + tension * 52)}%)`;
+        }
+
+        function springBack(fromX, fromY, triggered) {
+            if (animating) return;
+            animating = true;
+            const dur = triggered ? 380 : 500;
+            const t0 = performance.now();
+
+            function tick(now) {
+                const t = Math.min((now - t0) / dur, 1);
+                const fn = triggered ? easeElastic(t) : easeOutBounce(t);
+                updateCord(fromX + (REST_X - fromX) * fn, fromY + (REST_Y - fromY) * fn);
+                if (t < 1) { requestAnimationFrame(tick); return; }
+                updateCord(REST_X, REST_Y);
+                cord.style.stroke = '';
+                animating = false;
+            }
+            requestAnimationFrame(tick);
+        }
+
+        // Easing functions
+        function easeElastic(t) {
+            if (!t || t === 1) return t;
+            return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI / 3)) + 1;
+        }
+        function easeOutBounce(t) {
+            if (t < 1 / 2.75) return 7.5625 * t * t;
+            if (t < 2 / 2.75) { t -= 1.5 / 2.75; return 7.5625 * t * t + 0.750; }
+            if (t < 2.5 / 2.75) { t -= 2.25 / 2.75; return 7.5625 * t * t + 0.9375; }
+            t -= 2.625 / 2.75; return 7.5625 * t * t + 0.984375;
+        }
+
+        // Pointer helpers
+        function client(e) {
+            return e.touches
+                ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                : { x: e.clientX, y: e.clientY };
+        }
+
+        function onDown(e) {
+            if (animating) return;
+            e.preventDefault();
+            dragging = true;
+        }
+        function onMove(e) {
+            if (!dragging) return;
+            e.preventDefault();
+            const { x, y } = client(e);
+            const sv = toSVG(x, y);
+            updateCord(sv.x, Math.max(AY + 20, sv.y));
+        }
+        function onUp() {
+            if (!dragging) return;
+            dragging = false;
+            const dist = Math.hypot(curX - REST_X, curY - REST_Y);
+            if (dist > TRIGGER_DIST) toggleLight();
+            springBack(curX, curY, dist > TRIGGER_DIST);
+        }
+
+        // Attach events to both hit zone and cord line
+        [hit, cord].forEach(el => {
+            el.addEventListener('mousedown', onDown);
+            el.addEventListener('touchstart', onDown, { passive: false });
+        });
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', onUp);
+
+        /* --------------------------------------------------------------
+           LIGHT TOGGLE
+        -------------------------------------------------------------- */
+        const AUDIO = {
+            CLICK: new Audio("https://fezacademy.com/click-sound.mp3"),
+        };
+        function toggleLight() {
+            AUDIO.CLICK.play();
+            lightOn = !lightOn;
+            ROOT.style.setProperty('--on', lightOn ? '1' : '0');
+
+            const isLoggedIn = !!sessionStorage.getItem('discord_token');
+            if (isLoggedIn) {
+                // Show profile popup instead of login card
+                card.classList.remove('is-active');
+                const popup = document.getElementById('discord-profile-popup');
+                if (lightOn) {
+                    popup.classList.add('is-active');
+                } else {
+                    popup.classList.remove('is-active');
+                }
+            } else {
+                document.getElementById('discord-profile-popup').classList.remove('is-active');
+                card.classList.toggle('is-active', lightOn);
+            }
+        }
+
+    </script>
+
+    <!-- -- Dock Navbar -- -->
+    <nav class="nav-dock-container" id="main-nav">
+        <img src="images/fuse-logo.png" alt="Fuse.gg" style="width:36px; height:36px; object-fit:contain; margin-right:8px; flex-shrink:0; display:block;">
+
+        <a href="#" class="nav-item" data-page="home">
+            <i class="fa-solid fa-house-chimney"></i>
+            <span class="label">Home</span>
+        </a>
+
+        <a href="#" class="nav-item" data-page="store">
+            <i class="fa-solid fa-shopping-cart"></i>
+            <span class="label">Store</span>
+        </a>
+
+        <a href="https://discord.gg/fuse" target="_blank" class="nav-item">
+            <i class="fa-brands fa-discord"></i>
+            <span class="label">Discord</span>
+        </a>
+
+        <a href="#" class="nav-item" data-page="tos">
+            <i class="fa-solid fa-file-contract"></i>
+            <span class="label">Policy</span>
+        </a>
+
+        <div class="separator"></div>
+
+        <a href="#" class="nav-item active" data-page="sign-in">
+            <i class="fa-solid fa-user"></i>
+            <span class="label">Sign In</span>
+        </a>
+    </nav>
+    <script>
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.getAttribute('target') === '_blank') return;
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                const target = this.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                if (target) document.getElementById('page-' + target)?.classList.add('active');
+            });
+        });
+    </script>
+
+    <!-- -- Intro Typewriter Script -- -->
+    <script>
+        (function () {
+            const lines = [
+                { el: document.querySelector('#typed-line1 .typed'), text: 'Start Bypassing.' },
+                { el: document.querySelector('#typed-line2 .typed'), text: 'With Fuse.' },
+                { el: document.querySelector('#typed-line3 .typed'), text: 'Stay Undetected.' },
+            ];
+            const cursor = document.getElementById('typed-cursor');
+            const overlay = document.getElementById('intro-overlay');
+            const logo = document.getElementById('intro-logo');
+
+            const typeSpeed = 60;
+            const linePause = 320;
+
+            function typeLine(lineIndex, charIndex) {
+                const line = lines[lineIndex];
+                // fade in logo when line 3 starts
+                if (lineIndex === 2 && charIndex === 0) {
+                    logo.classList.add('visible');
+                }
+                if (charIndex < line.text.length) {
+                    line.el.textContent += line.text[charIndex];
+                    setTimeout(() => typeLine(lineIndex, charIndex + 1), typeSpeed);
+                } else if (lineIndex < lines.length - 1) {
+                    setTimeout(() => typeLine(lineIndex + 1, 0), linePause);
+                } else {
+                    // all done � hide cursor then fade out
+                    setTimeout(() => {
+                        cursor.style.animation = 'none';
+                        cursor.style.opacity = '0';
+                        setTimeout(() => {
+                            overlay.classList.add('fade-out');
+                            setTimeout(() => overlay.remove(), 850);
+                        }, 700);
+                    }, 900);
+                }
+            }
+
+            setTimeout(() => typeLine(0, 0), 400);
+        })();
+    </script>
+
+    <!-- -- Discord OAuth -- -->
+    <script>
+        /* --------------------------------------------------------------
+           DISCORD OAUTH2 � Implicit Grant (client-side only)
+           ? Replace DISCORD_CLIENT_ID with your actual Application ID
+             from https://discord.com/developers/applications
+           ? Add your site URL to the OAuth2 Redirect URIs in the portal
+        -------------------------------------------------------------- */
+        const DISCORD_CLIENT_ID = '1460340695578575041';
+        const DISCORD_REDIRECT   = window.location.href.split('?')[0].split('#')[0];
+        const DISCORD_SCOPE      = 'identify';
+
+        const widget   = document.getElementById('discord-user-widget');
+        const avatar   = document.getElementById('discord-avatar');
+        const username = document.getElementById('discord-username');
+        const tag      = document.getElementById('discord-tag');
+        const logoutBtn = document.getElementById('discord-logout');
+
+        function showUserWidget(user) {
+            const avatarUrl = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user.id) >> 22n) % 6n}.png`;
+            avatar.src   = avatarUrl;
+            username.textContent = user.global_name || user.username;
+            tag.textContent      = '@' + user.username;
+            widget.style.display = 'flex';
+
+            // Also populate the lamp popup
+            const popupAvatar = document.getElementById('popup-avatar');
+            const popupUsername = document.getElementById('popup-username');
+            const popupTag = document.getElementById('popup-tag');
+            if (popupAvatar) popupAvatar.src = avatarUrl;
+            if (popupUsername) popupUsername.textContent = user.global_name || user.username;
+            if (popupTag) popupTag.textContent = '@' + user.username;
+        }
+
+        function hideUserWidget() {
+            widget.style.display = 'none';
+        }
+
+        async function fetchDiscordUser(token) {
+            const res = await fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Failed to fetch user');
+            return res.json();
+        }
+
+        function saveSession(token, user) {
+            sessionStorage.setItem('discord_token', token);
+            sessionStorage.setItem('discord_user', JSON.stringify(user));
+        }
+
+        function clearSession() {
+            sessionStorage.removeItem('discord_token');
+            sessionStorage.removeItem('discord_user');
+        }
+
+        function loginWithDiscord() {
+            const params = new URLSearchParams({
+                client_id:     DISCORD_CLIENT_ID,
+                redirect_uri:  DISCORD_REDIRECT,
+                response_type: 'token',
+                scope:         DISCORD_SCOPE,
+            });
+            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+        }
+
+        // Handle OAuth callback � token arrives in URL hash
+        (async function handleCallback() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                const token  = params.get('access_token');
+                if (token) {
+                    // Clean the URL
+                    history.replaceState(null, '', window.location.pathname);
+                    try {
+                        const user = await fetchDiscordUser(token);
+                        saveSession(token, user);
+                        showUserWidget(user);
+                    } catch (e) {
+                        console.error('Discord login failed:', e);
+                    }
+                    return;
+                }
+            }
+
+            // Restore session from sessionStorage
+            const savedToken = sessionStorage.getItem('discord_token');
+            const savedUser  = sessionStorage.getItem('discord_user');
+            if (savedToken && savedUser) {
+                try {
+                    // Re-validate token is still good
+                    const user = await fetchDiscordUser(savedToken);
+                    saveSession(savedToken, user);
+                    showUserWidget(user);
+                } catch {
+                    clearSession();
+                }
+            }
+        })();
+
+        document.getElementById('js-discord-login').addEventListener('click', loginWithDiscord);
+
+        logoutBtn.addEventListener('click', () => {
+            clearSession();
+            hideUserWidget();
+        });
+
+        document.getElementById('popup-logout-btn').addEventListener('click', () => {
+            clearSession();
+            hideUserWidget();
+            // Turn lamp off and hide popup, show login card next time
+            lightOn = false;
+            ROOT.style.setProperty('--on', '0');
+            document.getElementById('discord-profile-popup').classList.remove('is-active');
+        });
+    </script>
+
+</body>
+
+</html>
