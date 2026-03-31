@@ -1510,7 +1510,7 @@
            ? Add your site URL to the OAuth2 Redirect URIs in the portal
         -------------------------------------------------------------- */
         const DISCORD_CLIENT_ID = '1460340695578575041';
-        const DISCORD_REDIRECT   = window.location.href.split('?')[0].split('#')[0];
+        const DISCORD_REDIRECT   = 'https://fusebypass.fun';
         const DISCORD_SCOPE      = 'identify';
 
         const widget   = document.getElementById('discord-user-widget');
@@ -1566,7 +1566,10 @@
                 response_type: 'token',
                 scope:         DISCORD_SCOPE,
             });
-            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+            const url = 'https://discord.com/oauth2/authorize?' + params.toString();
+            console.log('Discord OAuth URL:', url);
+            console.log('Redirect URI being sent:', DISCORD_REDIRECT);
+            window.location.href = url;
         }
 
         // Handle OAuth callback � token arrives in URL hash
