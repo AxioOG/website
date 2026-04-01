@@ -1537,6 +1537,18 @@
 
     <!-- -- Discord OAuth -- -->
     <script>
+        // !! FIRST THING: grab token from hash before anything wipes it
+        (function() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const p = new URLSearchParams(hash);
+                const token = p.get('access_token');
+                if (token) {
+                    localStorage.setItem('discord_pending_token', token);
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }
+        })();
         /* --------------------------------------------------------------
            DISCORD OAUTH2 � Implicit Grant (client-side only)
            ? Replace DISCORD_CLIENT_ID with your actual Application ID
@@ -1606,30 +1618,24 @@
             window.location.href = url;
         }
 
-        // Handle OAuth callback � token arrives in URL hash
+                // Handle OAuth callback - token saved early before any script wipes the hash
         (async function handleCallback() {
-            const hash = window.location.hash.substring(1);
-            if (hash) {
-                const params = new URLSearchParams(hash);
-                const token  = params.get('access_token');
-                if (token) {
-                    // Clean the URL
-                    history.replaceState(null, '', window.location.pathname);
-                    try {
-                        const user = await fetchDiscordUser(token);
-                        saveSession(token, user);
-                        showUserWidget(user);
-                    } catch (e) {
-                        console.error('Discord login failed:', e);
-                    }
-                    return;
+            const pendingToken = localStorage.getItem('discord_pending_token');
+            if (pendingToken) {
+                localStorage.removeItem('discord_pending_token');
+                try {
+                    const user = await fetchDiscordUser(pendingToken);
+                    saveSession(pendingToken, user);
+                    showUserWidget(user);
+                } catch (e) {
+                    console.error('Discord login failed:', e);
                 }
+                return;
             }
 
-            // Restore session from localStorage
+            // Restore existing session
             const savedToken = localStorage.getItem('discord_token');
-            const savedUser  = localStorage.getItem('discord_user');
-            if (savedToken && savedUser) {
+            if (savedToken) {
                 try {
                     const user = await fetchDiscordUser(savedToken);
                     saveSession(savedToken, user);
