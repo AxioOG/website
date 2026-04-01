@@ -1478,13 +1478,15 @@
 
         // On load, read the URL and activate the right page
         (function () {
-            // Check for redirect from 404.html
+            // Check for redirect from 404.html — restore path and hash
             const params = new URLSearchParams(window.location.search);
-            const redirected = params.get('p');
-            if (redirected) {
-                history.replaceState(null, '', redirected);
+            const redirectedPath = params.get('p');
+            const redirectedHash = params.get('h');
+            if (redirectedPath || redirectedHash) {
+                const cleanUrl = (redirectedPath || '/') + (redirectedHash ? decodeURIComponent(redirectedHash) : '');
+                history.replaceState(null, '', cleanUrl);
             }
-            const slug = redirected || window.location.pathname;
+            const slug = redirectedPath || window.location.pathname;
             const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
             if (match) navigateTo(match[0]);
         })();
