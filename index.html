@@ -1478,7 +1478,13 @@
 
         // On load, read the URL and activate the right page
         (function () {
-            const slug = window.location.pathname;
+            // Check for redirect from 404.html
+            const params = new URLSearchParams(window.location.search);
+            const redirected = params.get('p');
+            if (redirected) {
+                history.replaceState(null, '', redirected);
+            }
+            const slug = redirected || window.location.pathname;
             const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
             if (match) navigateTo(match[0]);
         })();
