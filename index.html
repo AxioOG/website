@@ -1445,17 +1445,43 @@
         </a>
     </nav>
     <script>
+        // Page name → URL slug mapping
+        const PAGE_SLUGS = {
+            account: '/',
+            home:    '/home',
+            store:   '/store',
+            tos:     '/policy',
+        };
+
+        function navigateTo(target) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector(`.nav-item[data-page="${target}"]`)?.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + target)?.classList.add('active');
+            const slug = PAGE_SLUGS[target] || '/';
+            history.pushState({ page: target }, '', slug);
+        }
+
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function(e) {
                 if (this.getAttribute('target') === '_blank') return;
                 e.preventDefault();
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
                 const target = this.dataset.page;
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                if (target) document.getElementById('page-' + target)?.classList.add('active');
+                if (target) navigateTo(target);
             });
         });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', (e) => {
+            if (e.state?.page) navigateTo(e.state.page);
+        });
+
+        // On load, read the URL and activate the right page
+        (function () {
+            const slug = window.location.pathname;
+            const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
+            if (match) navigateTo(match[0]);
+        })();
     </script>
 
     <!-- -- Intro Typewriter Script -- -->
