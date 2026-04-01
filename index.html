@@ -1395,7 +1395,7 @@
             lightOn = !lightOn;
             ROOT.style.setProperty('--on', lightOn ? '1' : '0');
 
-            const isLoggedIn = !!sessionStorage.getItem('discord_token');
+            const isLoggedIn = !!localStorage.getItem('discord_token');
             if (isLoggedIn) {
                 // Show profile popup instead of login card
                 card.classList.remove('is-active');
@@ -1584,13 +1584,13 @@
         }
 
         function saveSession(token, user) {
-            sessionStorage.setItem('discord_token', token);
-            sessionStorage.setItem('discord_user', JSON.stringify(user));
+            localStorage.setItem('discord_token', token);
+            localStorage.setItem('discord_user', JSON.stringify(user));
         }
 
         function clearSession() {
-            sessionStorage.removeItem('discord_token');
-            sessionStorage.removeItem('discord_user');
+            localStorage.removeItem('discord_token');
+            localStorage.removeItem('discord_user');
         }
 
         function loginWithDiscord() {
@@ -1626,12 +1626,11 @@
                 }
             }
 
-            // Restore session from sessionStorage
-            const savedToken = sessionStorage.getItem('discord_token');
-            const savedUser  = sessionStorage.getItem('discord_user');
+            // Restore session from localStorage
+            const savedToken = localStorage.getItem('discord_token');
+            const savedUser  = localStorage.getItem('discord_user');
             if (savedToken && savedUser) {
                 try {
-                    // Re-validate token is still good
                     const user = await fetchDiscordUser(savedToken);
                     saveSession(savedToken, user);
                     showUserWidget(user);
