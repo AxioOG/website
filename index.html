@@ -87,7 +87,8 @@
 
         #page-home.active,
         #page-tos.active,
-        #page-store.active {
+        #page-store.active,
+        #page-panel.active {
             align-items: flex-start;
             overflow-y: auto;
         }
@@ -1271,6 +1272,65 @@
         </div>
     </div>
 
+    <!-- ══ PAGE: Customer Panel ══ -->
+    <div class="page" id="page-panel">
+        <div style="width:100%;max-width:800px;padding:6rem 2rem 4rem;margin:0 auto;color:#fff;font-family:'DM Sans',sans-serif;">
+            <div id="panel-locked" style="text-align:center;padding:4rem 2rem;">
+                <i class="fa-solid fa-lock" style="font-size:3rem;color:rgba(255,255,255,0.2);margin-bottom:1rem;display:block;"></i>
+                <p style="color:rgba(255,255,255,0.4);font-size:0.95rem;">Sign in with Discord to access the panel.</p>
+            </div>
+            <div id="panel-content" style="display:none;">
+                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
+                    <img id="panel-avatar" src="" style="width:56px;height:56px;border-radius:50%;border:2px solid #5865F2;">
+                    <div>
+                        <div id="panel-name" style="font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:700;"></div>
+                        <div id="panel-role-badge" style="display:inline-block;margin-top:4px;padding:3px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;"></div>
+                    </div>
+                </div>
+                <div id="panel-admin-section" style="display:none;">
+                    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.1rem;margin-bottom:1rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;">Admin Controls</h2>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;">
+                        <div style="background:rgba(255,0,0,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:12px;padding:1.2rem;">
+                            <i class="fa-solid fa-users" style="color:#ff4444;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
+                            <div style="font-weight:600;font-size:0.9rem;">Manage Members</div>
+                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">View & manage customers</div>
+                        </div>
+                        <div style="background:rgba(255,0,0,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:12px;padding:1.2rem;">
+                            <i class="fa-solid fa-ticket" style="color:#ff4444;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
+                            <div style="font-weight:600;font-size:0.9rem;">Support Tickets</div>
+                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Handle open tickets</div>
+                        </div>
+                        <div style="background:rgba(255,0,0,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:12px;padding:1.2rem;">
+                            <i class="fa-solid fa-gear" style="color:#ff4444;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
+                            <div style="font-weight:600;font-size:0.9rem;">Settings</div>
+                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Configure the panel</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="panel-customer-section" style="display:none;">
+                    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.1rem;margin-bottom:1rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;">My Access</h2>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
+                        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:1.2rem;">
+                            <i class="fa-solid fa-crown" style="color:#f0a500;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
+                            <div style="font-weight:600;font-size:0.9rem;">Premium Access</div>
+                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Your license is active</div>
+                        </div>
+                        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:1.2rem;">
+                            <i class="fa-solid fa-download" style="color:#f0a500;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
+                            <div style="font-weight:600;font-size:0.9rem;">Downloads</div>
+                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Access your files</div>
+                        </div>
+                        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:1.2rem;">
+                            <i class="fa-solid fa-headset" style="color:#f0a500;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
+                            <div style="font-weight:600;font-size:0.9rem;">Support</div>
+                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Priority support access</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         /* --------------------------------------------------------------
            CORD PHYSICS
@@ -1443,14 +1503,20 @@
             <i class="fa-solid fa-user"></i>
             <span class="label">Sign In</span>
         </a>
+
+        <a href="#" class="nav-item" data-page="panel" id="nav-customer-panel" style="display:none;">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span class="label">Panel</span>
+        </a>
     </nav>
     <script>
         // Page name → URL slug mapping
         const PAGE_SLUGS = {
-            account: '/',
+            'sign-in': '/',
             home:    '/home',
             store:   '/store',
             tos:     '/policy',
+            panel:   '/panel',
         };
 
         function navigateTo(target) {
@@ -1525,7 +1591,7 @@
                         cursor.style.opacity = '0';
                         setTimeout(() => {
                             overlay.classList.add('fade-out');
-                            setTimeout(() => overlay.remove(), 850);
+                            setTimeout(() => { overlay.remove(); if(typeof navigateTo === 'function') navigateTo('home'); }, 850);
                         }, 700);
                     }, 900);
                 }
@@ -1535,9 +1601,9 @@
         })();
     </script>
 
-    <!-- -- Discord OAuth -- -->
+        <!-- -- Discord OAuth -- -->
     <script>
-        // !! FIRST THING: grab token from hash before anything wipes it
+        // STEP 1: Grab token from hash IMMEDIATELY before anything else runs
         (function() {
             const hash = window.location.hash.substring(1);
             if (hash) {
@@ -1545,46 +1611,120 @@
                 const token = p.get('access_token');
                 if (token) {
                     localStorage.setItem('discord_pending_token', token);
-                    history.replaceState(null, '', window.location.pathname);
+                    history.replaceState(null, '', '/');
                 }
             }
         })();
-        /* --------------------------------------------------------------
-           DISCORD OAUTH2 � Implicit Grant (client-side only)
-           ? Replace DISCORD_CLIENT_ID with your actual Application ID
-             from https://discord.com/developers/applications
-           ? Add your site URL to the OAuth2 Redirect URIs in the portal
-        -------------------------------------------------------------- */
-        const DISCORD_CLIENT_ID = '1460340695578575041';
-        const DISCORD_REDIRECT   = 'https://fusebypass.fun';
-        const DISCORD_SCOPE      = 'identify';
 
-        const widget   = document.getElementById('discord-user-widget');
-        const avatar   = document.getElementById('discord-avatar');
-        const username = document.getElementById('discord-username');
-        const tag      = document.getElementById('discord-tag');
+        const DISCORD_CLIENT_ID = '1460340695578575041';
+        const DISCORD_REDIRECT  = 'https://fusebypass.fun';
+        const DISCORD_GUILD_ID  = '1471974431579574538'.slice(0,18); // set your server ID below
+        // !! SET YOUR DISCORD SERVER ID HERE:
+        const GUILD_ID = 'YOUR_SERVER_ID';
+
+        // Role IDs
+        const ROLE_ADMIN1    = '1471974431579574538';
+        const ROLE_ADMIN2    = '1482165881315524688';
+        const ROLE_CUSTOMER  = '1489330191498084413';
+
+        const widget    = document.getElementById('discord-user-widget');
+        const avatar    = document.getElementById('discord-avatar');
+        const usernameEl = document.getElementById('discord-username');
+        const tagEl     = document.getElementById('discord-tag');
         const logoutBtn = document.getElementById('discord-logout');
 
-        function showUserWidget(user) {
+        function getRoleBadge(roles) {
+            if (!roles) return null;
+            if (roles.includes(ROLE_ADMIN1) || roles.includes(ROLE_ADMIN2)) return 'admin';
+            if (roles.includes(ROLE_CUSTOMER)) return 'customer';
+            return null;
+        }
+
+        function showUserWidget(user, roles) {
             const avatarUrl = user.avatar
                 ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user.id) >> 22n) % 6n}.png`;
-            avatar.src   = avatarUrl;
-            username.textContent = user.global_name || user.username;
-            tag.textContent      = '@' + user.username;
+                : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id) % 6n)}.png`;
+
+            avatar.src = avatarUrl;
+            usernameEl.textContent = user.global_name || user.username;
+
+            const role = getRoleBadge(roles);
+            if (role === 'admin') {
+                tagEl.textContent = '⚡ Admin';
+                tagEl.style.color = '#ff4444';
+            } else if (role === 'customer') {
+                tagEl.textContent = '👑 Customer';
+                tagEl.style.color = '#f0a500';
+            } else {
+                tagEl.textContent = '@' + user.username;
+                tagEl.style.color = '#5865F2';
+            }
             widget.style.display = 'flex';
 
-            // Also populate the lamp popup
-            const popupAvatar = document.getElementById('popup-avatar');
+            // Populate lamp popup
+            const popupAvatar   = document.getElementById('popup-avatar');
             const popupUsername = document.getElementById('popup-username');
-            const popupTag = document.getElementById('popup-tag');
-            if (popupAvatar) popupAvatar.src = avatarUrl;
+            const popupTag      = document.getElementById('popup-tag');
+            if (popupAvatar)   popupAvatar.src = avatarUrl;
             if (popupUsername) popupUsername.textContent = user.global_name || user.username;
-            if (popupTag) popupTag.textContent = '@' + user.username;
+            if (popupTag) {
+                if (role === 'admin')    { popupTag.textContent = '⚡ Admin';    popupTag.style.color = '#ff4444'; }
+                else if (role === 'customer') { popupTag.textContent = '👑 Customer'; popupTag.style.color = '#f0a500'; }
+                else                    { popupTag.textContent = '@' + user.username; popupTag.style.color = '#5865F2'; }
+            }
+
+
+        function updatePanel(user, roles) {
+            const role = getRoleBadge(roles);
+            const avatarUrl = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+                : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id) % 6n)}.png`;
+
+            const panelLocked  = document.getElementById('panel-locked');
+            const panelContent = document.getElementById('panel-content');
+            const panelAvatar  = document.getElementById('panel-avatar');
+            const panelName    = document.getElementById('panel-name');
+            const panelBadge   = document.getElementById('panel-role-badge');
+            const adminSection = document.getElementById('panel-admin-section');
+            const custSection  = document.getElementById('panel-customer-section');
+
+            if (!panelContent) return;
+
+            if (role === 'admin' || role === 'customer') {
+                if (panelLocked)  panelLocked.style.display  = 'none';
+                panelContent.style.display = 'block';
+                if (panelAvatar) panelAvatar.src = avatarUrl;
+                if (panelName)   panelName.textContent = user.global_name || user.username;
+                if (panelBadge) {
+                    if (role === 'admin') {
+                        panelBadge.textContent = '⚡ Admin';
+                        panelBadge.style.background = 'rgba(255,68,68,0.15)';
+                        panelBadge.style.color = '#ff4444';
+                        panelBadge.style.border = '1px solid rgba(255,68,68,0.3)';
+                    } else {
+                        panelBadge.textContent = '👑 Customer';
+                        panelBadge.style.background = 'rgba(240,165,0,0.15)';
+                        panelBadge.style.color = '#f0a500';
+                        panelBadge.style.border = '1px solid rgba(240,165,0,0.3)';
+                    }
+                }
+                if (adminSection) adminSection.style.display = role === 'admin' ? 'block' : 'none';
+                if (custSection)  custSection.style.display  = role === 'customer' ? 'block' : 'none';
+            } else {
+                if (panelLocked)  panelLocked.style.display  = 'block';
+                panelContent.style.display = 'none';
+            }
+        }
+            // Show/hide customer panel nav item
+            const cpNav = document.getElementById('nav-customer-panel');
+            if (cpNav) cpNav.style.display = (role === 'admin' || role === 'customer') ? 'flex' : 'none';
+            updatePanel(user, roles);
         }
 
         function hideUserWidget() {
             widget.style.display = 'none';
+            const cpNav = document.getElementById('nav-customer-panel');
+            if (cpNav) cpNav.style.display = 'none';
         }
 
         async function fetchDiscordUser(token) {
@@ -1595,14 +1735,28 @@
             return res.json();
         }
 
-        function saveSession(token, user) {
+        async function fetchGuildRoles(token) {
+            try {
+                const res = await fetch(`https://discord.com/api/users/@me/guilds/${GUILD_ID}/member`, {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (!res.ok) return [];
+                const data = await res.json();
+                return data.roles || [];
+            } catch { return []; }
+        }
+
+        function saveSession(token, user, roles) {
             localStorage.setItem('discord_token', token);
             localStorage.setItem('discord_user', JSON.stringify(user));
+            localStorage.setItem('discord_roles', JSON.stringify(roles || []));
         }
 
         function clearSession() {
             localStorage.removeItem('discord_token');
             localStorage.removeItem('discord_user');
+            localStorage.removeItem('discord_roles');
+            localStorage.removeItem('discord_pending_token');
         }
 
         function loginWithDiscord() {
@@ -1610,23 +1764,21 @@
                 client_id:     DISCORD_CLIENT_ID,
                 redirect_uri:  DISCORD_REDIRECT,
                 response_type: 'token',
-                scope:         DISCORD_SCOPE,
+                scope:         'identify guilds.members.read',
             });
-            const url = 'https://discord.com/oauth2/authorize?' + params.toString();
-            console.log('Discord OAuth URL:', url);
-            console.log('Redirect URI being sent:', DISCORD_REDIRECT);
-            window.location.href = url;
+            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
         }
 
-                // Handle OAuth callback - token saved early before any script wipes the hash
+        // STEP 2: Process pending token or restore session
         (async function handleCallback() {
             const pendingToken = localStorage.getItem('discord_pending_token');
             if (pendingToken) {
                 localStorage.removeItem('discord_pending_token');
                 try {
-                    const user = await fetchDiscordUser(pendingToken);
-                    saveSession(pendingToken, user);
-                    showUserWidget(user);
+                    const user  = await fetchDiscordUser(pendingToken);
+                    const roles = await fetchGuildRoles(pendingToken);
+                    saveSession(pendingToken, user, roles);
+                    showUserWidget(user, roles);
                 } catch (e) {
                     console.error('Discord login failed:', e);
                 }
@@ -1635,14 +1787,21 @@
 
             // Restore existing session
             const savedToken = localStorage.getItem('discord_token');
-            if (savedToken) {
+            const savedUser  = localStorage.getItem('discord_user');
+            const savedRoles = localStorage.getItem('discord_roles');
+            if (savedToken && savedUser) {
                 try {
-                    const user = await fetchDiscordUser(savedToken);
-                    saveSession(savedToken, user);
-                    showUserWidget(user);
-                } catch {
-                    clearSession();
-                }
+                    const user  = JSON.parse(savedUser);
+                    const roles = savedRoles ? JSON.parse(savedRoles) : [];
+                    showUserWidget(user, roles);
+                    // Re-validate in background
+                    fetchDiscordUser(savedToken).then(freshUser => {
+                        fetchGuildRoles(savedToken).then(freshRoles => {
+                            saveSession(savedToken, freshUser, freshRoles);
+                            showUserWidget(freshUser, freshRoles);
+                        });
+                    }).catch(() => clearSession());
+                } catch { clearSession(); }
             }
         })();
 
@@ -1656,7 +1815,6 @@
         document.getElementById('popup-logout-btn').addEventListener('click', () => {
             clearSession();
             hideUserWidget();
-            // Turn lamp off and hide popup, show login card next time
             lightOn = false;
             ROOT.style.setProperty('--on', '0');
             document.getElementById('discord-profile-popup').classList.remove('is-active');
