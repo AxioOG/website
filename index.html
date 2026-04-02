@@ -1601,9 +1601,9 @@
         })();
     </script>
 
-        <!-- -- Discord OAuth -- -->
+            <!-- -- Discord OAuth -- -->
     <script>
-        // STEP 1: Grab token from hash IMMEDIATELY before anything else runs
+        // Grab token from hash IMMEDIATELY before anything else can wipe it
         (function() {
             const hash = window.location.hash.substring(1);
             if (hash) {
@@ -1611,151 +1611,58 @@
                 const token = p.get('access_token');
                 if (token) {
                     localStorage.setItem('discord_pending_token', token);
-                    history.replaceState(null, '', '/');
+                    history.replaceState(null, '', window.location.pathname);
                 }
             }
         })();
 
         const DISCORD_CLIENT_ID = '1460340695578575041';
         const DISCORD_REDIRECT  = 'https://fusebypass.fun';
-        const DISCORD_GUILD_ID  = '1471974431579574538'.slice(0,18); // set your server ID below
-        // !! SET YOUR DISCORD SERVER ID HERE:
-        const GUILD_ID = 'YOUR_SERVER_ID';
 
-        // Role IDs
-        const ROLE_ADMIN1    = '1471974431579574538';
-        const ROLE_ADMIN2    = '1482165881315524688';
-        const ROLE_CUSTOMER  = '1489330191498084413';
-
-        const widget    = document.getElementById('discord-user-widget');
-        const avatar    = document.getElementById('discord-avatar');
+        const widget     = document.getElementById('discord-user-widget');
+        const avatarEl   = document.getElementById('discord-avatar');
         const usernameEl = document.getElementById('discord-username');
-        const tagEl     = document.getElementById('discord-tag');
-        const logoutBtn = document.getElementById('discord-logout');
+        const tagEl      = document.getElementById('discord-tag');
+        const logoutBtn  = document.getElementById('discord-logout');
 
-        function getRoleBadge(roles) {
-            if (!roles) return null;
-            if (roles.includes(ROLE_ADMIN1) || roles.includes(ROLE_ADMIN2)) return 'admin';
-            if (roles.includes(ROLE_CUSTOMER)) return 'customer';
-            return null;
-        }
-
-        function showUserWidget(user, roles) {
+        function showUserWidget(user) {
             const avatarUrl = user.avatar
                 ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-                : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id) % 6n)}.png`;
-
-            avatar.src = avatarUrl;
+                : `https://cdn.discordapp.com/embed/avatars/0.png`;
+            avatarEl.src = avatarUrl;
             usernameEl.textContent = user.global_name || user.username;
-
-            const role = getRoleBadge(roles);
-            if (role === 'admin') {
-                tagEl.textContent = '⚡ Admin';
-                tagEl.style.color = '#ff4444';
-            } else if (role === 'customer') {
-                tagEl.textContent = '👑 Customer';
-                tagEl.style.color = '#f0a500';
-            } else {
-                tagEl.textContent = '@' + user.username;
-                tagEl.style.color = '#5865F2';
-            }
+            tagEl.textContent = '@' + user.username;
             widget.style.display = 'flex';
 
             // Populate lamp popup
-            const popupAvatar   = document.getElementById('popup-avatar');
-            const popupUsername = document.getElementById('popup-username');
-            const popupTag      = document.getElementById('popup-tag');
-            if (popupAvatar)   popupAvatar.src = avatarUrl;
-            if (popupUsername) popupUsername.textContent = user.global_name || user.username;
-            if (popupTag) {
-                if (role === 'admin')    { popupTag.textContent = '⚡ Admin';    popupTag.style.color = '#ff4444'; }
-                else if (role === 'customer') { popupTag.textContent = '👑 Customer'; popupTag.style.color = '#f0a500'; }
-                else                    { popupTag.textContent = '@' + user.username; popupTag.style.color = '#5865F2'; }
-            }
-
-
-        function updatePanel(user, roles) {
-            const role = getRoleBadge(roles);
-            const avatarUrl = user.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
-                : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(user.id) % 6n)}.png`;
-
-            const panelLocked  = document.getElementById('panel-locked');
-            const panelContent = document.getElementById('panel-content');
-            const panelAvatar  = document.getElementById('panel-avatar');
-            const panelName    = document.getElementById('panel-name');
-            const panelBadge   = document.getElementById('panel-role-badge');
-            const adminSection = document.getElementById('panel-admin-section');
-            const custSection  = document.getElementById('panel-customer-section');
-
-            if (!panelContent) return;
-
-            if (role === 'admin' || role === 'customer') {
-                if (panelLocked)  panelLocked.style.display  = 'none';
-                panelContent.style.display = 'block';
-                if (panelAvatar) panelAvatar.src = avatarUrl;
-                if (panelName)   panelName.textContent = user.global_name || user.username;
-                if (panelBadge) {
-                    if (role === 'admin') {
-                        panelBadge.textContent = '⚡ Admin';
-                        panelBadge.style.background = 'rgba(255,68,68,0.15)';
-                        panelBadge.style.color = '#ff4444';
-                        panelBadge.style.border = '1px solid rgba(255,68,68,0.3)';
-                    } else {
-                        panelBadge.textContent = '👑 Customer';
-                        panelBadge.style.background = 'rgba(240,165,0,0.15)';
-                        panelBadge.style.color = '#f0a500';
-                        panelBadge.style.border = '1px solid rgba(240,165,0,0.3)';
-                    }
-                }
-                if (adminSection) adminSection.style.display = role === 'admin' ? 'block' : 'none';
-                if (custSection)  custSection.style.display  = role === 'customer' ? 'block' : 'none';
-            } else {
-                if (panelLocked)  panelLocked.style.display  = 'block';
-                panelContent.style.display = 'none';
-            }
-        }
-            // Show/hide customer panel nav item
-            const cpNav = document.getElementById('nav-customer-panel');
-            if (cpNav) cpNav.style.display = (role === 'admin' || role === 'customer') ? 'flex' : 'none';
-            updatePanel(user, roles);
+            const pa = document.getElementById('popup-avatar');
+            const pu = document.getElementById('popup-username');
+            const pt = document.getElementById('popup-tag');
+            if (pa) pa.src = avatarUrl;
+            if (pu) pu.textContent = user.global_name || user.username;
+            if (pt) pt.textContent = '@' + user.username;
         }
 
         function hideUserWidget() {
             widget.style.display = 'none';
-            const cpNav = document.getElementById('nav-customer-panel');
-            if (cpNav) cpNav.style.display = 'none';
         }
 
         async function fetchDiscordUser(token) {
             const res = await fetch('https://discord.com/api/users/@me', {
                 headers: { Authorization: 'Bearer ' + token }
             });
-            if (!res.ok) throw new Error('Failed to fetch user');
+            if (!res.ok) throw new Error('bad token');
             return res.json();
         }
 
-        async function fetchGuildRoles(token) {
-            try {
-                const res = await fetch(`https://discord.com/api/users/@me/guilds/${GUILD_ID}/member`, {
-                    headers: { Authorization: 'Bearer ' + token }
-                });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return data.roles || [];
-            } catch { return []; }
-        }
-
-        function saveSession(token, user, roles) {
+        function saveSession(token, user) {
             localStorage.setItem('discord_token', token);
             localStorage.setItem('discord_user', JSON.stringify(user));
-            localStorage.setItem('discord_roles', JSON.stringify(roles || []));
         }
 
         function clearSession() {
             localStorage.removeItem('discord_token');
             localStorage.removeItem('discord_user');
-            localStorage.removeItem('discord_roles');
             localStorage.removeItem('discord_pending_token');
         }
 
@@ -1764,43 +1671,30 @@
                 client_id:     DISCORD_CLIENT_ID,
                 redirect_uri:  DISCORD_REDIRECT,
                 response_type: 'token',
-                scope:         'identify guilds.members.read',
+                scope:         'identify',
             });
             window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
         }
 
-        // STEP 2: Process pending token or restore session
-        (async function handleCallback() {
-            const pendingToken = localStorage.getItem('discord_pending_token');
-            if (pendingToken) {
+        (async function init() {
+            // Check for fresh token from OAuth redirect
+            const pending = localStorage.getItem('discord_pending_token');
+            if (pending) {
                 localStorage.removeItem('discord_pending_token');
                 try {
-                    const user  = await fetchDiscordUser(pendingToken);
-                    const roles = await fetchGuildRoles(pendingToken);
-                    saveSession(pendingToken, user, roles);
-                    showUserWidget(user, roles);
-                } catch (e) {
-                    console.error('Discord login failed:', e);
-                }
+                    const user = await fetchDiscordUser(pending);
+                    saveSession(pending, user);
+                    showUserWidget(user);
+                } catch(e) { console.error(e); }
                 return;
             }
 
-            // Restore existing session
+            // Restore saved session instantly (no network call needed)
             const savedToken = localStorage.getItem('discord_token');
             const savedUser  = localStorage.getItem('discord_user');
-            const savedRoles = localStorage.getItem('discord_roles');
             if (savedToken && savedUser) {
                 try {
-                    const user  = JSON.parse(savedUser);
-                    const roles = savedRoles ? JSON.parse(savedRoles) : [];
-                    showUserWidget(user, roles);
-                    // Re-validate in background
-                    fetchDiscordUser(savedToken).then(freshUser => {
-                        fetchGuildRoles(savedToken).then(freshRoles => {
-                            saveSession(savedToken, freshUser, freshRoles);
-                            showUserWidget(freshUser, freshRoles);
-                        });
-                    }).catch(() => clearSession());
+                    showUserWidget(JSON.parse(savedUser));
                 } catch { clearSession(); }
             }
         })();
