@@ -1510,69 +1510,43 @@
         </a>
     </nav>
     <script>
-        // Page name → URL slug mapping
-        const PAGE_SLUGS = {
-            'sign-in': '/',
-            home:    '/home',
-            store:   '/store',
-            tos:     '/policy',
-            panel:   '/panel',
-        };
-
         function navigateTo(target) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector(`.nav-item[data-page="${target}"]`)?.classList.add('active');
+            var navItem = document.querySelector('.nav-item[data-page="' + target + '"]');
+            if (navItem) navItem.classList.add('active');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + target)?.classList.add('active');
-            const slug = PAGE_SLUGS[target] || '/';
+            var page = document.getElementById('page-' + target);
+            if (page) page.classList.add('active');
+            // Update URL without triggering a page reload
+            var slugs = {'sign-in':'/', 'home':'/home', 'store':'/store', 'tos':'/policy', 'panel':'/panel'};
+            var slug = slugs[target] || '/';
             history.pushState({ page: target }, '', slug);
         }
 
-        document.querySelectorAll('.nav-item').forEach(item => {
+        document.querySelectorAll('.nav-item').forEach(function(item) {
             item.addEventListener('click', function(e) {
                 if (this.getAttribute('target') === '_blank') return;
                 e.preventDefault();
-                const target = this.dataset.page;
+                var target = this.dataset.page;
                 if (target) navigateTo(target);
             });
         });
 
         // Handle browser back/forward
-        window.addEventListener('popstate', (e) => {
-            if (e.state?.page) navigateTo(e.state.page);
+        window.addEventListener('popstate', function(e) {
+            if (e.state && e.state.page) navigateTo(e.state.page);
         });
 
-        // On load, read the URL and activate the right page
-        (function () {
-            // FIRST: check for discord token in hash before anything wipes it
-            const rawHash = window.location.hash.substring(1);
-            if (rawHash) {
-                const hp = new URLSearchParams(rawHash);
-                const ht = hp.get('access_token');
-                if (ht) {
-                    localStorage.setItem('_dpt', ht);
-                    history.replaceState(null, '', window.location.pathname);
-                }
+        // Restore page from 404.html redirect (?p=/store etc)
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var redirectedPath = params.get('p');
+            if (redirectedPath) {
+                history.replaceState(null, '', redirectedPath);
+                var slugs = {'/':'sign-in', '/home':'home', '/store':'store', '/policy':'tos', '/panel':'panel'};
+                var target = slugs[redirectedPath];
+                if (target) navigateTo(target);
             }
-
-            // Check for redirect from 404.html — restore path and hash
-            const params = new URLSearchParams(window.location.search);
-            const redirectedPath = params.get('p');
-            const redirectedHash = params.get('h');
-            if (redirectedPath || redirectedHash) {
-                const decodedHash = redirectedHash ? decodeURIComponent(redirectedHash) : '';
-                // Check for token in redirected hash
-                if (decodedHash) {
-                    const hp2 = new URLSearchParams(decodedHash.substring(1));
-                    const ht2 = hp2.get('access_token');
-                    if (ht2) localStorage.setItem('_dpt', ht2);
-                }
-                const cleanUrl = (redirectedPath || '/');
-                history.replaceState(null, '', cleanUrl);
-            }
-            const slug = redirectedPath || window.location.pathname;
-            const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
-            if (match) navigateTo(match[0]);
         })();
     </script>
 
@@ -1627,7 +1601,7 @@
         const ROLE_ADMIN1       = '1471974431579574538';
         const ROLE_ADMIN2       = '1482165881315524688';
         const ROLE_CUSTOMER     = '1489330191498084413';
-        const PROXY             = 'https://corsproxy.io/?url=';
+        const PROXY = 'https://corsproxy.io/?';
 
         function getAvatarUrl(user) {
             return user.avatar
@@ -1703,36 +1677,41 @@
             }
         })();
 
-        // Handle OAuth token from URL hash
+        // Handle OAuth token from URL hash or from 404.html redirect
         (function handleToken() {
+            // Check localStorage first (set by 404.html if hash was lost)
+            var pendingToken = localStorage.getItem('fuse_pending_token');
+            if (pendingToken) {
+                localStorage.removeItem('fuse_pending_token');
+                processToken(pendingToken);
+                return;
+            }
+            // Check URL hash directly
             var hash = window.location.hash.substring(1);
             if (!hash) return;
             var params = new URLSearchParams(hash);
             var token = params.get('access_token');
             if (!token) return;
-
-            // Clean URL immediately
             history.replaceState(null, '', window.location.pathname);
-            localStorage.setItem('fuse_token', token);
+            processToken(token);
+        })();
 
-            // Fetch user info
-            fetch(PROXY + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
-                headers: { 'Authorization': 'Bearer ' + token }
+        function processToken(token) {
+            localStorage.setItem('fuse_token', token);
+            fetch(PROXY + 'https://discord.com/api/v10/users/@me', {
+                headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
             })
             .then(function(r) { return r.json(); })
             .then(function(user) {
-                // Try to get guild roles
-                return fetch(PROXY + encodeURIComponent('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member'), {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                return fetch(PROXY + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                    headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
                 })
                 .then(function(r) { return r.ok ? r.json() : {}; })
-                .then(function(member) {
-                    applyUI(user, member.roles || []);
-                })
+                .then(function(member) { applyUI(user, member.roles || []); })
                 .catch(function() { applyUI(user, []); });
             })
             .catch(function(e) { console.error('Discord login error:', e); });
-        })();
+        }
 
         function loginWithDiscord() {
             var params = new URLSearchParams({
@@ -1761,5 +1740,3 @@
 </body>
 
 </html>
-
-
