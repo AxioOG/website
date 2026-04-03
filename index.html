@@ -1510,23 +1510,70 @@
         </a>
     </nav>
     <script>
+        // Page name → URL slug mapping
+        const PAGE_SLUGS = {
+            'sign-in': '/',
+            home:    '/home',
+            store:   '/store',
+            tos:     '/policy',
+            panel:   '/panel',
+        };
+
         function navigateTo(target) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            var navItem = document.querySelector('.nav-item[data-page="' + target + '"]');
-            if (navItem) navItem.classList.add('active');
+            document.querySelector(`.nav-item[data-page="${target}"]`)?.classList.add('active');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            var page = document.getElementById('page-' + target);
-            if (page) page.classList.add('active');
+            document.getElementById('page-' + target)?.classList.add('active');
+            const slug = PAGE_SLUGS[target] || '/';
+            history.pushState({ page: target }, '', slug);
         }
 
-        document.querySelectorAll('.nav-item').forEach(function(item) {
+        document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function(e) {
                 if (this.getAttribute('target') === '_blank') return;
                 e.preventDefault();
-                var target = this.dataset.page;
+                const target = this.dataset.page;
                 if (target) navigateTo(target);
             });
         });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', (e) => {
+            if (e.state?.page) navigateTo(e.state.page);
+        });
+
+        // On load, read the URL and activate the right page
+        (function () {
+            // FIRST: check for discord token in hash before anything wipes it
+            const rawHash = window.location.hash.substring(1);
+            if (rawHash) {
+                const hp = new URLSearchParams(rawHash);
+                const ht = hp.get('access_token');
+                if (ht) {
+                    localStorage.setItem('_dpt', ht);
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }
+
+            // Check for redirect from 404.html — restore path and hash
+            const params = new URLSearchParams(window.location.search);
+            const redirectedPath = params.get('p');
+            const redirectedHash = params.get('h');
+            if (redirectedPath || redirectedHash) {
+                const decodedHash = redirectedHash ? decodeURIComponent(redirectedHash) : '';
+                // Check for token in redirected hash
+                if (decodedHash) {
+                    const hp2 = new URLSearchParams(decodedHash.substring(1));
+                    const ht2 = hp2.get('access_token');
+                    if (ht2) localStorage.setItem('_dpt', ht2);
+                }
+                const cleanUrl = (redirectedPath || '/');
+                history.replaceState(null, '', cleanUrl);
+            }
+            const slug = redirectedPath || window.location.pathname;
+            const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
+            if (match) navigateTo(match[0]);
+        })();
     </script>
 
     <!-- -- Intro Typewriter Script -- -->
@@ -1580,7 +1627,7 @@
         const ROLE_ADMIN1       = '1471974431579574538';
         const ROLE_ADMIN2       = '1482165881315524688';
         const ROLE_CUSTOMER     = '1489330191498084413';
-        const PROXY = 'https://corsproxy.io/?';
+        const PROXY             = 'https://corsproxy.io/?url=';
 
         function getAvatarUrl(user) {
             return user.avatar
@@ -1669,14 +1716,14 @@
             localStorage.setItem('fuse_token', token);
 
             // Fetch user info
-            fetch(PROXY + 'https://discord.com/api/v10/users/@me', {
-                headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
+            fetch(PROXY + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
+                headers: { 'Authorization': 'Bearer ' + token }
             })
             .then(function(r) { return r.json(); })
             .then(function(user) {
                 // Try to get guild roles
-                return fetch(PROXY + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
-                    headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
+                return fetch(PROXY + encodeURIComponent('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member'), {
+                    headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function(r) { return r.ok ? r.json() : {}; })
                 .then(function(member) {
