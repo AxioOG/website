@@ -1580,7 +1580,7 @@
         const ROLE_ADMIN1       = '1471974431579574538';
         const ROLE_ADMIN2       = '1482165881315524688';
         const ROLE_CUSTOMER     = '1489330191498084413';
-        const PROXY             = 'https://corsproxy.io/?url=';
+        const PROXY = 'https://corsproxy.io/?';
 
         function getAvatarUrl(user) {
             return user.avatar
@@ -1669,14 +1669,14 @@
             localStorage.setItem('fuse_token', token);
 
             // Fetch user info
-            fetch(PROXY + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
-                headers: { 'Authorization': 'Bearer ' + token }
+            fetch(PROXY + 'https://discord.com/api/v10/users/@me', {
+                headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
             })
             .then(function(r) { return r.json(); })
             .then(function(user) {
                 // Try to get guild roles
-                return fetch(PROXY + encodeURIComponent('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member'), {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                return fetch(PROXY + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                    headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
                 })
                 .then(function(r) { return r.ok ? r.json() : {}; })
                 .then(function(member) {
@@ -1714,4 +1714,5 @@
 </body>
 
 </html>
+
 
