@@ -1544,15 +1544,6 @@
 
         // On load, read the URL and activate the right page
         (function () {
-            // FIRST: check for discord token in hash before anything wipes it
-            const rawHash = window.location.hash.substring(1);
-            if (rawHash) {
-                const hp = new URLSearchParams(rawHash);
-                const ht = hp.get('access_token');
-                if (ht) {
-                    localStorage.setItem('_dpt', ht);
-                    history.replaceState(null, '', window.location.pathname);
-                }
             }
 
             // Check for redirect from 404.html — restore path and hash
@@ -1561,12 +1552,6 @@
             const redirectedHash = params.get('h');
             if (redirectedPath || redirectedHash) {
                 const decodedHash = redirectedHash ? decodeURIComponent(redirectedHash) : '';
-                // Check for token in redirected hash
-                if (decodedHash) {
-                    const hp2 = new URLSearchParams(decodedHash.substring(1));
-                    const ht2 = hp2.get('access_token');
-                    if (ht2) localStorage.setItem('_dpt', ht2);
-                }
                 const cleanUrl = (redirectedPath || '/');
                 history.replaceState(null, '', cleanUrl);
             }
