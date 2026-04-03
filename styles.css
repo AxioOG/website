@@ -1,0 +1,7 @@
+.lamp {
+  height: 46vmin;
+  min-height: 300px;
+  max-height: 420px;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
