@@ -1510,53 +1510,23 @@
         </a>
     </nav>
     <script>
-        // Page name → URL slug mapping
-        const PAGE_SLUGS = {
-            'sign-in': '/',
-            home:    '/home',
-            store:   '/store',
-            tos:     '/policy',
-            panel:   '/panel',
-        };
-
         function navigateTo(target) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector(`.nav-item[data-page="${target}"]`)?.classList.add('active');
+            var navItem = document.querySelector('.nav-item[data-page="' + target + '"]');
+            if (navItem) navItem.classList.add('active');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + target)?.classList.add('active');
-            const slug = PAGE_SLUGS[target] || '/';
-            history.pushState({ page: target }, '', slug);
+            var page = document.getElementById('page-' + target);
+            if (page) page.classList.add('active');
         }
 
-        document.querySelectorAll('.nav-item').forEach(item => {
+        document.querySelectorAll('.nav-item').forEach(function(item) {
             item.addEventListener('click', function(e) {
                 if (this.getAttribute('target') === '_blank') return;
                 e.preventDefault();
-                const target = this.dataset.page;
+                var target = this.dataset.page;
                 if (target) navigateTo(target);
             });
         });
-
-        // Handle browser back/forward
-        window.addEventListener('popstate', (e) => {
-            if (e.state?.page) navigateTo(e.state.page);
-        });
-
-        // On load, read the URL and activate the right page
-        (function () {
-            // Check for redirect from 404.html — restore path and hash
-            const params = new URLSearchParams(window.location.search);
-            const redirectedPath = params.get('p');
-            const redirectedHash = params.get('h');
-            if (redirectedPath || redirectedHash) {
-                const decodedHash = redirectedHash ? decodeURIComponent(redirectedHash) : '';
-                const cleanUrl = (redirectedPath || '/');
-                history.replaceState(null, '', cleanUrl);
-            }
-            const slug = redirectedPath || window.location.pathname;
-            const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
-            if (match) navigateTo(match[0]);
-        })();
     </script>
 
     <!-- -- Intro Typewriter Script -- -->
