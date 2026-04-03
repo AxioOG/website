@@ -1544,12 +1544,30 @@
 
         // On load, read the URL and activate the right page
         (function () {
+            // FIRST: check for discord token in hash before anything wipes it
+            const rawHash = window.location.hash.substring(1);
+            if (rawHash) {
+                const hp = new URLSearchParams(rawHash);
+                const ht = hp.get('access_token');
+                if (ht) {
+                    localStorage.setItem('_dpt', ht);
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }
+
             // Check for redirect from 404.html — restore path and hash
             const params = new URLSearchParams(window.location.search);
             const redirectedPath = params.get('p');
             const redirectedHash = params.get('h');
             if (redirectedPath || redirectedHash) {
-                const cleanUrl = (redirectedPath || '/') + (redirectedHash ? decodeURIComponent(redirectedHash) : '');
+                const decodedHash = redirectedHash ? decodeURIComponent(redirectedHash) : '';
+                // Check for token in redirected hash
+                if (decodedHash) {
+                    const hp2 = new URLSearchParams(decodedHash.substring(1));
+                    const ht2 = hp2.get('access_token');
+                    if (ht2) localStorage.setItem('_dpt', ht2);
+                }
+                const cleanUrl = (redirectedPath || '/');
                 history.replaceState(null, '', cleanUrl);
             }
             const slug = redirectedPath || window.location.pathname;
@@ -1603,19 +1621,7 @@
 
                 <!-- -- Discord OAuth -- -->
     <script>
-        // ── Step 1: Save token from hash BEFORE anything else runs ──────────
-        (function() {
-            const h = window.location.hash.substring(1);
-            if (h) {
-                const p = new URLSearchParams(h);
-                const t = p.get('access_token');
-                if (t) {
-                    localStorage.setItem('_dpt', t);
-                    // Don't navigate away — just clean the hash in place
-                    history.replaceState(null, '', window.location.pathname);
-                }
-            }
-        })();
+        // ── Step 1: token already grabbed by nav script above ────────────────
 
         // ── Config ───────────────────────────────────────────────────────────
         const CLIENT_ID     = '1460340695578575041';
