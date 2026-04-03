@@ -87,8 +87,7 @@
 
         #page-home.active,
         #page-tos.active,
-        #page-store.active,
-        #page-panel.active {
+        #page-store.active {
             align-items: flex-start;
             overflow-y: auto;
         }
@@ -1272,65 +1271,6 @@
         </div>
     </div>
 
-    <!-- ══ PAGE: Customer Panel ══ -->
-    <div class="page" id="page-panel">
-        <div style="width:100%;max-width:800px;padding:6rem 2rem 4rem;margin:0 auto;color:#fff;font-family:'DM Sans',sans-serif;">
-            <div id="panel-locked" style="text-align:center;padding:4rem 2rem;">
-                <i class="fa-solid fa-lock" style="font-size:3rem;color:rgba(255,255,255,0.2);margin-bottom:1rem;display:block;"></i>
-                <p style="color:rgba(255,255,255,0.4);font-size:0.95rem;">Sign in with Discord to access the panel.</p>
-            </div>
-            <div id="panel-content" style="display:none;">
-                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;">
-                    <img id="panel-avatar" src="" style="width:56px;height:56px;border-radius:50%;border:2px solid #5865F2;">
-                    <div>
-                        <div id="panel-name" style="font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:700;"></div>
-                        <div id="panel-role-badge" style="display:inline-block;margin-top:4px;padding:3px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;"></div>
-                    </div>
-                </div>
-                <div id="panel-admin-section" style="display:none;">
-                    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.1rem;margin-bottom:1rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;">Admin Controls</h2>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2rem;">
-                        <div style="background:rgba(255,0,0,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:12px;padding:1.2rem;">
-                            <i class="fa-solid fa-users" style="color:#ff4444;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
-                            <div style="font-weight:600;font-size:0.9rem;">Manage Members</div>
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">View & manage customers</div>
-                        </div>
-                        <div style="background:rgba(255,0,0,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:12px;padding:1.2rem;">
-                            <i class="fa-solid fa-ticket" style="color:#ff4444;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
-                            <div style="font-weight:600;font-size:0.9rem;">Support Tickets</div>
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Handle open tickets</div>
-                        </div>
-                        <div style="background:rgba(255,0,0,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:12px;padding:1.2rem;">
-                            <i class="fa-solid fa-gear" style="color:#ff4444;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
-                            <div style="font-weight:600;font-size:0.9rem;">Settings</div>
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Configure the panel</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="panel-customer-section" style="display:none;">
-                    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.1rem;margin-bottom:1rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;">My Access</h2>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
-                        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:1.2rem;">
-                            <i class="fa-solid fa-crown" style="color:#f0a500;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
-                            <div style="font-weight:600;font-size:0.9rem;">Premium Access</div>
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Your license is active</div>
-                        </div>
-                        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:1.2rem;">
-                            <i class="fa-solid fa-download" style="color:#f0a500;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
-                            <div style="font-weight:600;font-size:0.9rem;">Downloads</div>
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Access your files</div>
-                        </div>
-                        <div style="background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:1.2rem;">
-                            <i class="fa-solid fa-headset" style="color:#f0a500;margin-bottom:0.5rem;display:block;font-size:1.2rem;"></i>
-                            <div style="font-weight:600;font-size:0.9rem;">Support</div>
-                            <div style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:4px;">Priority support access</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         /* --------------------------------------------------------------
            CORD PHYSICS
@@ -1455,7 +1395,7 @@
             lightOn = !lightOn;
             ROOT.style.setProperty('--on', lightOn ? '1' : '0');
 
-            const isLoggedIn = !!localStorage.getItem('fuse_user');
+            const isLoggedIn = !!localStorage.getItem('discord_token');
             if (isLoggedIn) {
                 // Show profile popup instead of login card
                 card.classList.remove('is-active');
@@ -1503,50 +1443,52 @@
             <i class="fa-solid fa-user"></i>
             <span class="label">Sign In</span>
         </a>
-
-        <a href="#" class="nav-item" data-page="panel" id="nav-customer-panel" style="display:none;">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span class="label">Panel</span>
-        </a>
     </nav>
     <script>
+        // Page name → URL slug mapping
+        const PAGE_SLUGS = {
+            account: '/',
+            home:    '/home',
+            store:   '/store',
+            tos:     '/policy',
+        };
+
         function navigateTo(target) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            var navItem = document.querySelector('.nav-item[data-page="' + target + '"]');
-            if (navItem) navItem.classList.add('active');
+            document.querySelector(`.nav-item[data-page="${target}"]`)?.classList.add('active');
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            var page = document.getElementById('page-' + target);
-            if (page) page.classList.add('active');
-            // Update URL without triggering a page reload
-            var slugs = {'sign-in':'/', 'home':'/home', 'store':'/store', 'tos':'/policy', 'panel':'/panel'};
-            var slug = slugs[target] || '/';
+            document.getElementById('page-' + target)?.classList.add('active');
+            const slug = PAGE_SLUGS[target] || '/';
             history.pushState({ page: target }, '', slug);
         }
 
-        document.querySelectorAll('.nav-item').forEach(function(item) {
+        document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function(e) {
                 if (this.getAttribute('target') === '_blank') return;
                 e.preventDefault();
-                var target = this.dataset.page;
+                const target = this.dataset.page;
                 if (target) navigateTo(target);
             });
         });
 
         // Handle browser back/forward
-        window.addEventListener('popstate', function(e) {
-            if (e.state && e.state.page) navigateTo(e.state.page);
+        window.addEventListener('popstate', (e) => {
+            if (e.state?.page) navigateTo(e.state.page);
         });
 
-        // Restore page from 404.html redirect (?p=/store etc)
-        (function() {
-            var params = new URLSearchParams(window.location.search);
-            var redirectedPath = params.get('p');
-            if (redirectedPath) {
-                history.replaceState(null, '', redirectedPath);
-                var slugs = {'/':'sign-in', '/home':'home', '/store':'store', '/policy':'tos', '/panel':'panel'};
-                var target = slugs[redirectedPath];
-                if (target) navigateTo(target);
+        // On load, read the URL and activate the right page
+        (function () {
+            // Check for redirect from 404.html — restore path and hash
+            const params = new URLSearchParams(window.location.search);
+            const redirectedPath = params.get('p');
+            const redirectedHash = params.get('h');
+            if (redirectedPath || redirectedHash) {
+                const cleanUrl = (redirectedPath || '/') + (redirectedHash ? decodeURIComponent(redirectedHash) : '');
+                history.replaceState(null, '', cleanUrl);
             }
+            const slug = redirectedPath || window.location.pathname;
+            const match = Object.entries(PAGE_SLUGS).find(([, s]) => s === slug);
+            if (match) navigateTo(match[0]);
         })();
     </script>
 
@@ -1583,7 +1525,7 @@
                         cursor.style.opacity = '0';
                         setTimeout(() => {
                             overlay.classList.add('fade-out');
-                            setTimeout(() => { overlay.remove(); if(typeof navigateTo === 'function') navigateTo('home'); }, 850);
+                            setTimeout(() => overlay.remove(), 850);
                         }, 700);
                     }, 900);
                 }
@@ -1593,144 +1535,128 @@
         })();
     </script>
 
-                    <!-- -- Discord OAuth -- -->
+    <!-- -- Discord OAuth -- -->
     <script>
+        // !! FIRST THING: grab token from hash before anything wipes it
+        (function() {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const p = new URLSearchParams(hash);
+                const token = p.get('access_token');
+                if (token) {
+                    localStorage.setItem('discord_pending_token', token);
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }
+        })();
+        /* --------------------------------------------------------------
+           DISCORD OAUTH2 � Implicit Grant (client-side only)
+           ? Replace DISCORD_CLIENT_ID with your actual Application ID
+             from https://discord.com/developers/applications
+           ? Add your site URL to the OAuth2 Redirect URIs in the portal
+        -------------------------------------------------------------- */
         const DISCORD_CLIENT_ID = '1460340695578575041';
-        const DISCORD_REDIRECT  = 'https://fusebypass.fun';
-        const GUILD_ID          = '1305642236880617482';
-        const ROLE_ADMIN1       = '1471974431579574538';
-        const ROLE_ADMIN2       = '1482165881315524688';
-        const ROLE_CUSTOMER     = '1489330191498084413';
-        const PROXY = 'https://corsproxy.io/?';
+        const DISCORD_REDIRECT   = 'https://fusebypass.fun';
+        const DISCORD_SCOPE      = 'identify';
 
-        function getAvatarUrl(user) {
-            return user.avatar
-                ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png?size=128'
-                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+        const widget   = document.getElementById('discord-user-widget');
+        const avatar   = document.getElementById('discord-avatar');
+        const username = document.getElementById('discord-username');
+        const tag      = document.getElementById('discord-tag');
+        const logoutBtn = document.getElementById('discord-logout');
+
+        function showUserWidget(user) {
+            const avatarUrl = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user.id) >> 22n) % 6n}.png`;
+            avatar.src   = avatarUrl;
+            username.textContent = user.global_name || user.username;
+            tag.textContent      = '@' + user.username;
+            widget.style.display = 'flex';
+
+            // Also populate the lamp popup
+            const popupAvatar = document.getElementById('popup-avatar');
+            const popupUsername = document.getElementById('popup-username');
+            const popupTag = document.getElementById('popup-tag');
+            if (popupAvatar) popupAvatar.src = avatarUrl;
+            if (popupUsername) popupUsername.textContent = user.global_name || user.username;
+            if (popupTag) popupTag.textContent = '@' + user.username;
         }
 
-        function getRoleLabel(roles) {
-            if (!roles) return null;
-            if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
-            if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
-            return null;
+        function hideUserWidget() {
+            widget.style.display = 'none';
         }
 
-        function applyUI(user, roles) {
-            var label = getRoleLabel(roles);
-            var avatarUrl = getAvatarUrl(user);
-            var name = user.global_name || user.username;
-
-            // Top-left widget
-            var w = document.getElementById('discord-user-widget');
-            var wa = document.getElementById('discord-avatar');
-            var wn = document.getElementById('discord-username');
-            var wt = document.getElementById('discord-tag');
-            if (w && wa && wn && wt) {
-                wa.src = avatarUrl;
-                wn.textContent = name;
-                if (label === 'admin')    { wt.textContent = '⚡ Admin';    wt.style.color = '#ff4444'; }
-                else if (label === 'customer') { wt.textContent = '👑 Customer'; wt.style.color = '#f0a500'; }
-                else                      { wt.textContent = '@' + user.username; wt.style.color = '#5865F2'; }
-                w.style.display = 'flex';
-            }
-
-            // Lamp popup
-            var pa = document.getElementById('popup-avatar');
-            var pu = document.getElementById('popup-username');
-            var pt = document.getElementById('popup-tag');
-            if (pa) pa.src = avatarUrl;
-            if (pu) pu.textContent = name;
-            if (pt) {
-                if (label === 'admin')         { pt.textContent = '⚡ Admin';    pt.style.color = '#ff4444'; }
-                else if (label === 'customer') { pt.textContent = '👑 Customer'; pt.style.color = '#f0a500'; }
-                else                           { pt.textContent = '@' + user.username; pt.style.color = '#5865F2'; }
-            }
-
-            // Panel nav
-            var pn = document.getElementById('nav-customer-panel');
-            if (pn) pn.style.display = (label === 'admin' || label === 'customer') ? 'flex' : 'none';
-
-            // Save to localStorage
-            localStorage.setItem('fuse_user', JSON.stringify(user));
-            localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+        async function fetchDiscordUser(token) {
+            const res = await fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Failed to fetch user');
+            return res.json();
         }
 
-        function clearUI() {
-            var w = document.getElementById('discord-user-widget');
-            if (w) w.style.display = 'none';
-            var pn = document.getElementById('nav-customer-panel');
-            if (pn) pn.style.display = 'none';
-            localStorage.removeItem('fuse_user');
-            localStorage.removeItem('fuse_roles');
-            localStorage.removeItem('fuse_token');
+        function saveSession(token, user) {
+            localStorage.setItem('discord_token', token);
+            localStorage.setItem('discord_user', JSON.stringify(user));
         }
 
-        // Restore session on page load
-        (function restoreSession() {
-            var savedUser = localStorage.getItem('fuse_user');
-            var savedRoles = localStorage.getItem('fuse_roles');
-            if (savedUser) {
-                try {
-                    applyUI(JSON.parse(savedUser), JSON.parse(savedRoles || '[]'));
-                } catch(e) { clearUI(); }
-            }
-        })();
-
-        // Handle OAuth token from URL hash or from 404.html redirect
-        (function handleToken() {
-            // Check localStorage first (set by 404.html if hash was lost)
-            var pendingToken = localStorage.getItem('fuse_pending_token');
-            if (pendingToken) {
-                localStorage.removeItem('fuse_pending_token');
-                processToken(pendingToken);
-                return;
-            }
-            // Check URL hash directly
-            var hash = window.location.hash.substring(1);
-            if (!hash) return;
-            var params = new URLSearchParams(hash);
-            var token = params.get('access_token');
-            if (!token) return;
-            history.replaceState(null, '', window.location.pathname);
-            processToken(token);
-        })();
-
-        function processToken(token) {
-            localStorage.setItem('fuse_token', token);
-            fetch(PROXY + 'https://discord.com/api/v10/users/@me', {
-                headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(user) {
-                return fetch(PROXY + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
-                    headers: { 'Authorization': 'Bearer ' + token, 'x-cors-api-key': 'temp_' + Date.now() }
-                })
-                .then(function(r) { return r.ok ? r.json() : {}; })
-                .then(function(member) { applyUI(user, member.roles || []); })
-                .catch(function() { applyUI(user, []); });
-            })
-            .catch(function(e) { console.error('Discord login error:', e); });
+        function clearSession() {
+            localStorage.removeItem('discord_token');
+            localStorage.removeItem('discord_user');
         }
 
         function loginWithDiscord() {
-            var params = new URLSearchParams({
-                client_id: DISCORD_CLIENT_ID,
-                redirect_uri: DISCORD_REDIRECT,
+            const params = new URLSearchParams({
+                client_id:     DISCORD_CLIENT_ID,
+                redirect_uri:  DISCORD_REDIRECT,
                 response_type: 'token',
-                scope: 'identify guilds.members.read'
+                scope:         DISCORD_SCOPE,
             });
-            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+            const url = 'https://discord.com/oauth2/authorize?' + params.toString();
+            console.log('Discord OAuth URL:', url);
+            console.log('Redirect URI being sent:', DISCORD_REDIRECT);
+            window.location.href = url;
         }
+
+                // Handle OAuth callback - token saved early before any script wipes the hash
+        (async function handleCallback() {
+            const pendingToken = localStorage.getItem('discord_pending_token');
+            if (pendingToken) {
+                localStorage.removeItem('discord_pending_token');
+                try {
+                    const user = await fetchDiscordUser(pendingToken);
+                    saveSession(pendingToken, user);
+                    showUserWidget(user);
+                } catch (e) {
+                    console.error('Discord login failed:', e);
+                }
+                return;
+            }
+
+            // Restore existing session
+            const savedToken = localStorage.getItem('discord_token');
+            if (savedToken) {
+                try {
+                    const user = await fetchDiscordUser(savedToken);
+                    saveSession(savedToken, user);
+                    showUserWidget(user);
+                } catch {
+                    clearSession();
+                }
+            }
+        })();
 
         document.getElementById('js-discord-login').addEventListener('click', loginWithDiscord);
 
-        document.getElementById('discord-logout').addEventListener('click', function() {
-            clearUI();
+        logoutBtn.addEventListener('click', () => {
+            clearSession();
+            hideUserWidget();
         });
 
-        document.getElementById('popup-logout-btn').addEventListener('click', function() {
-            clearUI();
+        document.getElementById('popup-logout-btn').addEventListener('click', () => {
+            clearSession();
+            hideUserWidget();
+            // Turn lamp off and hide popup, show login card next time
             lightOn = false;
             ROOT.style.setProperty('--on', '0');
             document.getElementById('discord-profile-popup').classList.remove('is-active');
