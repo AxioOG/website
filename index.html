@@ -1648,13 +1648,9 @@
         }
 
         async function fetchDiscordUser(token) {
-            const res = await fetch('https://discord.com/api/users/@me', {
-                method: 'GET',
-                headers: { 
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                mode: 'cors'
+            // Use corsproxy to bypass CORB blocking on GitHub Pages
+            const res = await fetch('https://corsproxy.io/?https://discord.com/api/users/@me', {
+                headers: { 'Authorization': 'Bearer ' + token }
             });
             if (!res.ok) throw new Error('bad token');
             return res.json();
