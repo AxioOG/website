@@ -1601,133 +1601,199 @@
         })();
     </script>
 
-            <!-- -- Discord OAuth -- -->
+                <!-- -- Discord OAuth -- -->
     <script>
-        // Grab token from hash IMMEDIATELY before anything else can wipe it
+        // ── Step 1: Save token from hash BEFORE anything else runs ──────────
         (function() {
-            const hash = window.location.hash.substring(1);
-            if (hash) {
-                const p = new URLSearchParams(hash);
-                const token = p.get('access_token');
-                if (token) {
-                    localStorage.setItem('discord_pending_token', token);
-                    history.replaceState(null, '', window.location.pathname);
+            const h = window.location.hash.substring(1);
+            if (h) {
+                const p = new URLSearchParams(h);
+                const t = p.get('access_token');
+                if (t) {
+                    localStorage.setItem('_dpt', t);
+                    history.replaceState(null, '', '/');
                 }
             }
         })();
 
-        const DISCORD_CLIENT_ID = '1460340695578575041';
-        const DISCORD_REDIRECT  = 'https://fusebypass.fun';
+        // ── Config ───────────────────────────────────────────────────────────
+        const CLIENT_ID     = '1460340695578575041';
+        const REDIRECT_URI  = 'https://fusebypass.fun';
+        const GUILD_ID      = '1305642236880617482';
+        const ROLE_ADMIN1   = '1471974431579574538';
+        const ROLE_ADMIN2   = '1482165881315524688';
+        const ROLE_CUSTOMER = '1489330191498084413';
 
-        const widget     = document.getElementById('discord-user-widget');
-        const avatarEl   = document.getElementById('discord-avatar');
-        const usernameEl = document.getElementById('discord-username');
-        const tagEl      = document.getElementById('discord-tag');
-        const logoutBtn  = document.getElementById('discord-logout');
+        // ── Helpers ──────────────────────────────────────────────────────────
+        const PROXY = 'https://corsproxy.io/?';
 
-        function showUserWidget(user) {
-            const avatarUrl = user.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-                : `https://cdn.discordapp.com/embed/avatars/0.png`;
-            avatarEl.src = avatarUrl;
-            usernameEl.textContent = user.global_name || user.username;
-            tagEl.textContent = '@' + user.username;
-            widget.style.display = 'flex';
+        async function apiGet(url, token) {
+            const r = await fetch(PROXY + encodeURIComponent(url), {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!r.ok) throw new Error(r.status);
+            return r.json();
+        }
 
-            // Populate lamp popup
+        function getRoleLabel(roles) {
+            if (!roles || !roles.length) return null;
+            if (roles.includes(ROLE_ADMIN1) || roles.includes(ROLE_ADMIN2)) return 'admin';
+            if (roles.includes(ROLE_CUSTOMER)) return 'customer';
+            return null;
+        }
+
+        function getAvatarUrl(user) {
+            return user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+                : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.id) % 6}.png`;
+        }
+
+        // ── UI Updates ───────────────────────────────────────────────────────
+        function applyUserToUI(user, roles) {
+            const label    = getRoleLabel(roles);
+            const avatarUrl = getAvatarUrl(user);
+            const displayName = user.global_name || user.username;
+
+            // Top-left widget
+            const widget = document.getElementById('discord-user-widget');
+            const wAvatar = document.getElementById('discord-avatar');
+            const wName   = document.getElementById('discord-username');
+            const wTag    = document.getElementById('discord-tag');
+            if (widget) {
+                wAvatar.src = avatarUrl;
+                wName.textContent = displayName;
+                if (label === 'admin')    { wTag.textContent = '⚡ Admin';    wTag.style.color = '#ff4444'; }
+                else if (label === 'customer') { wTag.textContent = '👑 Customer'; wTag.style.color = '#f0a500'; }
+                else                      { wTag.textContent = '@' + user.username; wTag.style.color = '#5865F2'; }
+                widget.style.display = 'flex';
+            }
+
+            // Lamp popup
             const pa = document.getElementById('popup-avatar');
             const pu = document.getElementById('popup-username');
             const pt = document.getElementById('popup-tag');
             if (pa) pa.src = avatarUrl;
-            if (pu) pu.textContent = user.global_name || user.username;
-            if (pt) pt.textContent = '@' + user.username;
+            if (pu) pu.textContent = displayName;
+            if (pt) {
+                if (label === 'admin')         { pt.textContent = '⚡ Admin';    pt.style.color = '#ff4444'; }
+                else if (label === 'customer') { pt.textContent = '👑 Customer'; pt.style.color = '#f0a500'; }
+                else                           { pt.textContent = '@' + user.username; pt.style.color = '#5865F2'; }
+            }
+
+            // Panel nav visibility
+            const panelNav = document.getElementById('nav-customer-panel');
+            if (panelNav) panelNav.style.display = (label === 'admin' || label === 'customer') ? 'flex' : 'none';
+
+            // Panel content
+            updatePanel(user, roles, label, avatarUrl, displayName);
         }
 
-        function hideUserWidget() {
-            widget.style.display = 'none';
+        function updatePanel(user, roles, label, avatarUrl, displayName) {
+            const locked  = document.getElementById('panel-locked');
+            const content = document.getElementById('panel-content');
+            if (!content) return;
+            if (label === 'admin' || label === 'customer') {
+                if (locked) locked.style.display = 'none';
+                content.style.display = 'block';
+                const pa = document.getElementById('panel-avatar');
+                const pn = document.getElementById('panel-name');
+                const pb = document.getElementById('panel-role-badge');
+                const as = document.getElementById('panel-admin-section');
+                const cs = document.getElementById('panel-customer-section');
+                if (pa) pa.src = avatarUrl;
+                if (pn) pn.textContent = displayName;
+                if (pb) {
+                    if (label === 'admin') {
+                        pb.textContent = '⚡ Admin';
+                        pb.style.cssText = 'background:rgba(255,68,68,0.15);color:#ff4444;border:1px solid rgba(255,68,68,0.3);display:inline-block;padding:3px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;';
+                    } else {
+                        pb.textContent = '👑 Customer';
+                        pb.style.cssText = 'background:rgba(240,165,0,0.15);color:#f0a500;border:1px solid rgba(240,165,0,0.3);display:inline-block;padding:3px 12px;border-radius:999px;font-size:0.75rem;font-weight:700;';
+                    }
+                }
+                if (as) as.style.display = label === 'admin' ? 'block' : 'none';
+                if (cs) cs.style.display = label === 'customer' ? 'block' : 'none';
+            }
         }
 
-        async function fetchDiscordUser(token) {
-            // Use corsproxy to bypass CORB blocking on GitHub Pages
-            const res = await fetch('https://corsproxy.io/?https://discord.com/api/users/@me', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if (!res.ok) throw new Error('bad token');
-            return res.json();
+        function clearUI() {
+            const widget = document.getElementById('discord-user-widget');
+            if (widget) widget.style.display = 'none';
+            const panelNav = document.getElementById('nav-customer-panel');
+            if (panelNav) panelNav.style.display = 'none';
         }
 
-        function saveSession(token, user) {
-            localStorage.setItem('discord_token', token);
-            localStorage.setItem('discord_user', JSON.stringify(user));
+        // ── Session ──────────────────────────────────────────────────────────
+        function saveSession(token, user, roles) {
+            localStorage.setItem('_dt',  token);
+            localStorage.setItem('_du',  JSON.stringify(user));
+            localStorage.setItem('_dr',  JSON.stringify(roles || []));
         }
 
         function clearSession() {
-            localStorage.removeItem('discord_token');
-            localStorage.removeItem('discord_user');
-            localStorage.removeItem('discord_pending_token');
+            ['_dt','_du','_dr','_dpt'].forEach(k => localStorage.removeItem(k));
+            clearUI();
         }
 
+        // ── Login ────────────────────────────────────────────────────────────
         function loginWithDiscord() {
-            const params = new URLSearchParams({
-                client_id:     DISCORD_CLIENT_ID,
-                redirect_uri:  DISCORD_REDIRECT,
+            const p = new URLSearchParams({
+                client_id:     CLIENT_ID,
+                redirect_uri:  REDIRECT_URI,
                 response_type: 'token',
                 scope:         'identify',
             });
-            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+            window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
         }
 
+        // ── Init ─────────────────────────────────────────────────────────────
         (async function init() {
-            // Check for fresh token from OAuth redirect
-            const pending = localStorage.getItem('discord_pending_token');
+            const pending = localStorage.getItem('_dpt');
+
             if (pending) {
-                localStorage.removeItem('discord_pending_token');
+                // Fresh login — fetch user data
+                localStorage.removeItem('_dpt');
                 try {
-                    const user = await fetchDiscordUser(pending);
-                    saveSession(pending, user);
-                    showUserWidget(user);
-                } catch(e) { 
-                    console.error('Discord fetch failed:', e);
-                    // Token exists but fetch failed — save token and try showing cached
-                    localStorage.setItem('discord_token', pending);
+                    const user  = await apiGet('https://discord.com/api/v10/users/@me', pending);
+                    let roles = [];
+                    if (GUILD_ID !== 'YOUR_SERVER_ID') {
+                        try {
+                            const member = await apiGet(`https://discord.com/api/v10/users/@me/guilds/${GUILD_ID}/member`, pending);
+                            roles = member.roles || [];
+                        } catch(e) { console.warn('Could not fetch roles:', e); }
+                    }
+                    saveSession(pending, user, roles);
+                    applyUserToUI(user, roles);
+                } catch(e) {
+                    console.error('Login failed:', e);
                 }
                 return;
             }
 
-            // Restore saved session instantly
-            const savedToken = localStorage.getItem('discord_token');
-            const savedUser  = localStorage.getItem('discord_user');
-            if (savedToken && savedUser) {
+            // Restore from localStorage — instant, no network
+            const savedUser  = localStorage.getItem('_du');
+            const savedRoles = localStorage.getItem('_dr');
+            if (savedUser) {
                 try {
-                    showUserWidget(JSON.parse(savedUser));
+                    applyUserToUI(JSON.parse(savedUser), JSON.parse(savedRoles || '[]'));
                 } catch { clearSession(); }
-            } else if (savedToken && !savedUser) {
-                // Have token but no cached user — try fetching
-                try {
-                    const user = await fetchDiscordUser(savedToken);
-                    saveSession(savedToken, user);
-                    showUserWidget(user);
-                } catch(e) {
-                    console.error('Session restore failed:', e);
-                    clearSession();
-                }
             }
         })();
 
-        document.getElementById('js-discord-login').addEventListener('click', loginWithDiscord);
+        // ── Event Listeners ──────────────────────────────────────────────────
+        document.getElementById('js-discord-login')
+            .addEventListener('click', loginWithDiscord);
 
-        logoutBtn.addEventListener('click', () => {
-            clearSession();
-            hideUserWidget();
-        });
+        document.getElementById('discord-logout')
+            .addEventListener('click', () => { clearSession(); });
 
-        document.getElementById('popup-logout-btn').addEventListener('click', () => {
-            clearSession();
-            hideUserWidget();
-            lightOn = false;
-            ROOT.style.setProperty('--on', '0');
-            document.getElementById('discord-profile-popup').classList.remove('is-active');
-        });
+        document.getElementById('popup-logout-btn')
+            .addEventListener('click', () => {
+                clearSession();
+                lightOn = false;
+                ROOT.style.setProperty('--on', '0');
+                document.getElementById('discord-profile-popup').classList.remove('is-active');
+            });
     </script>
 
 </body>
