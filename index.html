@@ -1649,7 +1649,12 @@
 
         async function fetchDiscordUser(token) {
             const res = await fetch('https://discord.com/api/users/@me', {
-                headers: { Authorization: 'Bearer ' + token }
+                method: 'GET',
+                headers: { 
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors'
             });
             if (!res.ok) throw new Error('bad token');
             return res.json();
@@ -1685,17 +1690,31 @@
                     const user = await fetchDiscordUser(pending);
                     saveSession(pending, user);
                     showUserWidget(user);
-                } catch(e) { console.error(e); }
+                } catch(e) { 
+                    console.error('Discord fetch failed:', e);
+                    // Token exists but fetch failed — save token and try showing cached
+                    localStorage.setItem('discord_token', pending);
+                }
                 return;
             }
 
-            // Restore saved session instantly (no network call needed)
+            // Restore saved session instantly
             const savedToken = localStorage.getItem('discord_token');
             const savedUser  = localStorage.getItem('discord_user');
             if (savedToken && savedUser) {
                 try {
                     showUserWidget(JSON.parse(savedUser));
                 } catch { clearSession(); }
+            } else if (savedToken && !savedUser) {
+                // Have token but no cached user — try fetching
+                try {
+                    const user = await fetchDiscordUser(savedToken);
+                    saveSession(savedToken, user);
+                    showUserWidget(user);
+                } catch(e) {
+                    console.error('Session restore failed:', e);
+                    clearSession();
+                }
             }
         })();
 
