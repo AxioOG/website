@@ -719,111 +719,119 @@
         }
 
         /* -- Discord User Widget (top-left) -- */
-        /* -- Discord User Widget (top-left) -- */
         #discord-user-widget {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(10, 10, 10, 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(88, 101, 242, 0.4);
-    border-radius: 999px;
-    padding: 7px 14px 7px 7px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.15);
-    animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-        
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(10, 10, 10, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(88, 101, 242, 0.4);
+            border-radius: 999px;
+            padding: 7px 14px 7px 7px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.15);
+            animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
         @keyframes widgetSlideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-#discord-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #5865F2;
-    flex-shrink: 0;
-}
-#discord-user-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-#discord-username {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.2;
-}
-#discord-tag {
-    font-size: 0.65rem;
-    color: #5865F2;
-    font-family: 'DM Sans', sans-serif;
-    letter-spacing: 0.04em;
-}
-/* Role badge row */
-#discord-roles {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    margin-top: 2px;
-    flex-wrap: wrap;
-}
-.role-badge {
-    font-size: 0.58rem;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 999px;
-    border: 1px solid;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-#discord-logout {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: rgba(255,255,255,0.35);
-    display: flex;
-    align-items: center;
-    padding: 0;
-    margin-left: 4px;
-    transition: color 0.2s ease;
-}
-#discord-logout:hover { color: rgba(255,255,255,0.8); }
-</style>
+            from { opacity: 0; transform: translateX(-20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        #discord-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #5865F2;
+            flex-shrink: 0;
+        }
+        #discord-user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        #discord-username {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+        #discord-tag {
+            font-size: 0.65rem;
+            color: #5865F2;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.04em;
+        }
+        #discord-logout {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: rgba(255,255,255,0.35);
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin-left: 2px;
+            transition: color 0.2s ease;
+        }
+        #discord-logout:hover {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* -- Register Modal -- */
+        #register-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        #register-modal-overlay.open {
+            display: flex;
+            animation: fadeInOverlay 0.25s ease;
+        }
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        #register-modal {
+            width: 320px;
+            padding: 32px 28px 28px;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 20px;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            box-shadow: 0 22px 56px rgba(0,0,0,0.65);
+            animation: slideUpModal 0.3s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes slideUpModal {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
 </head>
 
 <body>
 
     <!-- -- Discord User Profile Widget -- -->
     <div id="discord-user-widget" style="display:none;">
-    <img id="discord-avatar" src="" alt="avatar">
-    <div id="discord-user-info">
-        <span id="discord-username"></span>
-        <span id="discord-tag"></span>
-        <div id="discord-roles"></div>
+        <img id="discord-avatar" src="" alt="avatar">
+        <div id="discord-user-info">
+            <span id="discord-username"></span>
+            <span id="discord-tag"></span>
+        </div>
+        <button id="discord-logout" title="Sign out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
     </div>
-    <button id="discord-logout" title="Sign out">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-    </button>
-</div>
 
     <!-- -- Intro Typewriter Overlay -- -->
     <div id="intro-overlay">
@@ -1387,7 +1395,7 @@
             lightOn = !lightOn;
             ROOT.style.setProperty('--on', lightOn ? '1' : '0');
 
-            const isLoggedIn = !!localStorage.getItem('fuse_user');
+            const isLoggedIn = !!localStorage.getItem('discord_token');
             if (isLoggedIn) {
                 // Show profile popup instead of login card
                 card.classList.remove('is-active');
@@ -1527,141 +1535,128 @@
         })();
     </script>
 
-        <!-- -- Discord OAuth -- -->
+    <!-- -- Discord OAuth -- -->
     <script>
-        // Grab token from hash immediately
+        // !! FIRST THING: grab token from hash before anything wipes it
         (function() {
-            var h = window.location.hash.substring(1);
-            if (h) {
-                var p = new URLSearchParams(h);
-                var t = p.get('access_token');
-                if (t) {
-                    localStorage.setItem('fuse_pending_token', t);
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const p = new URLSearchParams(hash);
+                const token = p.get('access_token');
+                if (token) {
+                    localStorage.setItem('discord_pending_token', token);
                     history.replaceState(null, '', window.location.pathname);
                 }
             }
-            // Also check if 404.html saved a token
-            var pt = localStorage.getItem('fuse_pending_token_404');
-            if (pt) {
-                localStorage.setItem('fuse_pending_token', pt);
-                localStorage.removeItem('fuse_pending_token_404');
-            }
         })();
+        /* --------------------------------------------------------------
+           DISCORD OAUTH2 � Implicit Grant (client-side only)
+           ? Replace DISCORD_CLIENT_ID with your actual Application ID
+             from https://discord.com/developers/applications
+           ? Add your site URL to the OAuth2 Redirect URIs in the portal
+        -------------------------------------------------------------- */
+        const DISCORD_CLIENT_ID = '1460340695578575041';
+        const DISCORD_REDIRECT   = 'https://fusebypass.fun';
+        const DISCORD_SCOPE      = 'identify';
 
-        var DISCORD_CLIENT_ID = '1460340695578575041';
-        var DISCORD_REDIRECT  = 'https://fusebypass.fun';
-        var GUILD_ID          = '1305642236880617482';
-        var ROLE_ADMIN1       = '1471974431579574538';
-        var ROLE_ADMIN2       = '1482165881315524688';
-        var ROLE_CUSTOMER     = '1489330191498084413';
+        const widget   = document.getElementById('discord-user-widget');
+        const avatar   = document.getElementById('discord-avatar');
+        const username = document.getElementById('discord-username');
+        const tag      = document.getElementById('discord-tag');
+        const logoutBtn = document.getElementById('discord-logout');
 
-        function getAvatarUrl(user) {
-            return user.avatar
-                ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png?size=128'
-                : 'https://cdn.discordapp.com/embed/avatars/0.png';
+        function showUserWidget(user) {
+            const avatarUrl = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+                : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user.id) >> 22n) % 6n}.png`;
+            avatar.src   = avatarUrl;
+            username.textContent = user.global_name || user.username;
+            tag.textContent      = '@' + user.username;
+            widget.style.display = 'flex';
+
+            // Also populate the lamp popup
+            const popupAvatar = document.getElementById('popup-avatar');
+            const popupUsername = document.getElementById('popup-username');
+            const popupTag = document.getElementById('popup-tag');
+            if (popupAvatar) popupAvatar.src = avatarUrl;
+            if (popupUsername) popupUsername.textContent = user.global_name || user.username;
+            if (popupTag) popupTag.textContent = '@' + user.username;
         }
 
-        function getRoleLabel(roles) {
-            if (!roles) return null;
-            if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
-            if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
-            return null;
+        function hideUserWidget() {
+            widget.style.display = 'none';
         }
 
-        function applyUI(user, roles) {
-            var label = getRoleLabel(roles);
-            var avatarUrl = getAvatarUrl(user);
-            var name = user.global_name || user.username;
-
-            var w  = document.getElementById('discord-user-widget');
-            var wa = document.getElementById('discord-avatar');
-            var wn = document.getElementById('discord-username');
-            var wt = document.getElementById('discord-tag');
-            if (w) {
-                if (wa) wa.src = avatarUrl;
-                if (wn) wn.textContent = name;
-                if (wt) {
-                    if (label === 'admin')         { wt.textContent = '⚡ Admin';    wt.style.color = '#ff4444'; }
-                    else if (label === 'customer') { wt.textContent = '👑 Customer'; wt.style.color = '#f0a500'; }
-                    else                           { wt.textContent = '@' + user.username; wt.style.color = '#5865F2'; }
-                }
-                w.style.display = 'flex';
-            }
-
-            var pa = document.getElementById('popup-avatar');
-            var pu = document.getElementById('popup-username');
-            var pt = document.getElementById('popup-tag');
-            if (pa) pa.src = avatarUrl;
-            if (pu) pu.textContent = name;
-            if (pt) {
-                if (label === 'admin')         { pt.textContent = '⚡ Admin';    pt.style.color = '#ff4444'; }
-                else if (label === 'customer') { pt.textContent = '👑 Customer'; pt.style.color = '#f0a500'; }
-                else                           { pt.textContent = '@' + user.username; pt.style.color = '#5865F2'; }
-            }
-
-            var pn = document.getElementById('nav-customer-panel');
-            if (pn) pn.style.display = (label === 'admin' || label === 'customer') ? 'flex' : 'none';
-
-            localStorage.setItem('fuse_user', JSON.stringify(user));
-            localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+        async function fetchDiscordUser(token) {
+            const res = await fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Failed to fetch user');
+            return res.json();
         }
 
-        function clearUI() {
-            var w = document.getElementById('discord-user-widget');
-            if (w) w.style.display = 'none';
-            var pn = document.getElementById('nav-customer-panel');
-            if (pn) pn.style.display = 'none';
-            localStorage.removeItem('fuse_user');
-            localStorage.removeItem('fuse_roles');
-            localStorage.removeItem('fuse_token');
-            localStorage.removeItem('fuse_pending_token');
+        function saveSession(token, user) {
+            localStorage.setItem('discord_token', token);
+            localStorage.setItem('discord_user', JSON.stringify(user));
         }
 
-        // Restore session instantly from localStorage
-        (function() {
-            var savedUser = localStorage.getItem('fuse_user');
-            if (savedUser) {
-                try { applyUI(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]')); }
-                catch(e) { clearUI(); }
-            }
-        })();
-
-        // Process pending token (from hash or 404 redirect)
-        (function() {
-            var token = localStorage.getItem('fuse_pending_token');
-            if (!token) return;
-            localStorage.removeItem('fuse_pending_token');
-            localStorage.setItem('fuse_token', token);
-
-            fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me', {
-                headers: { 'Authorization': 'Bearer ' + token }
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(user) {
-                fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(function(r) { return r.ok ? r.json() : {}; })
-                .then(function(m) { applyUI(user, m.roles || []); })
-                .catch(function() { applyUI(user, []); });
-            })
-            .catch(function(e) { console.error('Discord error:', e); });
-        })();
+        function clearSession() {
+            localStorage.removeItem('discord_token');
+            localStorage.removeItem('discord_user');
+        }
 
         function loginWithDiscord() {
-            var p = new URLSearchParams({
-                client_id: DISCORD_CLIENT_ID,
-                redirect_uri: DISCORD_REDIRECT,
+            const params = new URLSearchParams({
+                client_id:     DISCORD_CLIENT_ID,
+                redirect_uri:  DISCORD_REDIRECT,
                 response_type: 'token',
-                scope: 'identify guilds.members.read'
+                scope:         DISCORD_SCOPE,
             });
-            window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
+            const url = 'https://discord.com/oauth2/authorize?' + params.toString();
+            console.log('Discord OAuth URL:', url);
+            console.log('Redirect URI being sent:', DISCORD_REDIRECT);
+            window.location.href = url;
         }
 
+                // Handle OAuth callback - token saved early before any script wipes the hash
+        (async function handleCallback() {
+            const pendingToken = localStorage.getItem('discord_pending_token');
+            if (pendingToken) {
+                localStorage.removeItem('discord_pending_token');
+                try {
+                    const user = await fetchDiscordUser(pendingToken);
+                    saveSession(pendingToken, user);
+                    showUserWidget(user);
+                } catch (e) {
+                    console.error('Discord login failed:', e);
+                }
+                return;
+            }
+
+            // Restore existing session
+            const savedToken = localStorage.getItem('discord_token');
+            if (savedToken) {
+                try {
+                    const user = await fetchDiscordUser(savedToken);
+                    saveSession(savedToken, user);
+                    showUserWidget(user);
+                } catch {
+                    clearSession();
+                }
+            }
+        })();
+
         document.getElementById('js-discord-login').addEventListener('click', loginWithDiscord);
-        document.getElementById('discord-logout').addEventListener('click', function() { clearUI(); });
-        document.getElementById('popup-logout-btn').addEventListener('click', function() {
-            clearUI();
+
+        logoutBtn.addEventListener('click', () => {
+            clearSession();
+            hideUserWidget();
+        });
+
+        document.getElementById('popup-logout-btn').addEventListener('click', () => {
+            clearSession();
+            hideUserWidget();
+            // Turn lamp off and hide popup, show login card next time
             lightOn = false;
             ROOT.style.setProperty('--on', '0');
             document.getElementById('discord-profile-popup').classList.remove('is-active');
@@ -1669,6 +1664,5 @@
     </script>
 
 </body>
-
 
 </html>
