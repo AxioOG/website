@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fuse - Status</title>
+    <title>Fusebypass.fun</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Roboto:wght@700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
@@ -577,8 +577,8 @@
         }
 
         .badge-undetected {
-            background: rgba(0, 200, 80, 0.25);
-            color: #00c850;
+            background: rgba(253, 1, 1, 0.452);
+            color: #ff0800;
             padding: 0.35rem 1rem;
             border-radius: 999px;
             font-size: 0.72rem;
@@ -719,119 +719,111 @@
         }
 
         /* -- Discord User Widget (top-left) -- */
+        /* -- Discord User Widget (top-left) -- */
         #discord-user-widget {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(10, 10, 10, 0.88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(88, 101, 242, 0.4);
-            border-radius: 999px;
-            padding: 7px 14px 7px 7px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.15);
-            animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-        }
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10, 10, 10, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(88, 101, 242, 0.4);
+    border-radius: 999px;
+    padding: 7px 14px 7px 7px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.15);
+    animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+        
         @keyframes widgetSlideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to   { opacity: 1; transform: translateX(0); }
-        }
-        #discord-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #5865F2;
-            flex-shrink: 0;
-        }
-        #discord-user-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-        #discord-username {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1.2;
-        }
-        #discord-tag {
-            font-size: 0.65rem;
-            color: #5865F2;
-            font-family: 'DM Sans', sans-serif;
-            letter-spacing: 0.04em;
-        }
-        #discord-logout {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: rgba(255,255,255,0.35);
-            display: flex;
-            align-items: center;
-            padding: 0;
-            margin-left: 2px;
-            transition: color 0.2s ease;
-        }
-        #discord-logout:hover {
-            color: rgba(255,255,255,0.8);
-        }
-
-        /* -- Register Modal -- */
-        #register-modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-        #register-modal-overlay.open {
-            display: flex;
-            animation: fadeInOverlay 0.25s ease;
-        }
-        @keyframes fadeInOverlay {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
-        #register-modal {
-            width: 320px;
-            padding: 32px 28px 28px;
-            background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.13);
-            border-radius: 20px;
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            box-shadow: 0 22px 56px rgba(0,0,0,0.65);
-            animation: slideUpModal 0.3s cubic-bezier(0.22,1,0.36,1);
-        }
-        @keyframes slideUpModal {
-            from { opacity: 0; transform: translateY(24px) scale(0.97); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-    </style>
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+#discord-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #5865F2;
+    flex-shrink: 0;
+}
+#discord-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+#discord-username {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+#discord-tag {
+    font-size: 0.65rem;
+    color: #5865F2;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.04em;
+}
+/* Role badge row */
+#discord-roles {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+.role-badge {
+    font-size: 0.58rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+#discord-logout {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,0.35);
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin-left: 4px;
+    transition: color 0.2s ease;
+}
+#discord-logout:hover { color: rgba(255,255,255,0.8); }
+</style>
 </head>
 
 <body>
 
     <!-- -- Discord User Profile Widget -- -->
     <div id="discord-user-widget" style="display:none;">
-        <img id="discord-avatar" src="" alt="avatar">
-        <div id="discord-user-info">
-            <span id="discord-username"></span>
-            <span id="discord-tag"></span>
-        </div>
-        <button id="discord-logout" title="Sign out">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </button>
+    <img id="discord-avatar" src="" alt="avatar">
+    <div id="discord-user-info">
+        <span id="discord-username"></span>
+        <span id="discord-tag"></span>
+        <div id="discord-roles"></div>
     </div>
+    <button id="discord-logout" title="Sign out">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+    </button>
+</div>
 
     <!-- -- Intro Typewriter Overlay -- -->
     <div id="intro-overlay">
@@ -998,7 +990,7 @@
                         <div style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Advanced Bypass Solution - Private Version</div>
                     </div>
                 </div>
-                <span style="background:rgba(0, 200, 80, 0.25); color:#00c850; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">UNDETECTED</span>
+                <span style="background:rgba(255, 0, 0, 0.411); color:#ff0000; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">UNDETECTED</span>
             </div>
 
             <div onclick="document.querySelector('[data-page=store]').click()" style="
@@ -1023,7 +1015,7 @@
                         <div style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Advanced Bypass Solution - Public Version</div>
                     </div>
                 </div>
-                <span style="background:rgba(0, 200, 80, 0.25); color:#00c850; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">COMING SOON</span>
+                <span style="background:rgba(255, 0, 0, 0.411); color:#ff0000; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">COMING SOON</span>
             </div>
 
             <!-- Scanner Status -->
@@ -1439,7 +1431,10 @@
 
         <div class="separator"></div>
 
-        
+        <a href="#" class="nav-item active" data-page="sign-in">
+            <i class="fa-solid fa-user"></i>
+            <span class="label">Sign In</span>
+        </a>
     </nav>
     <script>
         // Page name → URL slug mapping
@@ -1532,4 +1527,118 @@
         })();
     </script>
 
-    
+    <!-- -- Discord OAuth -- -->
+    <script>
+        // !! FIRST THING: grab token from hash before anything wipes it
+        // ── Grab token from hash immediately before anything wipes it ────────
+    (function () {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            const p = new URLSearchParams(hash);
+            const token = p.get('access_token');
+            if (token) {
+                localStorage.setItem('discord_pending_token', token);
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+    })();
+ 
+    // ── Config ────────────────────────────────────────────────────────────
+    const DISCORD_CLIENT_ID  = '1460340695578575041';
+    const DISCORD_REDIRECT   = 'https://fusebypass.fun';
+    const DISCORD_SCOPE      = 'identify';
+    // Point this at wherever your Node.js server is running
+    const BACKEND_URL        = 'https://YOUR-BACKEND-DOMAIN.com'; // e.g. https://api.fusebypass.fun
+ 
+    // ── DOM refs ──────────────────────────────────────────────────────────
+    const widget       = document.getElementById('discord-user-widget');
+    const avatarEl     = document.getElementById('discord-avatar');
+    const usernameEl   = document.getElementById('discord-username');
+    const tagEl        = document.getElementById('discord-tag');
+    const rolesEl      = document.getElementById('discord-roles');
+    const logoutBtn    = document.getElementById('discord-logout');
+ 
+    // ── Role colour map (mirrors server.js) ──────────────────────────────
+    const ROLE_STYLES = {
+        '1471974431579574538': { label: 'Owner',        color: '#FFD700', bg: 'rgba(255,215,0,0.12)',  icon: '<:fusegg:1479448399060271217>' },
+        '1489330191498084413': { label: 'Premium',      color: '#5865F2', bg: 'rgba(88,101,242,0.12)', icon: '<:fuseggyellow:1489347358515790025>' },
+        '1482165881315524688': { label: 'Admin', color: '#FF4444', bg: 'rgba(255,68,68,0.12)',  icon: '<:fuseggred:1489380190239985686>' },
+    };
+ 
+    function renderRoles(roles) {
+        rolesEl.innerHTML = '';
+        if (!roles || roles.length === 0) return;
+        roles.forEach(r => {
+            const style = ROLE_STYLES[r.id] || { label: r.label, color: '#aaa', bg: 'rgba(255,255,255,0.07)', icon: '' };
+            const badge = document.createElement('span');
+            badge.className = 'role-badge';
+            badge.style.color       = style.color;
+            badge.style.borderColor = style.color;
+            badge.style.background  = style.bg;
+            badge.textContent       = (style.icon ? style.icon + ' ' : '') + style.label;
+            rolesEl.appendChild(badge);
+        });
+    }
+ 
+    function showUserWidget(user, roles) {
+        const avatarUrl = user.avatar
+            ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+            : `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(user.id) >> 22n) % 6n)}.png`;
+ 
+        avatarEl.src           = avatarUrl;
+        usernameEl.textContent = user.global_name || user.username;
+        tagEl.textContent      = '@' + user.username;
+        renderRoles(roles || []);
+        widget.style.display = 'flex';
+ 
+        // Sync lamp popup
+        const pa = document.getElementById('popup-avatar');
+        const pu = document.getElementById('popup-username');
+        const pt = document.getElementById('popup-tag');
+        if (pa) pa.src = avatarUrl;
+        if (pu) pu.textContent = user.global_name || user.username;
+        if (pt) pt.textContent = '@' + user.username;
+    }
+ 
+    function hideUserWidget() {
+        widget.style.display = 'none';
+        rolesEl.innerHTML    = '';
+    }
+ 
+    function saveSession(token, user, roles) {
+        localStorage.setItem('discord_token', token);
+        localStorage.setItem('discord_user',  JSON.stringify(user));
+        localStorage.setItem('discord_roles', JSON.stringify(roles || []));
+    }
+ 
+    function clearSession() {
+        localStorage.removeItem('discord_token');
+        localStorage.removeItem('discord_user');
+        localStorage.removeItem('discord_roles');
+    }
+ 
+    // Fetch user + roles from our backend
+    async function fetchUserAndRoles(token) {
+        const res = await fetch(BACKEND_URL + '/api/roles', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ access_token: token }),
+        });
+        if (!res.ok) throw new Error('Backend error ' + res.status);
+        return res.json(); // { user, roles, inGuild }
+    }
+ 
+    function loginWithDiscord() {
+        const params = new URLSearchParams({
+            client_id:     DISCORD_CLIENT_ID,
+            redirect_uri:  DISCORD_REDIRECT,
+            response_type: 'token',
+            scope:         DISCORD_SCOPE,
+        });
+        window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+    }</script>
+
+</body>
+
+
+</html>
