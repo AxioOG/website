@@ -1387,7 +1387,7 @@
             lightOn = !lightOn;
             ROOT.style.setProperty('--on', lightOn ? '1' : '0');
 
-            const isLoggedIn = !!localStorage.getItem('discord_token');
+            const isLoggedIn = !!localStorage.getItem('fuse_user');
             if (isLoggedIn) {
                 // Show profile popup instead of login card
                 card.classList.remove('is-active');
@@ -1527,116 +1527,146 @@
         })();
     </script>
 
-    <!-- -- Discord OAuth -- -->
+        <!-- -- Discord OAuth -- -->
     <script>
-        // !! FIRST THING: grab token from hash before anything wipes it
-        // ── Grab token from hash immediately before anything wipes it ────────
-    (function () {
-        const hash = window.location.hash.substring(1);
-        if (hash) {
-            const p = new URLSearchParams(hash);
-            const token = p.get('access_token');
-            if (token) {
-                localStorage.setItem('discord_pending_token', token);
-                history.replaceState(null, '', window.location.pathname);
+        // Grab token from hash immediately
+        (function() {
+            var h = window.location.hash.substring(1);
+            if (h) {
+                var p = new URLSearchParams(h);
+                var t = p.get('access_token');
+                if (t) {
+                    localStorage.setItem('fuse_pending_token', t);
+                    history.replaceState(null, '', window.location.pathname);
+                }
             }
+            // Also check if 404.html saved a token
+            var pt = localStorage.getItem('fuse_pending_token_404');
+            if (pt) {
+                localStorage.setItem('fuse_pending_token', pt);
+                localStorage.removeItem('fuse_pending_token_404');
+            }
+        })();
+
+        var DISCORD_CLIENT_ID = '1460340695578575041';
+        var DISCORD_REDIRECT  = 'https://fusebypass.fun';
+        var GUILD_ID          = '1305642236880617482';
+        var ROLE_ADMIN1       = '1471974431579574538';
+        var ROLE_ADMIN2       = '1482165881315524688';
+        var ROLE_CUSTOMER     = '1489330191498084413';
+
+        function getAvatarUrl(user) {
+            return user.avatar
+                ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png?size=128'
+                : 'https://cdn.discordapp.com/embed/avatars/0.png';
         }
-    })();
- 
-    // ── Config ────────────────────────────────────────────────────────────
-    const DISCORD_CLIENT_ID  = '1460340695578575041';
-    const DISCORD_REDIRECT   = 'https://fusebypass.fun';
-    const DISCORD_SCOPE      = 'identify';
-    // Point this at wherever your Node.js server is running
-    const BACKEND_URL        = 'https://YOUR-BACKEND-DOMAIN.com'; // e.g. https://api.fusebypass.fun
- 
-    // ── DOM refs ──────────────────────────────────────────────────────────
-    const widget       = document.getElementById('discord-user-widget');
-    const avatarEl     = document.getElementById('discord-avatar');
-    const usernameEl   = document.getElementById('discord-username');
-    const tagEl        = document.getElementById('discord-tag');
-    const rolesEl      = document.getElementById('discord-roles');
-    const logoutBtn    = document.getElementById('discord-logout');
- 
-    // ── Role colour map (mirrors server.js) ──────────────────────────────
-    const ROLE_STYLES = {
-        '1471974431579574538': { label: 'Owner',        color: '#FFD700', bg: 'rgba(255,215,0,0.12)',  icon: '<:fusegg:1479448399060271217>' },
-        '1489330191498084413': { label: 'Premium',      color: '#5865F2', bg: 'rgba(88,101,242,0.12)', icon: '<:fuseggyellow:1489347358515790025>' },
-        '1482165881315524688': { label: 'Admin', color: '#FF4444', bg: 'rgba(255,68,68,0.12)',  icon: '<:fuseggred:1489380190239985686>' },
-    };
- 
-    function renderRoles(roles) {
-        rolesEl.innerHTML = '';
-        if (!roles || roles.length === 0) return;
-        roles.forEach(r => {
-            const style = ROLE_STYLES[r.id] || { label: r.label, color: '#aaa', bg: 'rgba(255,255,255,0.07)', icon: '' };
-            const badge = document.createElement('span');
-            badge.className = 'role-badge';
-            badge.style.color       = style.color;
-            badge.style.borderColor = style.color;
-            badge.style.background  = style.bg;
-            badge.textContent       = (style.icon ? style.icon + ' ' : '') + style.label;
-            rolesEl.appendChild(badge);
+
+        function getRoleLabel(roles) {
+            if (!roles) return null;
+            if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+            if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
+            return null;
+        }
+
+        function applyUI(user, roles) {
+            var label = getRoleLabel(roles);
+            var avatarUrl = getAvatarUrl(user);
+            var name = user.global_name || user.username;
+
+            var w  = document.getElementById('discord-user-widget');
+            var wa = document.getElementById('discord-avatar');
+            var wn = document.getElementById('discord-username');
+            var wt = document.getElementById('discord-tag');
+            if (w) {
+                if (wa) wa.src = avatarUrl;
+                if (wn) wn.textContent = name;
+                if (wt) {
+                    if (label === 'admin')         { wt.textContent = '⚡ Admin';    wt.style.color = '#ff4444'; }
+                    else if (label === 'customer') { wt.textContent = '👑 Customer'; wt.style.color = '#f0a500'; }
+                    else                           { wt.textContent = '@' + user.username; wt.style.color = '#5865F2'; }
+                }
+                w.style.display = 'flex';
+            }
+
+            var pa = document.getElementById('popup-avatar');
+            var pu = document.getElementById('popup-username');
+            var pt = document.getElementById('popup-tag');
+            if (pa) pa.src = avatarUrl;
+            if (pu) pu.textContent = name;
+            if (pt) {
+                if (label === 'admin')         { pt.textContent = '⚡ Admin';    pt.style.color = '#ff4444'; }
+                else if (label === 'customer') { pt.textContent = '👑 Customer'; pt.style.color = '#f0a500'; }
+                else                           { pt.textContent = '@' + user.username; pt.style.color = '#5865F2'; }
+            }
+
+            var pn = document.getElementById('nav-customer-panel');
+            if (pn) pn.style.display = (label === 'admin' || label === 'customer') ? 'flex' : 'none';
+
+            localStorage.setItem('fuse_user', JSON.stringify(user));
+            localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+        }
+
+        function clearUI() {
+            var w = document.getElementById('discord-user-widget');
+            if (w) w.style.display = 'none';
+            var pn = document.getElementById('nav-customer-panel');
+            if (pn) pn.style.display = 'none';
+            localStorage.removeItem('fuse_user');
+            localStorage.removeItem('fuse_roles');
+            localStorage.removeItem('fuse_token');
+            localStorage.removeItem('fuse_pending_token');
+        }
+
+        // Restore session instantly from localStorage
+        (function() {
+            var savedUser = localStorage.getItem('fuse_user');
+            if (savedUser) {
+                try { applyUI(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]')); }
+                catch(e) { clearUI(); }
+            }
+        })();
+
+        // Process pending token (from hash or 404 redirect)
+        (function() {
+            var token = localStorage.getItem('fuse_pending_token');
+            if (!token) return;
+            localStorage.removeItem('fuse_pending_token');
+            localStorage.setItem('fuse_token', token);
+
+            fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(user) {
+                fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(function(r) { return r.ok ? r.json() : {}; })
+                .then(function(m) { applyUI(user, m.roles || []); })
+                .catch(function() { applyUI(user, []); });
+            })
+            .catch(function(e) { console.error('Discord error:', e); });
+        })();
+
+        function loginWithDiscord() {
+            var p = new URLSearchParams({
+                client_id: DISCORD_CLIENT_ID,
+                redirect_uri: DISCORD_REDIRECT,
+                response_type: 'token',
+                scope: 'identify guilds.members.read'
+            });
+            window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
+        }
+
+        document.getElementById('js-discord-login').addEventListener('click', loginWithDiscord);
+        document.getElementById('discord-logout').addEventListener('click', function() { clearUI(); });
+        document.getElementById('popup-logout-btn').addEventListener('click', function() {
+            clearUI();
+            lightOn = false;
+            ROOT.style.setProperty('--on', '0');
+            document.getElementById('discord-profile-popup').classList.remove('is-active');
         });
-    }
- 
-    function showUserWidget(user, roles) {
-        const avatarUrl = user.avatar
-            ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-            : `https://cdn.discordapp.com/embed/avatars/${Number((BigInt(user.id) >> 22n) % 6n)}.png`;
- 
-        avatarEl.src           = avatarUrl;
-        usernameEl.textContent = user.global_name || user.username;
-        tagEl.textContent      = '@' + user.username;
-        renderRoles(roles || []);
-        widget.style.display = 'flex';
- 
-        // Sync lamp popup
-        const pa = document.getElementById('popup-avatar');
-        const pu = document.getElementById('popup-username');
-        const pt = document.getElementById('popup-tag');
-        if (pa) pa.src = avatarUrl;
-        if (pu) pu.textContent = user.global_name || user.username;
-        if (pt) pt.textContent = '@' + user.username;
-    }
- 
-    function hideUserWidget() {
-        widget.style.display = 'none';
-        rolesEl.innerHTML    = '';
-    }
- 
-    function saveSession(token, user, roles) {
-        localStorage.setItem('discord_token', token);
-        localStorage.setItem('discord_user',  JSON.stringify(user));
-        localStorage.setItem('discord_roles', JSON.stringify(roles || []));
-    }
- 
-    function clearSession() {
-        localStorage.removeItem('discord_token');
-        localStorage.removeItem('discord_user');
-        localStorage.removeItem('discord_roles');
-    }
- 
-    // Fetch user + roles from our backend
-    async function fetchUserAndRoles(token) {
-        const res = await fetch(BACKEND_URL + '/api/roles', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ access_token: token }),
-        });
-        if (!res.ok) throw new Error('Backend error ' + res.status);
-        return res.json(); // { user, roles, inGuild }
-    }
- 
-    function loginWithDiscord() {
-        const params = new URLSearchParams({
-            client_id:     DISCORD_CLIENT_ID,
-            redirect_uri:  DISCORD_REDIRECT,
-            response_type: 'token',
-            scope:         DISCORD_SCOPE,
-        });
-        window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
-    }</script>
+    </script>
 
 </body>
 
