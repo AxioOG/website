@@ -849,7 +849,7 @@
 
 
     <!-- -- PAGE: Home -- -->
-    <div class="page" id="page-home">
+    <div class="page active" id="page-home">
         <div style="width:100%; max-width:700px; padding:6rem 2rem 4rem; margin:0 auto;">
 
             <!-- Available Products -->
@@ -1324,10 +1324,11 @@
     <script>
         // Page name → URL slug mapping
         const PAGE_SLUGS = {
-            account: '/',
-            home:    '/home',
+            'sign-in': '/signin',
+            home:    '/',
             store:   '/store',
             tos:     '/policy',
+            panel:   '/panel',
         };
 
         function navigateTo(target) {
