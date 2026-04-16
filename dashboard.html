@@ -394,6 +394,7 @@
 
             localStorage.setItem('fuse_user', JSON.stringify(user));
             localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+            localStorage.setItem('fuse_token', localStorage.getItem('fuse_token') || '');
 
             document.getElementById('no-access').style.display = 'none';
             document.getElementById('dash-content').style.display = 'block';
@@ -416,57 +417,84 @@
             if (!pill.contains(e.target)) pill.classList.remove('open');
         });
 
-        // Handle OAuth token from hash
-        (function() {
-            var h = window.location.hash.substring(1);
-            if (h) {
-                var p = new URLSearchParams(h);
-                var t = p.get('access_token');
-                if (t) {
-                    localStorage.setItem('fuse_pending_token', t);
-                    history.replaceState(null, '', window.location.pathname);
-                }
-            }
-        })();
+        function showNoAccess() {
+            document.getElementById('no-access').style.display = 'flex';
+            document.getElementById('dash-content').style.display = 'none';
+            document.getElementById('dash-username').textContent = 'Guest';
+        }
 
-        // Process token
-        (function() {
-            var token = localStorage.getItem('fuse_pending_token') || localStorage.getItem('fuse_token');
-            if (token) {
-                localStorage.removeItem('fuse_pending_token');
+        function fetchAndApply(token) {
+            var proxies = [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url='
+            ];
+            var proxy = proxies[0];
+
+            fetch(proxy + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) {
+                if (!r.ok) throw new Error('auth failed');
+                return r.json();
+            })
+            .then(function(user) {
+                if (!user.id) throw new Error('no user');
                 localStorage.setItem('fuse_token', token);
-
-                fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me', {
+                fetch(proxy + encodeURIComponent('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member'), {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(function(r) { return r.ok ? r.json() : {}; })
+                .then(function(m) { applyDashboard(user, m.roles || []); })
+                .catch(function() { applyDashboard(user, []); });
+            })
+            .catch(function() {
+                // Try second proxy
+                fetch(proxies[1] + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
                     headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function(r) { return r.json(); })
                 .then(function(user) {
-                    fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    })
-                    .then(function(r) { return r.ok ? r.json() : {}; })
-                    .then(function(m) { applyDashboard(user, m.roles || []); })
-                    .catch(function() { applyDashboard(user, []); });
+                    if (!user.id) throw new Error('no user');
+                    localStorage.setItem('fuse_token', token);
+                    applyDashboard(user, []);
                 })
                 .catch(function() { showNoAccess(); });
-                return;
-            }
+            });
+        }
 
-            // Try saved session
-            var savedUser = localStorage.getItem('fuse_user');
-            if (savedUser) {
-                try {
-                    applyDashboard(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]'));
-                    return;
-                } catch(e) {}
+        // STEP 1: Grab token from hash first (Discord puts it here on redirect)
+        var token = null;
+        var rawHash = window.location.hash.substring(1);
+        if (rawHash) {
+            var hashParams = new URLSearchParams(rawHash);
+            token = hashParams.get('access_token');
+            if (token) {
+                localStorage.setItem('fuse_token', token);
+                localStorage.removeItem('fuse_pending_token');
+                history.replaceState(null, '', window.location.pathname);
             }
+        }
 
+        // STEP 2: Fall back to localStorage
+        if (!token) token = localStorage.getItem('fuse_pending_token') || localStorage.getItem('fuse_token');
+        if (token) localStorage.removeItem('fuse_pending_token');
+
+        // STEP 3: Try saved session first for instant load
+        var savedUser = localStorage.getItem('fuse_user');
+        var savedToken = localStorage.getItem('fuse_token');
+        if (savedUser && savedToken && !rawHash) {
+            try {
+                applyDashboard(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]'));
+                // Refresh in background
+                fetchAndApply(savedToken);
+            } catch(e) {
+                if (token) fetchAndApply(token);
+                else showNoAccess();
+            }
+        } else if (token) {
+            fetchAndApply(token);
+        } else {
             showNoAccess();
-        })();
-
-        function showNoAccess() {
-            document.getElementById('no-access').style.display = 'flex';
-            document.getElementById('dash-content').style.display = 'none';
         }
     </script>
 </body>
