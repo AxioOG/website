@@ -66,7 +66,12 @@
         .topbar-logo span { color: rgba(255,255,255,0.4); }
 
         /* ── User pill ── */
-        .user-pill { position: relative; }
+        .user-pill { 
+            position: fixed;
+            bottom: 32px;
+            left: 32px;
+            z-index: 100;
+        }
 
         .user-pill-btn {
             display: flex;
@@ -104,8 +109,8 @@
         /* ── Dropdown ── */
         .dropdown {
             position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
+            bottom: calc(100% + 10px);
+            left: 0;
             min-width: 190px;
             background: rgba(14,14,14,0.98);
             border: 1px solid rgba(255,255,255,0.08);
@@ -114,7 +119,7 @@
             box-shadow: 0 16px 48px rgba(0,0,0,0.75);
             opacity: 0;
             pointer-events: none;
-            transform: translateY(-6px);
+            transform: translateY(6px);
             transition: opacity 0.16s, transform 0.16s;
             z-index: 200;
         }
@@ -231,21 +236,22 @@
 <!-- Top bar -->
 <header class="topbar">
     <a class="topbar-logo" href="https://fusebypass.fun">fusebypass<span>.fun</span></a>
-
-    <div class="user-pill" id="user-pill">
-        <button class="user-pill-btn" onclick="toggleDD()">
-            <img id="pill-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
-            <span id="pill-name">—</span>
-            <i class="fa fa-chevron-down chevron"></i>
-        </button>
-        <div class="dropdown">
-            <a class="dd-item" href="/dashboard"><i class="fa fa-house"></i> Dashboard</a>
-            <a class="dd-item" href="https://fusebypass.fun/store"><i class="fa fa-cart-shopping"></i> Store</a>
-            <div class="dd-sep"></div>
-            <button class="dd-item red" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Logout</button>
-        </div>
-    </div>
 </header>
+
+<!-- User pill (bottom left) -->
+<div class="user-pill" id="user-pill">
+    <button class="user-pill-btn" onclick="toggleDD()">
+        <img id="pill-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
+        <span id="pill-name">—</span>
+        <i class="fa fa-chevron-down chevron"></i>
+    </button>
+    <div class="dropdown">
+        <a class="dd-item" href="/dashboard"><i class="fa fa-house"></i> Dashboard</a>
+        <a class="dd-item" href="https://fusebypass.fun/store"><i class="fa fa-cart-shopping"></i> Store</a>
+        <div class="dd-sep"></div>
+        <button class="dd-item red" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Logout</button>
+    </div>
+</div>
 
 <!-- No access -->
 <div id="no-access">
