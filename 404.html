@@ -2,11 +2,21 @@
 <html>
 <head>
 <script>
-    // Preserve both path and hash (needed for Discord OAuth token)
-    const path = window.location.pathname;
-    const hash = window.location.hash;
-    window.location.replace('/?p=' + encodeURIComponent(path) + (hash ? '&h=' + encodeURIComponent(hash) : ''));
+    var path = window.location.pathname;
+    var hash = window.location.hash;
+
+    // Discord OAuth callback — token is in the hash
+    if (hash && hash.indexOf('access_token') !== -1) {
+        var p = new URLSearchParams(hash.substring(1));
+        var t = p.get('access_token');
+        if (t) localStorage.setItem('fuse_pending_token', t);
+        // Go straight to dashboard.html (real file, no more 404 loop)
+        window.location.replace('/dashboard.html');
+    } else if (path === '/dashboard' || path === '/dashboard/') {
+        window.location.replace('/dashboard.html');
+    } else {
+        window.location.replace('/?p=' + encodeURIComponent(path));
+    }
 </script>
 </head>
 </html>
-
