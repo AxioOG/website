@@ -351,12 +351,10 @@
     </main>
 
     <script>
-        var DISCORD_CLIENT_ID = '1460340695578575041';
-        var DISCORD_REDIRECT  = 'https://fusebypass.fun/dashboard';
-        var GUILD_ID          = '1305642236880617482';
-        var ROLE_ADMIN1       = '1471974431579574538';
-        var ROLE_ADMIN2       = '1482165881315524688';
-        var ROLE_CUSTOMER     = '1489330191498084413';
+        var GUILD_ID     = '1305642236880617482';
+        var ROLE_ADMIN1  = '1471974431579574538';
+        var ROLE_ADMIN2  = '1482165881315524688';
+        var ROLE_CUSTOMER= '1489330191498084413';
 
         function getAvatarUrl(user) {
             return user.avatar
@@ -373,10 +371,9 @@
 
         function applyDashboard(user, roles) {
             var label = getRoleLabel(roles);
-            var avatar = getAvatarUrl(user);
-            var name = user.global_name || user.username;
+            var name  = user.global_name || user.username;
 
-            document.getElementById('dash-avatar').src = avatar;
+            document.getElementById('dash-avatar').src = getAvatarUrl(user);
             document.getElementById('dash-username').textContent = name;
             document.getElementById('dash-name').textContent = name;
             document.getElementById('dash-account-tag').textContent = '@' + user.username;
@@ -392,82 +389,66 @@
                 document.getElementById('license-badge').className = 'license-badge badge-active';
             }
 
-            localStorage.setItem('fuse_user', JSON.stringify(user));
+            localStorage.setItem('fuse_user',  JSON.stringify(user));
             localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
-            localStorage.setItem('fuse_token', localStorage.getItem('fuse_token') || '');
 
-            document.getElementById('no-access').style.display = 'none';
+            document.getElementById('no-access').style.display  = 'none';
             document.getElementById('dash-content').style.display = 'block';
         }
 
-        function logout() {
-            localStorage.removeItem('fuse_user');
-            localStorage.removeItem('fuse_roles');
-            localStorage.removeItem('fuse_token');
-            localStorage.removeItem('fuse_pending_token');
-            window.location.href = 'https://fusebypass.fun';
-        }
-
-        function toggleDropdown() {
-            document.getElementById('user-pill').classList.toggle('open');
-        }
-
-        document.addEventListener('click', function(e) {
-            var pill = document.getElementById('user-pill');
-            if (!pill.contains(e.target)) pill.classList.remove('open');
-        });
-
         function showNoAccess() {
-            document.getElementById('no-access').style.display = 'flex';
+            document.getElementById('no-access').style.display  = 'flex';
             document.getElementById('dash-content').style.display = 'none';
             document.getElementById('dash-username').textContent = 'Guest';
         }
 
-        function fetchAndApply(token) {
-            var proxies = [
-                'https://corsproxy.io/?',
-                'https://api.allorigins.win/raw?url='
-            ];
-            var proxy = proxies[0];
+        function logout() {
+            ['fuse_user','fuse_roles','fuse_token','fuse_pending_token'].forEach(function(k){ localStorage.removeItem(k); });
+            window.location.href = 'https://fusebypass.fun';
+        }
 
-            fetch(proxy + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
+        function toggleDropdown() { document.getElementById('user-pill').classList.toggle('open'); }
+        document.addEventListener('click', function(e) {
+            var p = document.getElementById('user-pill');
+            if (!p.contains(e.target)) p.classList.remove('open');
+        });
+
+        function fetchAndApply(token) {
+            // Call Discord API directly — works with implicit grant tokens from browser
+            fetch('https://discord.com/api/v10/users/@me', {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-            .then(function(r) {
-                if (!r.ok) throw new Error('auth failed');
-                return r.json();
-            })
+            .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(function(user) {
-                if (!user.id) throw new Error('no user');
+                if (!user.id) throw new Error('no id');
                 localStorage.setItem('fuse_token', token);
-                fetch(proxy + encodeURIComponent('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member'), {
+                // Fetch guild member for role check
+                fetch('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function(r) { return r.ok ? r.json() : {}; })
-                .then(function(m) { applyDashboard(user, m.roles || []); })
-                .catch(function() { applyDashboard(user, []); });
+                .then(function(m)  { applyDashboard(user, m.roles || []); })
+                .catch(function()  { applyDashboard(user, []); });
             })
-            .catch(function() {
-                // Try second proxy
-                fetch(proxies[1] + encodeURIComponent('https://discord.com/api/v10/users/@me'), {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(user) {
-                    if (!user.id) throw new Error('no user');
-                    localStorage.setItem('fuse_token', token);
-                    applyDashboard(user, []);
-                })
-                .catch(function() { showNoAccess(); });
+            .catch(function(err) {
+                console.warn('Discord fetch failed:', err);
+                // Try saved session as fallback
+                var saved = localStorage.getItem('fuse_user');
+                if (saved) {
+                    try { applyDashboard(JSON.parse(saved), JSON.parse(localStorage.getItem('fuse_roles') || '[]')); return; }
+                    catch(e) {}
+                }
+                showNoAccess();
             });
         }
 
-        // STEP 1: Grab token from hash first (Discord puts it here on redirect)
+        // ── Boot ──────────────────────────────────────────────────────
+        // 1. Read token from URL hash (Discord puts it here after OAuth)
         var token = null;
         var rawHash = window.location.hash.substring(1);
         if (rawHash) {
-            var hashParams = new URLSearchParams(rawHash);
-            token = hashParams.get('access_token');
+            var hp = new URLSearchParams(rawHash);
+            token = hp.get('access_token');
             if (token) {
                 localStorage.setItem('fuse_token', token);
                 localStorage.removeItem('fuse_pending_token');
@@ -475,23 +456,18 @@
             }
         }
 
-        // STEP 2: Fall back to localStorage
-        if (!token) token = localStorage.getItem('fuse_pending_token') || localStorage.getItem('fuse_token');
-        if (token) localStorage.removeItem('fuse_pending_token');
+        // 2. Fall back to stored token
+        if (!token) {
+            token = localStorage.getItem('fuse_pending_token') || localStorage.getItem('fuse_token');
+            localStorage.removeItem('fuse_pending_token');
+        }
 
-        // STEP 3: Try saved session first for instant load
-        var savedUser = localStorage.getItem('fuse_user');
-        var savedToken = localStorage.getItem('fuse_token');
-        if (savedUser && savedToken && !rawHash) {
-            try {
-                applyDashboard(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]'));
-                // Refresh in background
-                fetchAndApply(savedToken);
-            } catch(e) {
-                if (token) fetchAndApply(token);
-                else showNoAccess();
+        // 3. Show saved session instantly, then refresh
+        if (token) {
+            var savedUser = localStorage.getItem('fuse_user');
+            if (savedUser && !rawHash) {
+                try { applyDashboard(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]')); } catch(e) {}
             }
-        } else if (token) {
             fetchAndApply(token);
         } else {
             showNoAccess();
