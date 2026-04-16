@@ -642,90 +642,107 @@
             transform: scale(0.98);
         }
 
-        /* -- Discord User Widget (top-left) -- */
-        /* -- Discord User Widget (top-left) -- */
+        /* -- Discord User Widget (top-right) -- */
         #discord-user-widget {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(10, 10, 10, 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(88, 101, 242, 0.4);
-    border-radius: 999px;
-    padding: 7px 14px 7px 7px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(88,101,242,0.15);
-    animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-        
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            animation: widgetSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
         @keyframes widgetSlideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-#discord-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #5865F2;
-    flex-shrink: 0;
-}
-#discord-user-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-#discord-username {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.2;
-}
-#discord-tag {
-    font-size: 0.65rem;
-    color: #5865F2;
-    font-family: 'DM Sans', sans-serif;
-    letter-spacing: 0.04em;
-}
-/* Role badge row */
-#discord-roles {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-    margin-top: 2px;
-    flex-wrap: wrap;
-}
-.role-badge {
-    font-size: 0.58rem;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 999px;
-    border: 1px solid;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-#discord-logout {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: rgba(255,255,255,0.35);
-    display: flex;
-    align-items: center;
-    padding: 0;
-    margin-left: 4px;
-    transition: color 0.2s ease;
-}
-#discord-logout:hover { color: rgba(255,255,255,0.8); }
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .widget-pill {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px;
+            padding: 5px 14px 5px 5px;
+            cursor: pointer;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: background 0.2s;
+            user-select: none;
+        }
+        .widget-pill:hover { background: rgba(255,255,255,0.11); }
+
+        #discord-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.15);
+            flex-shrink: 0;
+        }
+
+        #discord-username {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .widget-chevron {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.45);
+            margin-left: 2px;
+            transition: transform 0.2s;
+        }
+        #discord-user-widget.open .widget-chevron { transform: rotate(180deg); }
+
+        /* Widget Dropdown */
+        .widget-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 190px;
+            background: rgba(14,14,14,0.98);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 7px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.75);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(6px);
+            transition: opacity 0.16s, transform 0.16s;
+        }
+        #discord-user-widget.open .widget-dropdown {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .widget-dd-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 13px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.87rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            transition: background 0.15s, color 0.15s;
+        }
+        .widget-dd-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+        .widget-dd-item i { width: 16px; text-align: center; }
+        .widget-dd-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 5px 0; }
+        .widget-dd-item.red { color: rgba(255,80,80,0.8); }
+        .widget-dd-item.red:hover { background: rgba(255,50,50,0.1); color: #ff5555; }
 
         .nav-item:hover, .nav-item.active {
             color: #ffffff !important;
@@ -789,23 +806,20 @@
         <span style="color:#ffffff;">fusebypass</span><span style="color:#f7f5f5b4;">.fun</span>
     </div>
 
-    <!-- -- Discord User Profile Widget -- -->
+    <!-- -- Discord User Widget (top-right pill with dropdown) -- -->
     <div id="discord-user-widget" style="display:none;">
-    <img id="discord-avatar" src="" alt="avatar">
-    <div id="discord-user-info">
-        <span id="discord-username"></span>
-        <span id="discord-tag"></span>
-        <div id="discord-roles"></div>
+        <div class="widget-pill" onclick="document.getElementById('discord-user-widget').classList.toggle('open')">
+            <img id="discord-avatar" src="" alt="avatar">
+            <span id="discord-username"></span>
+            <i class="fa fa-chevron-down widget-chevron"></i>
+        </div>
+        <div class="widget-dropdown">
+            <a class="widget-dd-item" href="/dashboard"><i class="fa fa-house"></i> Dashboard</a>
+            <a class="widget-dd-item" href="/store"><i class="fa fa-cart-shopping"></i> Store</a>
+            <div class="widget-dd-sep"></div>
+            <button class="widget-dd-item red" id="discord-logout"><i class="fa fa-right-from-bracket"></i> Sign Out</button>
+        </div>
     </div>
-    <button id="discord-logout" title="Sign out">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-    </button>
-</div>
 
 
 
@@ -1498,23 +1512,16 @@
         }
 
         function applyUI(user, roles) {
-            var label = getRoleLabel(roles);
             var avatarUrl = getAvatarUrl(user);
             var name = user.global_name || user.username;
 
             var w  = document.getElementById('discord-user-widget');
             var wa = document.getElementById('discord-avatar');
             var wn = document.getElementById('discord-username');
-            var wt = document.getElementById('discord-tag');
             if (w) {
                 if (wa) wa.src = avatarUrl;
                 if (wn) wn.textContent = name;
-                if (wt) {
-                    if (label === 'admin')         { wt.textContent = '⚡ Admin';    wt.style.color = '#ff4444'; }
-                    else if (label === 'customer') { wt.textContent = '👑 Customer'; wt.style.color = '#f0a500'; }
-                    else                           { wt.textContent = '@' + user.username; wt.style.color = '#5865F2'; }
-                }
-                w.style.display = 'flex';
+                w.style.display = 'block';
             }
 
             var pa = document.getElementById('popup-avatar');
@@ -1522,14 +1529,7 @@
             var pt = document.getElementById('popup-tag');
             if (pa) pa.src = avatarUrl;
             if (pu) pu.textContent = name;
-            if (pt) {
-                if (label === 'admin')         { pt.textContent = '⚡ Admin';    pt.style.color = '#ff4444'; }
-                else if (label === 'customer') { pt.textContent = '👑 Customer'; pt.style.color = '#f0a500'; }
-                else                           { pt.textContent = '@' + user.username; pt.style.color = '#5865F2'; }
-            }
-
-            var pn = document.getElementById('nav-customer-panel');
-            if (pn) pn.style.display = (label === 'admin' || label === 'customer') ? 'flex' : 'none';
+            if (pt) pt.textContent = '@' + user.username;
 
             localStorage.setItem('fuse_user', JSON.stringify(user));
             localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
@@ -1588,6 +1588,12 @@
         }
 
         document.getElementById('discord-logout').addEventListener('click', function() { clearUI(); });
+
+        // Close widget dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            var w = document.getElementById('discord-user-widget');
+            if (w && !w.contains(e.target)) w.classList.remove('open');
+        });
         document.getElementById('popup-logout-btn').addEventListener('click', function() {
             clearUI();
             lightOn = false;
