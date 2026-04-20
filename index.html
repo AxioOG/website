@@ -101,6 +101,11 @@
             overflow-y: auto;
         }
 
+        #page-home.active {
+            flex-direction: column;
+            align-items: center;
+        }
+
         /* Ambient room glow � only visible on account page */
         #page-account::after {
             content: '';
@@ -773,6 +778,281 @@
             box-shadow: none !important;
         }
 
+        /* ═══════════════════════════════════════════
+           FANCY ENHANCEMENTS
+        ═══════════════════════════════════════════ */
+
+        /* Animated gradient orbs in background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 55% 45% at 20% 60%, rgba(120,80,255,0.07) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 55% at 80% 30%, rgba(80,160,255,0.06) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
+            animation: orbDrift 18s ease-in-out infinite alternate;
+        }
+        @keyframes orbDrift {
+            from { transform: scale(1) translateY(0); }
+            to   { transform: scale(1.08) translateY(-20px); }
+        }
+
+        /* Hero title */
+        .hero-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2.2rem, 5vw, 3.4rem);
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.55) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        /* Hero subtitle */
+        .hero-sub {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 2.5rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.55) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeUp 0.7s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Primary button */
+        .btn-primary {
+            padding: 13px 32px;
+            background: #fff;
+            color: #000;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.88rem;
+            letter-spacing: 0.04em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.18s, box-shadow 0.25s;
+            box-shadow: 0 0 0 0 rgba(255,255,255,0);
+            animation: fadeUp 0.7s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(255,255,255,0.22); }
+        .btn-primary:hover::after { opacity: 1; }
+        .btn-primary:active { transform: scale(0.97); }
+
+        /* Ghost button */
+        .btn-ghost {
+            padding: 13px 32px;
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.88rem;
+            letter-spacing: 0.04em;
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.18s;
+            animation: fadeUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); transform: translateY(-3px); }
+        .btn-ghost:active { transform: scale(0.97); }
+
+        /* Section label */
+        .section-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.28);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-label::before,
+        .section-label::after {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 1px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Team cards — enhanced */
+        .team-card {
+            background: rgba(255,255,255,0.03) !important;
+            border: 1px solid rgba(255,255,255,0.07) !important;
+            border-radius: 16px !important;
+            transition: background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s !important;
+        }
+        .team-card:hover {
+            background: rgba(255,255,255,0.07) !important;
+            border-color: rgba(255,255,255,0.16) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        /* Store pricing cards — enhanced */
+        #page-store > div > div {
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+        }
+        #page-store > div > div:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.2) !important;
+        }
+
+        /* Nav items — subtle glow on active */
+        #main-nav .nav-item.active {
+            color: #fff !important;
+            text-shadow: 0 0 18px rgba(255,255,255,0.5);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+        /* ── Games Ticker ── */
+        .games-ticker-wrap {
+            width: 100%;
+            padding: 0 0 4rem;
+            overflow: hidden;
+            position: relative;
+        }
+        .games-ticker-wrap::before,
+        .games-ticker-wrap::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 120px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .games-ticker-wrap::before {
+            left: 0;
+            background: linear-gradient(to right, #000 0%, transparent 100%);
+        }
+        .games-ticker-wrap::after {
+            right: 0;
+            background: linear-gradient(to left, #000 0%, transparent 100%);
+        }
+
+        .games-ticker-label {
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            margin-bottom: 1.8rem;
+        }
+
+        .games-ticker-track {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .games-ticker {
+            display: flex;
+            gap: 1.2rem;
+            width: max-content;
+            animation: tickerScroll 22s linear infinite;
+        }
+        .games-ticker:hover { animation-play-state: paused; }
+
+        @keyframes tickerScroll {
+            from { transform: translateX(-50%); }
+            to   { transform: translateX(0); }
+        }
+
+        .game-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            width: 120px;
+            height: 170px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1rem 0.75rem 1rem;
+            flex-shrink: 0;
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            cursor: default;
+        }
+        .game-card:hover {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(255,255,255,0.18);
+            transform: translateY(-4px);
+        }
+        .game-card img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            opacity: 0.9;
+            flex-shrink: 0;
+        }
+        .game-card span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.55);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .game-status {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .game-status.available {
+            background: rgba(0,200,80,0.15);
+            color: #00c850;
+            border: 1px solid rgba(0,200,80,0.3);
+        }
+        .game-status.soon {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.35);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
     </style>
 </head>
 
@@ -815,7 +1095,7 @@
         </div>
         <div class="widget-dropdown">
             <a class="widget-dd-item" href="/dashboard"><i class="fa fa-house"></i> Dashboard</a>
-            <a class="widget-dd-item" href="/home"><i class="fa fa-house"></i> Home</a>
+            <a class="widget-dd-item" href="/home"><i class="fa fa-cart-shopping"></i> Home</a>
             <div class="widget-dd-sep"></div>
             <button class="widget-dd-item red" id="discord-logout"><i class="fa fa-right-from-bracket"></i> Sign Out</button>
         </div>
@@ -825,18 +1105,29 @@
 
     <!-- -- PAGE: Home -- -->
     <div class="page active" id="page-home">
-        <div style="width:100%; max-width:760px; padding:6rem 2rem 4rem; margin:0 auto; text-align:center;">
-            <h1 style="font-family:'Montserrat',sans-serif; font-size:2.8rem; font-weight:800; color:#fff; margin-bottom:1rem; letter-spacing:-0.03em;">Welcome to Fuse</h1>
-            <p style="color:rgba(255,255,255,0.5); font-size:1.05rem; margin-bottom:2.5rem; line-height:1.7;">Advanced bypass utility — undetected, reliable, and built for performance.</p>
+        <div style="width:100%; max-width:760px; padding:6rem 2rem 0; margin:0 auto; text-align:center;">
+            <p class="hero-sub">Advanced Cheating Utilities <br>Undetected And<br>Built For Performance.</p>
             <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:3.5rem;">
-                <button onclick="navigateTo('store')" style="padding:12px 28px; background:#fff; color:#000; font-family:'Montserrat',sans-serif; font-weight:700; font-size:0.9rem; border:none; border-radius:10px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(255,255,255,0.25)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">Purchase</button>
-                <button onclick="navigateTo('status')" style="padding:12px 28px; background:rgba(255,255,255,0.08); color:#fff; font-family:'Montserrat',sans-serif; font-weight:700; font-size:0.9rem; border:1px solid rgba(255,255,255,0.15); border-radius:10px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">View Status</button>
+                <button class="btn-primary" onclick="navigateTo('store')">Purchase</button>
+                <button class="btn-ghost" onclick="navigateTo('status')">View Status</button>
             </div>
 
             <!-- Team Section -->
-            <h2 style="font-family:'Montserrat',sans-serif; font-size:1.1rem; font-weight:700; color:rgba(255,255,255,0.35); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:1.5rem;">Team</h2>
-            <div id="team-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; text-align:left;"></div>
+            <h2 class="section-label">Team</h2>
+            <div id="team-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; text-align:left; margin-bottom:3rem;"></div>
+
+            <!-- Supported Games Ticker -->
+            <h2 class="section-label" style="margin-bottom:1.5rem;">✦ SUPPORTED GAMES</h2>
         </div>
+
+        <div class="games-ticker-wrap">
+            <div class="games-ticker-track" style="display:flex; justify-content:center;">
+                <div class="games-ticker" style="animation:none; width:auto;">
+                    <div class="game-card"><img src="images/fivem.png?v=2" alt="FiveM"><span>FiveM</span><small class="game-status available">Available</small></div>
+                </div>
+            </div>
+        </div>
+
     </div><!-- end page-home -->
 
     <style>
@@ -916,7 +1207,7 @@
                 id: '838411101645045821',
                 role: 'Owner',
                 name: 'Axio',
-                avatar: 'https://cdn.discordapp.com/avatars/838411101645045821/d7c8479409c6958889d7ae729868386e.webp?size=1024'
+                avatar: 'https://cdn.discordapp.com/avatars/838411101645045821/7d5614f2598c5c514a69cd88fdc27e99.webp?size=1024'
             },
             {
                 id: '704440841317384206',
@@ -969,7 +1260,7 @@
 
             <!-- Available Products -->
             <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Available Products</h2>
-            <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Currently available products & operational status of Fuse.gg.</p>
+            <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Currently available products & operational status of Fuse.</p>
             <p style="color:rgba(255,255,255,0.35); text-align:center; margin-bottom:2rem; font-size:0.85rem;">Live status: <a href="https://fusebypass.fun/status" target="_blank" style="color:rgba(255,255,255,0.6); text-decoration:underline;">fusebypass.fun/status</a></p>
 
             <div onclick="document.querySelector('[data-page=store]').click()" style="
