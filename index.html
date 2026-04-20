@@ -1103,6 +1103,53 @@
 
 
 
+    <!-- -- PAGE: Account (Login) -- -->
+    <div class="page" id="page-account">
+        <div class="scene">
+            <svg class="lamp" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <g class="lamp-light" filter="url(#glow)">
+                    <ellipse cx="100" cy="60" rx="45" ry="35" fill="rgba(255,255,200,0.4)"/>
+                    <circle cx="100" cy="60" r="50" fill="none" stroke="rgba(255,255,150,0.2)" stroke-width="2"/>
+                </g>
+                <path id="js-cord" class="lamp-cord" d="M100,95 Q95,150 90,250" stroke="#666" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <rect class="fill-opening" x="75" y="95" width="50" height="15" rx="3"/>
+                <rect class="fill-base-top" x="70" y="110" width="60" height="20" rx="2"/>
+                <rect class="fill-base-side" x="65" y="130" width="70" height="80" rx="3"/>
+                <rect class="fill-post" x="95" y="210" width="10" height="100" rx="2"/>
+                <rect class="fill-shade" x="60" y="310" width="80" height="60" rx="4"/>
+                <path id="js-hit" class="lamp-hit" d="M100,95 Q95,150 90,250" stroke="transparent" stroke-width="20" fill="none"/>
+            </svg>
+            <div class="card" id="js-card">
+                <div class="brand">
+                    <div class="brand-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg></div>
+                    <div><div class="brand-name">Fuse</div><div class="brand-tag">Bypass</div></div>
+                </div>
+                <div class="card-sep"></div>
+                <h2 class="card-title">Welcome Back</h2>
+                <p class="card-sub">Sign in with Discord to continue</p>
+                <button class="btn-discord" onclick="loginWithDiscord()"><i class="fab fa-discord"></i> Sign in with Discord</button>
+                <div class="divider-or"><div class="divider-line"></div><span class="divider-text">or</span><div class="divider-line"></div></div>
+                <div class="field"><label>Email</label><div class="field-wrap"><i class="field-icon fas fa-envelope"></i><input type="email" placeholder="your@email.com"></div></div>
+                <div class="field"><label>Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="••••••••"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
+                <div class="forgot"><a href="#">Forgot password?</a></div>
+                <button class="btn-submit">Sign In</button>
+                <div class="signup">Don't have an account? <a href="#">Create one</a></div>
+            </div>
+        </div>
+        <div id="discord-profile-popup" class="card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;display:none;">
+            <div style="text-align:center;">
+                <img id="popup-avatar" src="" alt="avatar" style="width:80px;height:80px;border-radius:50%;margin-bottom:1rem;border:3px solid rgba(255,255,255,0.2);">
+                <div id="popup-username" style="font-size:1.2rem;font-weight:700;margin-bottom:0.5rem;"></div>
+                <div id="popup-tag" style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:1.5rem;"></div>
+                <button class="btn-primary" onclick="navigateTo('store')" style="width:100%;margin-bottom:0.5rem;">View Store</button>
+                <button class="btn-ghost" id="popup-logout-btn" style="width:100%;">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
     <!-- -- PAGE: Home -- -->
     <div class="page active" id="page-home">
         <div style="width:100%; max-width:760px; padding:6rem 2rem 0; margin:0 auto; text-align:center;">
