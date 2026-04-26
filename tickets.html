@@ -27,7 +27,6 @@
         const app = initializeApp(firebaseConfig);
         const db  = getFirestore(app);
 
-        // Expose to global scope for use in non-module scripts
         window._db         = db;
         window._fbCol      = (name) => collection(db, name);
         window._fbAddDoc   = addDoc;
@@ -40,8 +39,8 @@
         window._fbServerTs = serverTimestamp;
         window._fbReady    = true;
 
-        // Signal that Firebase is ready
-        document.dispatchEvent(new Event('firebase-ready'));
+        // Signal that Firebase is ready — use setTimeout to ensure the regular script listener is registered first
+        setTimeout(() => document.dispatchEvent(new Event('firebase-ready')), 0);
     </script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -370,7 +369,7 @@
     var perPage      = 10;
 
     // ── Boot ──
-    document.addEventListener('firebase-ready', function() {
+    function bootApp() {
         var userData  = localStorage.getItem('fuse_user');
         var rolesData = localStorage.getItem('fuse_roles');
         var token     = localStorage.getItem('fuse_token');
@@ -387,7 +386,14 @@
 
         startRealtimeListener();
         showList();
-    });
+    }
+
+    // Wait for Firebase — poll every 100ms as fallback
+    var _booted = false;
+    document.addEventListener('firebase-ready', function() { if (!_booted) { _booted = true; bootApp(); } });
+    var _fbPoll = setInterval(function() {
+        if (window._fbReady && !_booted) { _booted = true; clearInterval(_fbPoll); bootApp(); }
+    }, 100);
 
     function showNoAccess() {
         document.getElementById('no-access').style.display = 'flex';
