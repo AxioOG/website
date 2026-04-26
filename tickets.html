@@ -354,22 +354,23 @@
 </div>
 
 <script>
-    // ── Constants (same as dashboard) ──
-    var ROLE_ADMIN1   = '1471974431579574538';
-    var ROLE_ADMIN2   = '1482165881315524688';
+    // ── Constants ──
+    var ROLE_ADMIN1 = '1471974431579574538';
+    var ROLE_ADMIN2 = '1482165881315524688';
 
     // ── State ──
-    var currentUser  = null;
-    var userRoles    = [];
-    var isAdmin      = false;
-    var allTickets   = [];
+    var currentUser   = null;
+    var userRoles     = [];
+    var isAdmin       = false;
+    var allTickets    = [];
     var currentTicket = null;
-    var selectedCat  = 'general';
-    var currentPage  = 1;
-    var perPage      = 10;
+    var selectedCat   = 'general';
+    var currentPage   = 1;
+    var perPage       = 10;
+    var unsubscribe   = null;
 
-    // ── Boot ──
-    function bootApp() {
+    // ── Immediate boot — show UI right away ──
+    (function immediateInit() {
         var userData  = localStorage.getItem('fuse_user');
         var rolesData = localStorage.getItem('fuse_roles');
         var token     = localStorage.getItem('fuse_token');
@@ -378,14 +379,25 @@
             document.getElementById('no-access').style.display = 'flex';
             return;
         }
-
-        try { currentUser = JSON.parse(userData); } catch(e) { showNoAccess(); return; }
-        try { userRoles   = JSON.parse(rolesData || '[]'); } catch(e) { userRoles = []; }
+        try { currentUser = JSON.parse(userData); } catch(e) {
+            document.getElementById('no-access').style.display = 'flex'; return;
+        }
+        try { userRoles = JSON.parse(rolesData || '[]'); } catch(e) { userRoles = []; }
 
         isAdmin = userRoles.indexOf(ROLE_ADMIN1) > -1 || userRoles.indexOf(ROLE_ADMIN2) > -1;
 
+        // Show list immediately — Firebase will populate it when ready
+        document.getElementById('no-access').style.display   = 'none';
+        document.getElementById('view-list').style.display   = 'block';
+        document.getElementById('view-detail').style.display = 'none';
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('entries-info').textContent  = 'Loading tickets...';
+    })();
+
+    // ── Firebase boot (fires when module is ready) ──
+    function bootApp() {
+        if (!currentUser) return; // not logged in, already handled above
         startRealtimeListener();
-        showList();
     }
 
     // Wait for Firebase — poll every 100ms as fallback
