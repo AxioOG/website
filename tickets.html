@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tickets — Fuse</title>
+    <link rel="icon" type="image/png" href="fuseggbw.png" sizes="64x64">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #0a0a0f;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 120px 120px;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 64px;
+            background: rgba(8,8,8,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 100;
+        }
+
+        .topbar-logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #fff;
+            text-decoration: none;
+        }
+        .topbar-logo span { color: rgba(255,255,255,0.4); }
+
+        /* ── Main Content ── */
+        .wrap { 
+            padding: 88px 32px 40px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+
+        .tickets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .tickets-title-section h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .tickets-title-section p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+
+        .create-ticket-btn {
+            background: #00c8a8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .create-ticket-btn:hover {
+            background: #00b396;
+        }
+
+        /* ── Tickets Table ── */
+        .tickets-container {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tickets-table th {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .tickets-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.9rem;
+        }
+
+        .tickets-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-open { 
+            background: rgba(0, 200, 80, 0.2); 
+            color: #00c850; 
+        }
+
+        .participants-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .participant-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #00c8a8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination button {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .pagination button:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .pagination button.active {
+            background: #00c8a8;
+            border-color: #00c8a8;
+        }
+
+        /* ── Create Ticket Modal ── */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .create-ticket-modal {
+            background: #1a1a1f;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .category-option {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .category-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .category-option.selected {
+            background: rgba(0, 200, 168, 0.1);
+            border-color: #00c8a8;
+        }
+
+        .category-emoji {
+            font-size: 1.2rem;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .category-description {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: #00c8a8;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .btn-primary:disabled {
+            background: rgba(0, 200, 168, 0.3);
+            cursor: not-allowed;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+    <a class="topbar-logo" href="https://fusebypass.fun">fusebypass<span>.fun</span></a>
+</header>
+
+<!-- Main Content -->
+<main class="wrap">
+    <div class="tickets-header">
+        <div class="tickets-title-section">
+            <h1>Need Help?</h1>
+            <p>Search for a handbook or create a support ticket.</p>
+        </div>
+        <button class="create-ticket-btn" onclick="showCreateModal()">
+            <i class="fa fa-plus"></i> Create Ticket
+        </button>
+    </div>
+
+    <div class="tickets-container">
+        <table class="tickets-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Participants</th>
+                    <th>Category</th>
+                    <th>Messages</th>
+                    <th>Messages</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="tickets-tbody">
+                <!-- Tickets will be populated here -->
+            </tbody>
+        </table>
+        
+        <div class="table-footer">
+            <span id="entries-info">Showing 0 to 0 of 0 entries</span>
+            <div class="pagination">
+                <button onclick="previousPage()">Previous</button>
+                <button class="active">1</button>
+                <button onclick="nextPage()">Next</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Create Ticket Modal -->
+<div class="modal-overlay" id="create-modal">
+    <div class="create-ticket-modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Create Support Ticket</h2>
+            <button class="close-btn" onclick="hideCreateModal()">&times;</button>
+        </div>
+        
+        <form id="create-ticket-form">
+            <div class="form-group">
+                <label class="form-label">Subject</label>
+                <input type="text" class="form-input" id="ticket-subject" placeholder="Enter ticket subject" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <div class="category-grid" id="category-grid">
+                    <div class="category-option" data-category="general">
+                        <span class="category-emoji">🔧</span>
+                        <div class="category-info">
+                            <div class="category-title">General</div>
+                            <div class="category-description">General inquiries (not listed below)</div>
+                        </div>
+                    </div>
+                    <div class="category-option" data-category="ban_appeal">
+                        <span class="category-emoji">⚡</span>
+                        <div class="category-info">
+                            <div class="category-title">Ban Appeal</div>
+                            <div class="category-description">Appeal an account restriction</div>
+                        </div>
+                    </div>
+                    <div class="category-option" data-category="stripe">
+                        <span class="category-emoji">💳</span>
+                        <div class="category-info">
+                            <div class="category-title">Stripe</div>
+                            <div class="category-description">Stripe billing inquiries</div>
+                        </div>
+                    </div>
+                    <div class="category-option" data-category="crypto">
+                        <span class="category-emoji">₿</span>
+                        <div class="category-info">
+                            <div class="category-title">Crypto</div>
+                            <div class="category-description">Crypto billing inquiries</div>
+                        </div>
+                    </div>
+                    <div class="category-option" data-category="partnership">
+                        <span class="category-emoji">🤝</span>
+                        <div class="category-info">
+                            <div class="category-title">Partnership</div>
+                            <div class="category-description">Partnership inquiries</div>
+                        </div>
+                    </div>
+                    <div class="category-option" data-category="technical_support">
+                        <span class="category-emoji">🔧</span>
+                        <div class="category-info">
+                            <div class="category-title">Technical Support</div>
+                            <div class="category-description">Report or request assistance with technical issues</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="hideCreateModal()">Cancel</button>
+            <button class="btn-primary" id="create-btn" onclick="createTicket()" disabled>Create Ticket</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Ticket System JavaScript
+    let tickets = [];
+    let selectedCategory = null;
+    let currentUser = null;
+
+    // Initialize the page
+    function init() {
+        loadUserData();
+        loadTickets();
+        setupCategorySelection();
+        updateTicketsDisplay();
+    }
+
+    // Load user data from localStorage (from dashboard)
+    function loadUserData() {
+        const userData = localStorage.getItem('fuse_user');
+        if (userData) {
+            currentUser = JSON.parse(userData);
+        }
+    }
+
+    // Load tickets from localStorage
+    function loadTickets() {
+        const savedTickets = localStorage.getItem('fuse_tickets');
+        if (savedTickets) {
+            tickets = JSON.parse(savedTickets);
+        }
+    }
+
+    // Save tickets to localStorage
+    function saveTickets() {
+        localStorage.setItem('fuse_tickets', JSON.stringify(tickets));
+    }
+
+    // Setup category selection
+    function setupCategorySelection() {
+        const categoryOptions = document.querySelectorAll('.category-option');
+        categoryOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                categoryOptions.forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                selectedCategory = this.dataset.category;
+                updateCreateButton();
+            });
+        });
+
+        // Subject input validation
+        document.getElementById('ticket-subject').addEventListener('input', updateCreateButton);
+    }
+
+    // Update create button state
+    function updateCreateButton() {
+        const subject = document.getElementById('ticket-subject').value.trim();
+        const createBtn = document.getElementById('create-btn');
+        
+        if (subject.length >= 5 && selectedCategory) {
+            createBtn.disabled = false;
+        } else {
+            createBtn.disabled = true;
+        }
+    }
+
+    // Show create modal
+    function showCreateModal() {
+        document.getElementById('create-modal').classList.add('show');
+        // Reset form
+        document.getElementById('ticket-subject').value = '';
+        selectedCategory = null;
+        document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('selected'));
+        updateCreateButton();
+    }
+
+    // Hide create modal
+    function hideCreateModal() {
+        document.getElementById('create-modal').classList.remove('show');
+    }
+
+    // Create new ticket
+    function createTicket() {
+        const subject = document.getElementById('ticket-subject').value.trim();
+        
+        if (!subject || !selectedCategory || !currentUser) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        const ticket = {
+            id: generateTicketId(),
+            userId: currentUser.id,
+            subject: subject,
+            category: selectedCategory,
+            status: 'open',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            lastReplyAt: new Date().toISOString(),
+            participants: [currentUser.id],
+            messageCount: 1,
+            replies: [{
+                id: generateReplyId(),
+                ticketId: null, // Will be set after ticket creation
+                authorId: currentUser.id,
+                authorName: currentUser.global_name || currentUser.username,
+                message: `Ticket created: ${subject}`,
+                createdAt: new Date().toISOString(),
+                isStaff: false
+            }]
+        };
+
+        ticket.replies[0].ticketId = ticket.id;
+        tickets.push(ticket);
+        saveTickets();
+        updateTicketsDisplay();
+        hideCreateModal();
+        
+        // Show success message
+        alert(`Ticket created successfully! ID: ${ticket.id}`);
+    }
+
+    // Generate unique ticket ID
+    function generateTicketId() {
+        return 'TICKET-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+    }
+
+    // Generate unique reply ID
+    function generateReplyId() {
+        return 'REPLY-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+    }
+
+    // Update tickets display
+    function updateTicketsDisplay() {
+        const tbody = document.getElementById('tickets-tbody');
+        const entriesInfo = document.getElementById('entries-info');
+        
+        if (!currentUser) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa fa-exclamation-triangle"></i><h3>Authentication Required</h3><p>Please sign in to view your tickets.</p></td></tr>';
+            entriesInfo.textContent = 'Showing 0 to 0 of 0 entries';
+            return;
+        }
+
+        // Filter tickets for current user
+        const userTickets = tickets.filter(ticket => ticket.userId === currentUser.id);
+        
+        if (userTickets.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa fa-ticket"></i><h3>No tickets found</h3><p>You haven\'t created any support tickets yet.</p></td></tr>';
+            entriesInfo.textContent = 'Showing 0 to 0 of 0 entries';
+            return;
+        }
+
+        // Sort tickets by creation date (newest first)
+        userTickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        tbody.innerHTML = userTickets.map(ticket => `
+            <tr onclick="viewTicket('${ticket.id}')">
+                <td>${ticket.subject}</td>
+                <td><span class="status-badge status-${ticket.status}">${ticket.status}</span></td>
+                <td>
+                    <div class="participants-cell">
+                        <div class="participant-avatar">${(currentUser.global_name || currentUser.username).charAt(0).toUpperCase()}</div>
+                        ${ticket.participants.length > 1 ? `<span>+${ticket.participants.length - 1}</span>` : ''}
+                    </div>
+                </td>
+                <td>${getCategoryDisplayName(ticket.category)}</td>
+                <td><i class="fa fa-comment"></i> ${ticket.messageCount}</td>
+                <td>Today at ${new Date(ticket.lastReplyAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+                <td><i class="fa fa-chevron-right"></i></td>
+            </tr>
+        `).join('');
+
+        entriesInfo.textContent = `Showing 1 to ${userTickets.length} of ${userTickets.length} entries`;
+    }
+
+    // Get category display name
+    function getCategoryDisplayName(category) {
+        const categoryMap = {
+            'general': 'General',
+            'ban_appeal': 'Ban Appeal',
+            'stripe': 'Stripe',
+            'crypto': 'Crypto',
+            'partnership': 'Partnership',
+            'technical_support': 'Technical Support'
+        };
+        return categoryMap[category] || category;
+    }
+
+    // View individual ticket (placeholder)
+    function viewTicket(ticketId) {
+        // For now, just show an alert. Later this will navigate to ticket detail view
+        alert(`Opening ticket: ${ticketId}\n\nThis will be implemented in the next phase.`);
+    }
+
+    // Pagination functions (placeholder)
+    function previousPage() {
+        // Implement pagination logic
+    }
+
+    function nextPage() {
+        // Implement pagination logic
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('create-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideCreateModal();
+        }
+    });
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
