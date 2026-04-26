@@ -10,6 +10,39 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFwYUyllePp3mg0DHl4XHPhmFoGGhjJ68",
+            authDomain: "fuse-tickets.firebaseapp.com",
+            projectId: "fuse-tickets",
+            storageBucket: "fuse-tickets.firebasestorage.app",
+            messagingSenderId: "1095180652042",
+            appId: "1:1095180652042:web:4c510969bcc818f470d9f3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db  = getFirestore(app);
+
+        // Expose to global scope for use in non-module scripts
+        window._db         = db;
+        window._fbCol      = (name) => collection(db, name);
+        window._fbAddDoc   = addDoc;
+        window._fbGetDocs  = getDocs;
+        window._fbDoc      = (col, id) => doc(db, col, id);
+        window._fbUpdate   = updateDoc;
+        window._fbQuery    = query;
+        window._fbOrderBy  = orderBy;
+        window._fbSnapshot = onSnapshot;
+        window._fbServerTs = serverTimestamp;
+        window._fbReady    = true;
+
+        // Signal that Firebase is ready
+        document.dispatchEvent(new Event('firebase-ready'));
+    </script>
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -287,6 +320,9 @@
             <small id="detail-id">—</small>
         </div>
         <span id="detail-badge" class="badge badge-open">Open</span>
+        <button id="btn-close-ticket" onclick="closeTicket()" style="display:none;margin-left:auto;padding:8px 16px;background:rgba(180,30,30,0.15);border:1px solid rgba(180,30,30,0.35);border-radius:9px;color:#e05555;font-family:'Montserrat',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:background 0.15s;">
+            <i class="fa fa-lock"></i> Close Ticket
+        </button>
     </div>
     <div class="detail-layout">
         <div class="conversation-col">
@@ -334,7 +370,7 @@
     var perPage      = 10;
 
     // ── Boot ──
-    (function boot() {
+    document.addEventListener('firebase-ready', function() {
         var userData  = localStorage.getItem('fuse_user');
         var rolesData = localStorage.getItem('fuse_roles');
         var token     = localStorage.getItem('fuse_token');
@@ -349,9 +385,9 @@
 
         isAdmin = userRoles.indexOf(ROLE_ADMIN1) > -1 || userRoles.indexOf(ROLE_ADMIN2) > -1;
 
-        loadTickets();
+        startRealtimeListener();
         showList();
-    })();
+    });
 
     function showNoAccess() {
         document.getElementById('no-access').style.display = 'flex';
@@ -359,17 +395,40 @@
         document.getElementById('view-detail').style.display = 'none';
     }
 
-    // ── Storage ──
-    function loadTickets() {
-        try { allTickets = JSON.parse(localStorage.getItem('fuse_tickets') || '[]'); } catch(e) { allTickets = []; }
-    }
+    // ── Firestore realtime listener ──
+    function startRealtimeListener() {
+        var col = window._fbCol('tickets');
+        var q   = window._fbQuery(col, window._fbOrderBy('createdAt', 'desc'));
 
-    function saveTickets() {
-        localStorage.setItem('fuse_tickets', JSON.stringify(allTickets));
+        if (unsubscribe) unsubscribe();
+
+        unsubscribe = window._fbSnapshot(q, function(snapshot) {
+            allTickets = [];
+            snapshot.forEach(function(docSnap) {
+                var data = docSnap.data();
+                data._docId = docSnap.id;
+                allTickets.push(data);
+            });
+
+            // If viewing detail, refresh it live
+            if (currentTicket) {
+                var updated = allTickets.find(function(t) { return t.id === currentTicket.id; });
+                if (updated) {
+                    currentTicket = updated;
+                    renderMessages();
+                    updateDetailSidebar(updated);
+                }
+            } else {
+                renderTable();
+            }
+        }, function(err) {
+            console.error('Firestore error:', err);
+            showToast('Failed to load tickets.', 'error');
+        });
     }
 
     // ── Visibility filter ──
-    // Users see only their own tickets; admins see all
+    // Users see only their own tickets; admins see ALL
     function getVisibleTickets() {
         if (isAdmin) return allTickets.slice();
         return allTickets.filter(function(t) { return t.userId === currentUser.id; });
@@ -402,31 +461,18 @@
         document.getElementById('detail-subject').textContent = ticket.subject;
         document.getElementById('detail-id').textContent      = ticket.id;
         var badgeEl = document.getElementById('detail-badge');
-        badgeEl.className = 'badge badge-' + ticket.status;
+        badgeEl.className   = 'badge badge-' + ticket.status;
         badgeEl.textContent = statusLabel(ticket.status);
 
-        // Sidebar
-        var sbStatus = document.getElementById('sb-status');
-        sbStatus.className = 'badge badge-' + ticket.status;
-        sbStatus.textContent = statusLabel(ticket.status);
-        document.getElementById('sb-category').textContent = catLabel(ticket.category);
-        document.getElementById('sb-created').textContent  = timeAgo(ticket.createdAt);
-        document.getElementById('sb-last').textContent     = timeAgo(ticket.lastReplyAt || ticket.createdAt);
+        // Show close button only if ticket is not closed, and only for admins or ticket owner
+        var closeBtn = document.getElementById('btn-close-ticket');
+        if (ticket.status !== 'closed' && (isAdmin || ticket.userId === currentUser.id)) {
+            closeBtn.style.display = 'inline-flex';
+        } else {
+            closeBtn.style.display = 'none';
+        }
 
-        // Members
-        var members = ticket.members || [{ id: ticket.userId, name: ticket.userName || 'User', isStaff: false }];
-        document.getElementById('sb-member-count').textContent = members.length;
-        document.getElementById('sb-members').innerHTML = members.map(function(m) {
-            var initials = (m.name || 'U').charAt(0).toUpperCase();
-            var avatarHtml = m.avatar
-                ? '<img src="' + m.avatar + '" alt="">'
-                : initials;
-            return '<div class="member-row" style="margin-bottom:8px;">' +
-                '<div class="member-av">' + avatarHtml + '</div>' +
-                '<div><div class="member-name">' + escHtml(m.name) + '</div>' +
-                '<div class="member-role">' + (m.isStaff ? 'Staff' : 'Member') + '</div></div>' +
-                '</div>';
-        }).join('');
+        updateDetailSidebar(ticket);
 
         // Input bar: hide if ticket is closed
         document.getElementById('msg-input-bar').style.display = ticket.status === 'closed' ? 'none' : 'flex';
@@ -434,13 +480,37 @@
         renderMessages();
     }
 
+    function updateDetailSidebar(ticket) {
+        var sbStatus = document.getElementById('sb-status');
+        sbStatus.className   = 'badge badge-' + ticket.status;
+        sbStatus.textContent = statusLabel(ticket.status);
+        document.getElementById('sb-category').textContent = catLabel(ticket.category);
+        document.getElementById('sb-created').textContent  = timeAgo(ticket.createdAt && ticket.createdAt.toDate ? ticket.createdAt.toDate().toISOString() : ticket.createdAt);
+        document.getElementById('sb-last').textContent     = timeAgo(ticket.lastReplyAt && ticket.lastReplyAt.toDate ? ticket.lastReplyAt.toDate().toISOString() : (ticket.lastReplyAt || ticket.createdAt));
+
+        var members = ticket.members || [{ id: ticket.userId, name: ticket.userName || 'User', isStaff: false }];
+        document.getElementById('sb-member-count').textContent = members.length;
+        document.getElementById('sb-members').innerHTML = members.map(function(m) {
+            var initials = (m.name || 'U').charAt(0).toUpperCase();
+            var avatarHtml = m.avatar ? '<img src="' + m.avatar + '" alt="">' : initials;
+            return '<div class="member-row" style="margin-bottom:8px;">' +
+                '<div class="member-av">' + avatarHtml + '</div>' +
+                '<div><div class="member-name">' + escHtml(m.name) + '</div>' +
+                '<div class="member-role">' + (m.isStaff ? 'Staff' : 'Member') + '</div></div>' +
+                '</div>';
+        }).join('');
+    }
+
     // ── Table rendering ──
     function renderTable() {
-        loadTickets();
         var visible = getVisibleTickets();
-        visible.sort(function(a,b){ return new Date(b.createdAt) - new Date(a.createdAt); });
+        visible.sort(function(a,b){
+            var ta = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+            var tb = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+            return tb - ta;
+        });
 
-        var total = visible.length;
+        var total      = visible.length;
         var totalPages = Math.max(1, Math.ceil(total / perPage));
         if (currentPage > totalPages) currentPage = totalPages;
 
@@ -457,15 +527,16 @@
         } else {
             empty.style.display = 'none';
             tbody.innerHTML = page.map(function(t) {
-                var initials = (t.userName || currentUser.global_name || currentUser.username || 'U').charAt(0).toUpperCase();
+                var initials = (t.userName || 'U').charAt(0).toUpperCase();
                 var msgCount = (t.replies || []).length;
+                var lastTs   = t.lastReplyAt && t.lastReplyAt.toDate ? t.lastReplyAt.toDate().toISOString() : (t.lastReplyAt || t.createdAt);
                 return '<tr onclick="showDetail(\'' + t.id + '\')">' +
                     '<td class="td-subject">' + escHtml(t.subject) + '<small>' + t.id + '</small></td>' +
                     '<td><span class="badge badge-' + t.status + '">' + statusLabel(t.status) + '</span></td>' +
-                    '<td><div style="display:flex;align-items:center;gap:6px;"><div class="member-av" style="width:26px;height:26px;font-size:0.68rem;">' + initials + '</div><span style="font-size:0.78rem;color:rgba(255,255,255,0.5);">1</span></div></td>' +
+                    '<td><div style="display:flex;align-items:center;gap:6px;"><div class="member-av" style="width:26px;height:26px;font-size:0.68rem;">' + initials + '</div></div></td>' +
                     '<td class="td-category">' + catLabel(t.category) + '</td>' +
                     '<td class="td-messages">' + msgCount + '</td>' +
-                    '<td class="td-last">' + timeAgo(t.lastReplyAt || t.createdAt) + '</td>' +
+                    '<td class="td-last">' + timeAgo(lastTs) + '</td>' +
                     '</tr>';
             }).join('');
             document.getElementById('entries-info').textContent =
@@ -485,7 +556,7 @@
     // ── Messages rendering ──
     function renderMessages() {
         if (!currentTicket) return;
-        var area = document.getElementById('messages-area');
+        var area    = document.getElementById('messages-area');
         var replies = currentTicket.replies || [];
 
         if (replies.length === 0) {
@@ -494,25 +565,23 @@
         }
 
         area.innerHTML = replies.map(function(r) {
-            var isStaff = r.isStaff || false;
-            var initials = (r.authorName || 'U').charAt(0).toUpperCase();
-            var avatarHtml = r.authorAvatar
-                ? '<img src="' + r.authorAvatar + '" alt="">'
-                : initials;
+            var isStaff   = r.isStaff || false;
+            var initials  = (r.authorName || 'U').charAt(0).toUpperCase();
+            var avatarHtml = r.authorAvatar ? '<img src="' + r.authorAvatar + '" alt="">' : initials;
+            var ts = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toISOString() : r.createdAt;
             return '<div class="msg-row">' +
                 '<div class="msg-avatar ' + (isStaff ? 'staff-av' : '') + '">' + avatarHtml + '</div>' +
                 '<div class="msg-body">' +
                     '<div class="msg-meta">' +
                         '<span class="msg-author ' + (isStaff ? 'staff-name' : '') + '">' + escHtml(r.authorName) + '</span>' +
                         (isStaff ? '<span class="staff-tag">STAFF</span>' : '') +
-                        '<span class="msg-time">' + formatDate(r.createdAt) + '</span>' +
+                        '<span class="msg-time">' + formatDate(ts) + '</span>' +
                     '</div>' +
                     '<div class="msg-bubble ' + (isStaff ? 'staff-bubble' : '') + '">' + escHtml(r.message) + '</div>' +
                 '</div>' +
             '</div>';
         }).join('');
 
-        // Scroll to bottom
         area.scrollTop = area.scrollHeight;
     }
 
@@ -523,6 +592,7 @@
         var text = textarea.value.trim();
         if (!text) return;
 
+        var now = new Date().toISOString();
         var reply = {
             id:           'R-' + Date.now(),
             ticketId:     currentTicket.id,
@@ -532,45 +602,31 @@
                 ? 'https://cdn.discordapp.com/avatars/' + currentUser.id + '/' + currentUser.avatar + '.png?size=64'
                 : null,
             message:      text,
-            createdAt:    new Date().toISOString(),
+            createdAt:    now,
             isStaff:      isAdmin
         };
 
-        // Find ticket in allTickets and update
-        var idx = allTickets.findIndex(function(t) { return t.id === currentTicket.id; });
-        if (idx === -1) return;
+        var newStatus = currentTicket.status;
+        if (isAdmin && currentTicket.status === 'open') newStatus = 'in_progress';
+        if (!isAdmin && currentTicket.status === 'waiting') newStatus = 'open';
 
-        if (!allTickets[idx].replies) allTickets[idx].replies = [];
-        allTickets[idx].replies.push(reply);
-        allTickets[idx].lastReplyAt = reply.createdAt;
-        allTickets[idx].updatedAt   = reply.createdAt;
+        var updatedReplies = (currentTicket.replies || []).concat([reply]);
 
-        // If admin replies, set status to in_progress if still open
-        if (isAdmin && allTickets[idx].status === 'open') {
-            allTickets[idx].status = 'in_progress';
-        }
-        // If user replies on waiting ticket, set back to open
-        if (!isAdmin && allTickets[idx].status === 'waiting') {
-            allTickets[idx].status = 'open';
-        }
-
-        saveTickets();
-        currentTicket = allTickets[idx];
-
-        textarea.value = '';
-        textarea.style.height = 'auto';
-
-        // Update sidebar timestamps and status
-        document.getElementById('sb-last').textContent = timeAgo(reply.createdAt);
-        var sbStatus = document.getElementById('sb-status');
-        sbStatus.className = 'badge badge-' + currentTicket.status;
-        sbStatus.textContent = statusLabel(currentTicket.status);
-        var badgeEl = document.getElementById('detail-badge');
-        badgeEl.className = 'badge badge-' + currentTicket.status;
-        badgeEl.textContent = statusLabel(currentTicket.status);
-
-        renderMessages();
-        showToast('Message sent!', 'success');
+        // Update Firestore
+        var docRef = window._fbDoc('tickets', currentTicket._docId);
+        window._fbUpdate(docRef, {
+            replies:     updatedReplies,
+            lastReplyAt: now,
+            updatedAt:   now,
+            status:      newStatus
+        }).then(function() {
+            textarea.value = '';
+            textarea.style.height = 'auto';
+            showToast('Message sent!', 'success');
+        }).catch(function(err) {
+            console.error(err);
+            showToast('Failed to send message.', 'error');
+        });
     }
 
     function handleMsgKey(e) {
@@ -613,24 +669,24 @@
         if (!subject) { showToast('Please enter a subject.', 'error'); return; }
         if (subject.length < 3) { showToast('Subject must be at least 3 characters.', 'error'); return; }
 
-        var userName = currentUser.global_name || currentUser.username;
+        var userName   = currentUser.global_name || currentUser.username;
         var userAvatar = currentUser.avatar
             ? 'https://cdn.discordapp.com/avatars/' + currentUser.id + '/' + currentUser.avatar + '.png?size=64'
             : null;
 
-        var now = new Date().toISOString();
+        var now      = new Date().toISOString();
         var ticketId = 'TKT-' + Date.now().toString(36).toUpperCase();
 
-        var firstReply = {
+        var firstReply = message ? [{
             id:           'R-' + Date.now(),
             ticketId:     ticketId,
             authorId:     currentUser.id,
             authorName:   userName,
             authorAvatar: userAvatar,
-            message:      message || subject,
+            message:      message,
             createdAt:    now,
             isStaff:      false
-        };
+        }] : [];
 
         var ticket = {
             id:          ticketId,
@@ -643,15 +699,39 @@
             createdAt:   now,
             updatedAt:   now,
             lastReplyAt: now,
-            replies:     message ? [firstReply] : [],
-            members: [{ id: currentUser.id, name: userName, avatar: userAvatar, isStaff: false }]
+            replies:     firstReply,
+            members:     [{ id: currentUser.id, name: userName, avatar: userAvatar, isStaff: false }]
         };
 
-        allTickets.unshift(ticket);
-        saveTickets();
-        closeModal();
-        showToast('Ticket created: ' + ticketId, 'success');
-        renderTable();
+        // Save to Firestore
+        window._fbAddDoc(window._fbCol('tickets'), ticket)
+            .then(function() {
+                closeModal();
+                showToast('Ticket created: ' + ticketId, 'success');
+            })
+            .catch(function(err) {
+                console.error(err);
+                showToast('Failed to create ticket.', 'error');
+            });
+    }
+
+    // ── Close Ticket ──
+    function closeTicket() {
+        if (!currentTicket) return;
+        if (!confirm('Are you sure you want to close this ticket? This cannot be undone.')) return;
+
+        var docRef = window._fbDoc('tickets', currentTicket._docId);
+        window._fbUpdate(docRef, {
+            status:    'closed',
+            updatedAt: new Date().toISOString()
+        }).then(function() {
+            showToast('Ticket closed.', 'success');
+            document.getElementById('btn-close-ticket').style.display = 'none';
+            document.getElementById('msg-input-bar').style.display    = 'none';
+        }).catch(function(err) {
+            console.error(err);
+            showToast('Failed to close ticket.', 'error');
+        });
     }
 
     // ── Helpers ──
