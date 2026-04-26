@@ -5,6 +5,9 @@
   # Handle dashboard route
   RewriteRule ^dashboard/?$ dashboard.html [L]
   
+  # Handle tickets route
+  RewriteRule ^tickets/?$ tickets.html [L]
+  
   # Handle home route
   RewriteRule ^home/?$ index.html [L]
   
