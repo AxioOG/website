@@ -1303,7 +1303,7 @@
 
     <!-- -- PAGE: Status -- -->
     <div class="page" id="page-status">
-        <div style="width:100%; max-width:700px; padding:6rem 2rem 4rem; margin:0 auto;">
+        <div style="width:100%; max-width:1100px; padding:6rem 2rem 4rem; margin:0 auto;">
 
             <!-- Available Products -->
             <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Available Products</h2>
@@ -1364,57 +1364,68 @@
             <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Scanner Condition</h2>
             <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Current detection status from scanners. This applies to all of our products.</p>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
-                <div class="scanner-row">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Ocean.ac</span>
+            <!-- Scanner list + Radar side by side -->
+            <div style="display:flex; gap:2rem; align-items:flex-start;">
+
+                <!-- Scanner list — original full width style -->
+                <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
+                    <div class="scanner-row">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Ocean.ac</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
                     </div>
-                    <span class="badge-undetected">UNDETECTED</span>
+                    <div class="scanner-row">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Storm.cc</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
+                    </div>
+                    <div class="scanner-row">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Echo.ac</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
+                    </div>
+                    <div class="scanner-row">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Napse.ac</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
+                    </div>
+                    <div class="scanner-row">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Detect.ac</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
+                    </div>
+                    <div class="scanner-row">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Async.ac</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
+                    </div>
+                    <div class="scanner-row" style="border-bottom:none;">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+                            <span style="color:#fff; font-size:0.95rem;">Timeless</span>
+                        </div>
+                        <span class="badge-undetected">UNDETECTED</span>
+                    </div>
                 </div>
-                <div class="scanner-row">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Storm.cc</span>
-                    </div>
-                    <span class="badge-undetected">UNDETECTED</span>
+
+                <!-- Radar circle -->
+                <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0; padding-top:0.5rem;">
+                    <canvas id="radarCanvas" width="280" height="280" style="border-radius:50%; display:block;"></canvas>
+                    <div id="radarLabel" style="margin-top:1.2rem; font-family:'Courier New',monospace; font-size:0.8rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#00c850; text-shadow:0 0 10px rgba(0,200,80,0.7); min-height:1.2em; text-align:center;">&nbsp;</div>
                 </div>
-                <div class="scanner-row">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Echo.ac</span>
-                    </div>
-                    <span class="badge-undetected">UNDETECTED</span>
-                </div>
-                <div class="scanner-row">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Napse.ac</span>
-                    </div>
-                    <span class="badge-undetected">UNDETECTED</span>
-                </div>
-                <div class="scanner-row">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Detect.ac</span>
-                    </div>
-                    <span class="badge-undetected">UNDETECTED</span>
-                </div>
-                <div class="scanner-row">
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Async.ac</span>
-                    </div>
-                    <span class="badge-undetected">UNDETECTED</span>
-                </div>
-                <div class="scanner-row" style="border-bottom:none;"> 
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                        <div class="scanner-icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
-                        <span style="color:#fff; font-size:0.95rem;">Timeless</span>
-                    </div>
-                    <span class="badge-undetected">UNDETECTED</span>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div><!-- end page-status -->
@@ -1957,7 +1968,150 @@
         });
     </script>
 
+<script>
+(function() {
+    var SCANNERS = ['Ocean.ac','Storm.cc','Echo.ac','Napse.ac','Detect.ac','Async.ac','Timeless'];
+    var scanIdx = 0;
+    var labelTimer = null;
+    var started = false;
+
+    function initRadar() {
+        var canvas = document.getElementById('radarCanvas');
+        if (!canvas || started) return;
+        started = true;
+        var ctx = canvas.getContext('2d');
+        var W = 280, H = 280, cx = 140, cy = 140, R = 138;
+        var angle = 0;
+        var lastTrig = -999;
+        var blips = [
+            {x:cx-52,y:cy+58},{x:cx+62,y:cy+38},{x:cx+18,y:cy+72},
+            {x:cx-30,y:cy-48},{x:cx+70,y:cy-20},{x:cx-68,y:cy+10},{x:cx+40,y:cy-65}
+        ];
+
+        function draw() {
+            ctx.clearRect(0,0,W,H);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx,cy,R,0,Math.PI*2);
+            ctx.clip();
+
+            // bg
+            ctx.fillStyle='rgba(0,10,4,0.98)';
+            ctx.fillRect(0,0,W,H);
+
+            // grid
+            ctx.strokeStyle='rgba(0,200,80,0.06)';
+            ctx.lineWidth=1;
+            for(var i=1;i<=14;i++){
+                ctx.beginPath();ctx.moveTo(i*20,0);ctx.lineTo(i*20,H);ctx.stroke();
+                ctx.beginPath();ctx.moveTo(0,i*20);ctx.lineTo(W,i*20);ctx.stroke();
+            }
+
+            // rings
+            ctx.strokeStyle='rgba(0,200,80,0.12)';
+            [0.28,0.52,0.76,1.0].forEach(function(f){
+                ctx.beginPath();ctx.arc(cx,cy,R*f,0,Math.PI*2);ctx.stroke();
+            });
+
+            // crosshairs
+            ctx.strokeStyle='rgba(0,200,80,0.09)';
+            ctx.beginPath();ctx.moveTo(cx,cy-R);ctx.lineTo(cx,cy+R);ctx.stroke();
+            ctx.beginPath();ctx.moveTo(cx-R,cy);ctx.lineTo(cx+R,cy);ctx.stroke();
+
+            // sweep trail
+            var trail = Math.PI*0.55;
+            for(var i=0;i<50;i++){
+                var a = angle-(i/50)*trail;
+                var alpha = (1-i/50)*0.16;
+                ctx.beginPath();
+                ctx.moveTo(cx,cy);
+                ctx.arc(cx,cy,R,a,a+trail/50);
+                ctx.closePath();
+                ctx.fillStyle='rgba(0,200,80,'+alpha+')';
+                ctx.fill();
+            }
+
+            // sweep line
+            ctx.beginPath();
+            ctx.moveTo(cx,cy);
+            ctx.lineTo(cx+Math.cos(angle)*R, cy+Math.sin(angle)*R);
+            ctx.strokeStyle='rgba(0,255,100,0.85)';
+            ctx.lineWidth=1.5;
+            ctx.stroke();
+
+            // blips
+            blips.forEach(function(b){
+                var ba = Math.atan2(b.y-cy,b.x-cx);
+                var diff = (angle-ba+Math.PI*4)%(Math.PI*2);
+                var fade = diff<trail?(1-diff/trail):0;
+                if(fade>0){
+                    var g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,10);
+                    g.addColorStop(0,'rgba(0,255,80,'+(0.9*fade)+')');
+                    g.addColorStop(1,'rgba(0,255,80,0)');
+                    ctx.beginPath();ctx.arc(b.x,b.y,10,0,Math.PI*2);
+                    ctx.fillStyle=g;ctx.fill();
+                    ctx.beginPath();ctx.arc(b.x,b.y,3,0,Math.PI*2);
+                    ctx.fillStyle='rgba(0,255,80,'+fade+')';ctx.fill();
+                    ctx.beginPath();ctx.arc(b.x,b.y,7,0,Math.PI*2);
+                    ctx.strokeStyle='rgba(0,255,80,'+(0.5*fade)+')';
+                    ctx.lineWidth=1;ctx.stroke();
+                }
+            });
+
+            ctx.restore();
+
+            // border
+            ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+            ctx.strokeStyle='rgba(0,200,80,0.2)';ctx.lineWidth=1.5;ctx.stroke();
+
+            // trigger label on each full rotation
+            var fa = angle%(Math.PI*2);
+            if(fa<0.07 && Math.abs(angle-lastTrig)>Math.PI){
+                lastTrig = angle;
+                var lbl = document.getElementById('radarLabel');
+                if(lbl){
+                    lbl.textContent = SCANNERS[scanIdx%SCANNERS.length] + ' - BYPASSED';
+                    scanIdx++;
+                    clearTimeout(labelTimer);
+                    labelTimer = setTimeout(function(){
+                        var l=document.getElementById('radarLabel');
+                        if(l) l.innerHTML='&nbsp;';
+                    },2000);
+                }
+            }
+
+            angle+=0.022;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    // Start when status page becomes active
+    var origNav = window.navigateTo;
+    document.addEventListener('DOMContentLoaded', function(){
+        // Patch navigateTo after it's defined
+        var checkNav = setInterval(function(){
+            if(typeof navigateTo === 'function'){
+                clearInterval(checkNav);
+                var orig = navigateTo;
+                window.navigateTo = function(target){
+                    orig(target);
+                    if(target==='status') setTimeout(initRadar,50);
+                };
+            }
+        },50);
+
+        // Also check if status is already active on load
+        var statusPage = document.getElementById('page-status');
+        if(statusPage && statusPage.classList.contains('active')){
+            setTimeout(initRadar,100);
+        }
+    });
+})();
+</script>
+
 </body>
 
 
+</html>
 </html>
