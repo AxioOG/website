@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Roboto:wght@700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./styles.css">
     <style>
         /* --- Design Tokens --------------------------------------- */
         :root {
@@ -66,10 +67,6 @@
         body {
             font-family: 'DM Sans', sans-serif;
             background: #000;
-            background-image:
-                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.22) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 50% 100%, rgba(255,255,255,0.08) 0%, transparent 60%);
-            background-size: 100% 100%, 100% 100%;
             min-height: 100vh;
         }
 
@@ -782,14 +779,7 @@
 
         /* Background glow */
         body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse 70% 55% at 50% 10%, rgba(255,255,255,0.18) 0%, transparent 65%),
-                radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 60%);
-            pointer-events: none;
-            z-index: 0;
+            display: none;
         }
 
         /* Hero title */
@@ -1202,8 +1192,7 @@
     <!-- -- PAGE: Home -- -->
     <div class="page active" id="page-home" style="position:relative; overflow:hidden;">
 
-        <!-- White top glow (replaces red from image) -->
-        <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:900px;height:550px;background:radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.10) 40%, transparent 70%);pointer-events:none;z-index:0;"></div>
+        <!-- White bottom glow removed -->
 
         <!-- Floating badge: Try Fuse Today! (top-right) -->
         <div class="float-badge float-badge-right" style="top:140px; right:calc(50% - 480px);">
@@ -1492,8 +1481,8 @@
                 </div>
 
                 <!-- Radar circle -->
-                <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0; padding-top:0.5rem;">
-                    <canvas id="radarCanvas" width="280" height="280" style="border-radius:50%; display:block;"></canvas>
+                <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0; padding-top:0.5rem; overflow:hidden;">
+                    <canvas id="radarCanvas" width="260" height="260" style="border-radius:50%; display:block; max-width:260px;"></canvas>
                     <div id="radarLabel" style="margin-top:1.2rem; font-family:'Courier New',monospace; font-size:0.8rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#00c850; text-shadow:0 0 10px rgba(0,200,80,0.7); min-height:1.2em; text-align:center;">&nbsp;</div>
                 </div>
 
@@ -1639,17 +1628,17 @@
         <div style="max-width:700px; width:100%; padding:6rem 2rem 4rem; color:#fff; font-family:'DM Sans',sans-serif; margin:0 auto;">
             <h1 style="font-family:'Roboto',sans-serif; font-size:2.2rem; margin-bottom:2.5rem;">Please Read Our Policy Terms</h1>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Reverse Engineering</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You may not decompile, disassemble, alter, or otherwise reverse engineer the software in any form. Any violation will result in a permanent ban and blacklisting.</p>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">No Refunds</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">All sales are final. Refunds are not provided for any reason, including detections, bans, or compatibility problems.</p>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Chargebacks</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Filing a chargeback will lead to:</p>
                 <ul style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
@@ -1659,22 +1648,22 @@
                 </ul>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Use at Your Own Risk</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We take no responsibility for bans or any other consequences. You acknowledge and accept all risks associated with using cheat software.</p>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">HWID Lock</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Licenses are locked to a single hardware ID. HWID resets are granted at our discretion and may be refused if misuse is suspected.</p>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Account Responsibility</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You are solely responsible for securing your account and license. Sharing, selling, or leaking your license will result in an immediate ban without notice.</p>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Prohibited Actions</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You must not:</p>
                 <ul style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
@@ -1683,12 +1672,12 @@
                 </ul>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Software Availability</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We do not guarantee uninterrupted service or undetected operation. Downtime, maintenance, or bans do not qualify for refunds.</p>
             </div>
 
-            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:1.5rem; margin-bottom:1rem;">
+            <div class="tos-item" style="border-bottom:none !important;">
                 <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Agreement</h2>
                 <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">By using this software, you agree to all terms listed above and accept full responsibility.</p>
             </div>
