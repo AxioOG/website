@@ -238,13 +238,13 @@
                     </div>
                     
                     
-                    <div class="cat-item" data-value="partnership" onclick="selectCat(this)">
-                        <span class="cat-emoji">🤝</span>
-                        <div><div class="cat-name">Partnership</div><div class="cat-desc">Partnership inquiries</div></div>
+                    <div class="cat-item" data-value="media" onclick="selectCat(this)">
+                        <span class="cat-emoji">🎥</span>
+                        <div><div class="cat-name">Media</div><div class="cat-desc">Apply For Media Creator</div></div>
                     </div>
-                    <div class="cat-item" data-value="ban-appeal" onclick="selectCat(this)">
-                        <span class="cat-emoji">🛑</span>
-                        <div><div class="cat-name">Ban Appeal</div><div class="cat-desc">Appeal an account restriction</div></div>
+                    <div class="cat-item" data-value="investor" onclick="selectCat(this)">
+                        <span class="cat-emoji">💼</span>
+                        <div><div class="cat-name">Investor</div><div class="cat-desc">Work With Us , Start Gain Cash</div></div>
                     </div>
                 </div>
             </div>
@@ -441,9 +441,12 @@
 
     // ── Visibility filter ──
     // Users see only their own tickets; admins see ALL
+    // Closed tickets are hidden from regular users
     function getVisibleTickets() {
         if (isAdmin) return allTickets.slice();
-        return allTickets.filter(function(t) { return t.userId === currentUser.id; });
+        return allTickets.filter(function(t) {
+            return t.userId === currentUser.id && t.status !== 'closed';
+        });
     }
 
     // ── Views ──
@@ -462,6 +465,12 @@
         // Access control: non-admins can only open their own tickets
         if (!isAdmin && ticket.userId !== currentUser.id) {
             showToast('Access denied.', 'error');
+            return;
+        }
+
+        // Closed tickets are invisible to regular users
+        if (!isAdmin && ticket.status === 'closed') {
+            showToast('This ticket is no longer available.', 'error');
             return;
         }
 
