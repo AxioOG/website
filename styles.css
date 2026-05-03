@@ -1,1 +1,180 @@
+.lamp {
+  height: 46vmin;
+  min-height: 300px;
+  max-height: 420px;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
 
+/* ── Smooth page transitions ── */
+.page {
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.page:not(.active) {
+  opacity: 0;
+  pointer-events: none;
+}
+.page.active {
+  opacity: 1;
+}
+
+/* ── Glassmorphism cards ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+/* ── Shimmer effect on buttons ── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.btn-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,255,255,0.12) 40%,
+    rgba(255,255,255,0.0) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 2.8s linear infinite;
+}
+
+/* ── Glow pulse on active nav item ── */
+@keyframes navGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(255,255,255,0.3); }
+  50%       { text-shadow: 0 0 22px rgba(255,255,255,0.7), 0 0 40px rgba(255,255,255,0.2); }
+}
+#main-nav .nav-item.active {
+  animation: navGlow 3s ease-in-out infinite;
+}
+
+/* ── Subtle noise texture overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+}
+
+/* ── Floating badge entrance animation ── */
+@keyframes badgeEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.float-badge {
+  animation-fill-mode: both !important;
+}
+.float-badge-left  { animation: floatLeft  5.5s ease-in-out infinite, badgeEntrance 0.7s 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+.float-badge-right { animation: floatRight 6s   ease-in-out infinite, badgeEntrance 0.7s 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+.float-badge-right2{ animation: floatRight2 7s  ease-in-out infinite, badgeEntrance 0.7s 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── Hero text gradient shimmer ── */
+@keyframes heroShimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.hero-sub {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    rgba(255,255,255,0.6) 40%,
+    #ffffff 60%,
+    rgba(255,255,255,0.5) 100%
+  ) !important;
+  background-size: 300% 300% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: heroShimmer 6s ease infinite;
+}
+
+/* ── Scanner row hover glow ── */
+.scanner-row {
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
+}
+.scanner-row:hover {
+  background: rgba(255,255,255,0.05) !important;
+  box-shadow: inset 3px 0 0 rgba(255,255,255,0.25);
+}
+
+/* ── Badge undetected pulse ── */
+@keyframes undetectedPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,200,80,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(0,200,80,0); }
+}
+.badge-undetected {
+  animation: undetectedPulse 2.5s ease-in-out infinite;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+/* ── Selection color ── */
+::selection {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+}
+
+/* ── Smooth focus rings ── */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.5);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ── TOS page — clean borderless style ── */
+.tos-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+.tos-item:last-of-type {
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+/* ── Status page — keep radar inside bounds ── */
+#page-status {
+  overflow: hidden;
+}
+#radarCanvas {
+  max-width: 100%;
+  height: auto;
+}
