@@ -531,6 +531,21 @@
             return tb - ta;
         });
 
+        // Disable create button if user already has an open ticket
+        if (!isAdmin) {
+            var activeStatuses = ['open', 'in_progress', 'waiting'];
+            var hasOpen = allTickets.some(function(t) {
+                return t.userId === currentUser.id && activeStatuses.indexOf(t.status) > -1;
+            });
+            var createBtn = document.querySelector('.btn-create');
+            if (createBtn) {
+                createBtn.disabled = hasOpen;
+                createBtn.title    = hasOpen ? 'You already have an open ticket' : '';
+                createBtn.style.opacity = hasOpen ? '0.4' : '1';
+                createBtn.style.cursor  = hasOpen ? 'not-allowed' : 'pointer';
+            }
+        }
+
         var total      = visible.length;
         var totalPages = Math.max(1, Math.ceil(total / perPage));
         if (currentPage > totalPages) currentPage = totalPages;
@@ -689,6 +704,17 @@
 
         if (!subject) { showToast('Please enter a subject.', 'error'); return; }
         if (subject.length < 3) { showToast('Subject must be at least 3 characters.', 'error'); return; }
+
+        // Check if user already has an open ticket
+        var activeStatuses = ['open', 'in_progress', 'waiting'];
+        var hasOpenTicket = allTickets.some(function(t) {
+            return t.userId === currentUser.id && activeStatuses.indexOf(t.status) > -1;
+        });
+        if (hasOpenTicket) {
+            showToast('You already have an open ticket. Please wait for it to be resolved.', 'error');
+            closeModal();
+            return;
+        }
 
         var userName   = currentUser.global_name || currentUser.username;
         var userAvatar = currentUser.avatar
