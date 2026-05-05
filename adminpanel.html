@@ -11,9 +11,6 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Fuse Storage API (Pure Client-Side) -->
-    <script src="/storage-api.js"></script>
-
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
         (function() {
@@ -420,43 +417,30 @@
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
 
-    /* ── Get users from Storage API ── */
+    /* ── Read directly from localStorage ── */
     function getSeenUsers() {
-        console.log('[ADMIN] Loading users...');
-        return window.FuseAPI.getUsers()
-            .then(function(data) {
-                console.log('[ADMIN] Users loaded:', data.users ? data.users.length : 0);
-                return data.users || [];
-            })
-            .catch(function(err) {
-                console.error('[ADMIN] Failed to load users:', err);
-                return [];
-            });
+        try {
+            var users = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
+            return Promise.resolve(users);
+        } catch(e) { return Promise.resolve([]); }
     }
 
-    /* ── Get banned users ── */
     function getBannedUsers() {
-        return window.FuseAPI.getUsers()
-            .then(function(data) {
-                return data.banned || [];
-            })
-            .catch(function() { return []; });
+        try {
+            return JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+        } catch(e) { return []; }
     }
 
-    /* ── Listen for updates from other tabs ── */
-    window.onFuseStorageUpdate = function() {
-        console.log('[ADMIN] Storage updated, refreshing...');
-        if (document.getElementById('panel').style.display === 'block') {
-            renderLists();
-        }
-    };
+    function saveBanned(arr) {
+        localStorage.setItem('fuse_banned_users', JSON.stringify(arr));
+    }
 
-    /* ── Auto-refresh every 5 seconds ── */
+    /* ── Auto-refresh every 3 seconds ── */
     setInterval(function() {
         if (document.getElementById('panel').style.display === 'block') {
             renderLists();
         }
-    }, 5000);
+    }, 3000);
 
     /* ── Helpers ── */
     function getRoleLabel(roles) {
@@ -504,38 +488,27 @@
         getSeenUsers().then(function(seen) {
             var user = seen.filter(function(u) { return u.id === userId; })[0];
             if (!user) return;
-            
-            var banEntry = {
-                id: user.id,
-                username: user.username,
-                global_name: user.global_name,
-                avatar: user.avatar,
-                bannedAt: Date.now()
-            };
-
-            window.FuseAPI.banUser(banEntry).then(function() {
-                showToast('Banned ' + (user.global_name || user.username), '255,68,68');
-                renderLists();
-            }).catch(function() {
-                showToast('Failed to ban user', '255,68,68');
-            });
+            var banned = getBannedUsers();
+            if (!banned.some(function(b) { return b.id === userId; })) {
+                banned.push({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
+                saveBanned(banned);
+            }
+            showToast('Banned ' + (user.global_name || user.username), '255,68,68');
+            renderLists();
         });
     }
 
     function unbanUser(userId) {
-        window.FuseAPI.unbanUser(userId).then(function() {
-            showToast('Unbanned user', '0,200,80');
-            renderLists();
-        }).catch(function() {
-            showToast('Failed to unban user', '255,68,68');
-        });
+        var banned = getBannedUsers().filter(function(u) { return u.id !== userId; });
+        saveBanned(banned);
+        showToast('Unbanned user', '0,200,80');
+        renderLists();
     }
 
     /* ── Render ── */
     function renderLists() {
-        Promise.all([getSeenUsers(), getBannedUsers()]).then(function(results) {
-            var seen = results[0];
-            var banned = results[1];
+        getSeenUsers().then(function(seen) {
+            var banned    = getBannedUsers();
             var bannedIds = banned.map(function(u) { return u.id; });
 
             var customers = seen.filter(function(u) { return getRoleLabel(u.roles) === 'customer'; }).length;
