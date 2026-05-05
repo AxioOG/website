@@ -314,6 +314,11 @@
             <h3>Tickets</h3>
             <p>Create and manage support tickets.</p>
         </div>
+        <div class="card clickable admin-only" id="admin-panel-card" onclick="location.href='https://fusebypass.fun/adminpanel'" style="display:none; border-color: rgba(255,68,68,0.25);">
+            <div class="card-icon" style="background: rgba(255,68,68,0.1); color: #ff4444;"><i class="fa fa-shield-halved"></i></div>
+            <h3 style="color:#ff4444;">Admin Panel</h3>
+            <p>Manage users, licenses, and site settings.</p>
+        </div>
     </div>
 </main>
 
@@ -354,6 +359,19 @@
     }
 
     function showDash(user, roles) {
+        // Check if this user is banned
+        try {
+            var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+            if (banned.some(function(b) { return b.id === user.id; })) {
+                document.getElementById('loading').style.display   = 'none';
+                document.getElementById('no-access').style.display = 'flex';
+                document.getElementById('no-access').querySelector('h2').textContent = 'Account Banned';
+                document.getElementById('no-access').querySelector('p').textContent  = 'Your account has been banned. Contact support on Discord.';
+                document.getElementById('dash').style.display = 'none';
+                return;
+            }
+        } catch(e) {}
+
         var label  = getRoleLabel(roles);
         var name   = user.global_name || user.username;
         var avatar = user.avatar
@@ -369,9 +387,9 @@
         document.getElementById('dash-tag').textContent  = '@' + user.username;
 
         var roleEl = document.getElementById('dash-role');
-        if (label === 'admin')         { roleEl.textContent = '⚡ Admin';    roleEl.style.color = '#ff4444'; }
-        else if (label === 'customer') { roleEl.textContent = '👑 Customer'; roleEl.style.color = '#f0a500'; }
-        else                           { roleEl.textContent = 'Free';        roleEl.style.color = 'rgba(255,255,255,0.4)'; }
+        if (label === 'admin')         { roleEl.textContent = 'Admin';    roleEl.style.color = '#ff4444'; }
+        else if (label === 'customer') { roleEl.textContent = 'Customer'; roleEl.style.color = '#f0a500'; }
+        else                           { roleEl.textContent = 'Free';     roleEl.style.color = 'rgba(255,255,255,0.4)'; }
 
         if (label === 'customer' || label === 'admin') {
             document.getElementById('lic-key').textContent   = 'FUSE-' + user.id.slice(-8).toUpperCase();
@@ -379,8 +397,24 @@
             document.getElementById('lic-badge').className   = 'badge badge-on';
         }
 
+        // Show Admin Panel card only for admins
+        var adminCard = document.getElementById('admin-panel-card');
+        if (adminCard) {
+            adminCard.style.display = label === 'admin' ? 'block' : 'none';
+        }
+
         localStorage.setItem('fuse_user',  JSON.stringify(user));
         localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+
+        // Register in the shared seen-users registry (read by admin panel)
+        try {
+            var seen = JSON.parse(localStorage.getItem('fuse_seen_users') || '[]');
+            var idx  = -1;
+            for (var i = 0; i < seen.length; i++) { if (seen[i].id === user.id) { idx = i; break; } }
+            var entry = { id: user.id, username: user.username, global_name: user.global_name || user.username, avatar: user.avatar, roles: roles || [], seenAt: Date.now() };
+            if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
+            localStorage.setItem('fuse_seen_users', JSON.stringify(seen));
+        } catch(e) {}
 
         document.getElementById('loading').style.display    = 'none';
         document.getElementById('no-access').style.display  = 'none';
