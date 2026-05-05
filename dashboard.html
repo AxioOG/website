@@ -444,8 +444,9 @@
             adminCard.style.display = label === 'admin' ? 'block' : 'none';
         }
 
-        localStorage.setItem('fuse_user',  JSON.stringify(user));
-        localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+        localStorage.setItem('fuse_user',       JSON.stringify(user));
+        localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
+        localStorage.setItem('fuse_role_label', label || 'free');
 
         // Register in the shared seen-users registry (read by admin panel)
         try {
