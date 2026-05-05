@@ -416,55 +416,55 @@
     var ROLE_ADMIN2       = '1482165881315524688';
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
-    var SUPABASE_URL      = 'https://eoxjphbijyhsbwtjyrkg.supabase.co';
-    var SUPABASE_KEY      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveGpwaGJpanloc2J3dGp5cmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTQzNjEsImV4cCI6MjA5MzU3MDM2MX0.bAqVcTgqzWoMIMXMeyKQOj92MXv1BYP3xryczEupqb0';
 
-    var SB_HEADERS = {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-    };
-
-    // Try Supabase, fall back to localStorage
+    /* ── Fetch ALL server members via Netlify function ── */
     function getSeenUsers() {
-        return fetch(SUPABASE_URL + '/rest/v1/users?select=*&order=seen_at.desc', { headers: SB_HEADERS })
+        document.getElementById('users-list').innerHTML =
+            '<div class="empty-state"><div class="spin" style="margin:0 auto 12px;width:24px;height:24px;border-width:2px;"></div>Loading members from Discord...</div>';
+
+        return fetch('/api/members?action=list')
             .then(function(r) {
-                if (!r.ok) throw new Error('Supabase error: ' + r.status);
+                if (!r.ok) throw new Error('Function error: ' + r.status);
                 return r.json();
             })
             .then(function(data) {
-                console.log('[ADMIN] Loaded from Supabase:', data.length, 'users');
-                return (data || []).map(function(u) {
-                    return { id: u.id, username: u.username, global_name: u.global_name, avatar: u.avatar, roles: u.roles || [], seenAt: new Date(u.seen_at).getTime() };
+                if (data.error) throw new Error(data.error);
+                console.log('[ADMIN] Loaded', data.members.length, 'members from Discord');
+                return data.members.map(function(m) {
+                    return {
+                        id: m.id,
+                        username: m.username,
+                        global_name: m.global_name || m.username,
+                        avatar: m.avatar,
+                        discriminator: m.discriminator || '0',
+                        roles: m.roles || [],
+                        seenAt: m.joined_at ? new Date(m.joined_at).getTime() : Date.now()
+                    };
                 });
             })
             .catch(function(err) {
-                console.warn('[ADMIN] Supabase failed, using localStorage:', err.message);
-                try { return JSON.parse(localStorage.getItem('fuse_all_users') || '[]'); } catch(e) { return []; }
+                console.error('[ADMIN] Failed to load members:', err.message);
+                document.getElementById('users-list').innerHTML =
+                    '<div class="empty-state"><i class="fa fa-triangle-exclamation" style="color:#ff4444;opacity:1;"></i><br>Failed to load members: ' + err.message + '</div>';
+                return [];
             });
     }
 
+    /* ── Bans stored in localStorage (cross-device via ban button) ── */
     function getBannedUsersAsync() {
-        return fetch(SUPABASE_URL + '/rest/v1/banned_users?select=*&order=banned_at.desc', { headers: SB_HEADERS })
-            .then(function(r) {
-                if (!r.ok) throw new Error('Supabase error: ' + r.status);
-                return r.json();
-            })
-            .then(function(data) {
-                return (data || []).map(function(u) {
-                    return { id: u.id, username: u.username, global_name: u.global_name, avatar: u.avatar, bannedAt: new Date(u.banned_at).getTime() };
-                });
-            })
-            .catch(function() {
-                try { return JSON.parse(localStorage.getItem('fuse_banned_users') || '[]'); } catch(e) { return []; }
-            });
+        try {
+            return Promise.resolve(JSON.parse(localStorage.getItem('fuse_banned_users') || '[]'));
+        } catch(e) { return Promise.resolve([]); }
     }
 
-    /* ── Auto-refresh every 5 seconds ── */
+    function saveBanned(arr) {
+        localStorage.setItem('fuse_banned_users', JSON.stringify(arr));
+    }
+
+    /* ── Auto-refresh every 30 seconds (Discord API rate limits) ── */
     setInterval(function() {
         if (document.getElementById('panel').style.display === 'block') renderLists();
-    }, 5000);
+    }, 30000);
 
     /* ── Helpers ── */
     function getRoleLabel(roles) {
@@ -512,47 +512,21 @@
         getSeenUsers().then(function(seen) {
             var user = seen.filter(function(u) { return u.id === userId; })[0];
             if (!user) return;
-            var bannedEntry = { id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, banned_at: new Date().toISOString() };
-            fetch(SUPABASE_URL + '/rest/v1/banned_users', {
-                method: 'POST',
-                headers: Object.assign({}, SB_HEADERS, { 'Prefer': 'resolution=merge-duplicates' }),
-                body: JSON.stringify(bannedEntry)
-            }).catch(function() {
-                // Supabase failed — save to localStorage fallback
-                try {
-                    var stored = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-                    stored = stored.filter(function(u) { return u.id !== userId; });
-                    stored.unshift({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
-                    localStorage.setItem('fuse_banned_users', JSON.stringify(stored));
-                } catch(e) {}
-            }).then(function() {
-                // Also keep localStorage in sync as a fallback mirror
-                try {
-                    var stored = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-                    stored = stored.filter(function(u) { return u.id !== userId; });
-                    stored.unshift({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
-                    localStorage.setItem('fuse_banned_users', JSON.stringify(stored));
-                } catch(e) {}
-                showToast('Banned ' + (user.global_name || user.username), '255,68,68');
-                renderLists();
-            });
+            var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+            if (!banned.some(function(b) { return b.id === userId; })) {
+                banned.unshift({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
+                saveBanned(banned);
+            }
+            showToast('Banned ' + (user.global_name || user.username), '255,68,68');
+            renderLists();
         });
     }
 
     function unbanUser(userId) {
-        fetch(SUPABASE_URL + '/rest/v1/banned_users?id=eq.' + userId, {
-            method: 'DELETE',
-            headers: SB_HEADERS
-        }).catch(function() {}).then(function() {
-            // Remove from localStorage fallback too
-            try {
-                var stored = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-                stored = stored.filter(function(u) { return u.id !== userId; });
-                localStorage.setItem('fuse_banned_users', JSON.stringify(stored));
-            } catch(e) {}
-            showToast('Unbanned user', '0,200,80');
-            renderLists();
-        });
+        var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]').filter(function(u) { return u.id !== userId; });
+        saveBanned(banned);
+        showToast('Unbanned user', '0,200,80');
+        renderLists();
     }
 
     /* ── Render ── */
@@ -561,7 +535,6 @@
             var seen      = results[0];
             var banned    = results[1];
             var bannedIds = banned.map(function(u) { return u.id; });
-
             var customers = seen.filter(function(u) { return getRoleLabel(u.roles) === 'customer'; }).length;
             var licenses  = seen.filter(function(u) { var r = getRoleLabel(u.roles); return r === 'customer' || r === 'admin'; }).length;
             document.getElementById('stat-total').textContent     = seen.length;
