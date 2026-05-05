@@ -1,0 +1,631 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel — Fuse</title>
+    <link rel="icon" type="image/png" href="fuseggbw.png" sizes="64x64">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Extract token from hash BEFORE anything else runs -->
+    <script>
+        (function() {
+            var h = window.location.hash.substring(1);
+            if (h) {
+                var p = new URLSearchParams(h);
+                var t = p.get('access_token');
+                if (t) {
+                    localStorage.setItem('fuse_token', t);
+                    history.replaceState(null, '', window.location.pathname);
+                }
+            }
+        })();
+    </script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Animated background (matches index.html) ── */
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(30,30,30,0.8) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(40,40,40,0.8) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(25,25,25,0.8) 0%, transparent 50%),
+                linear-gradient(135deg, #000 0%, #0a0a0a 50%, #000 100%);
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 120px 120px;
+            opacity: 0.6;
+            animation: geometricMove 30s linear infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%,100% { background-position: 0% 0%, 100% 100%, 50% 0%, 0% 0%; }
+            25%      { background-position: 100% 0%, 0% 100%, 0% 50%, 25% 25%; }
+            50%      { background-position: 100% 100%, 0% 0%, 100% 50%, 50% 50%; }
+            75%      { background-position: 0% 100%, 100% 0%, 50% 100%, 75% 75%; }
+        }
+        @keyframes geometricMove {
+            0%   { background-position: 0 0, 0 0; }
+            100% { background-position: 120px 120px, -120px 120px; }
+        }
+
+        /* Floating orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .orb-1 { width: 400px; height: 400px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(60,60,60,0.4) 0%, transparent 70%); animation: floatOrb1 25s ease-in-out infinite; }
+        .orb-2 { width: 500px; height: 500px; bottom: -150px; right: -150px; background: radial-gradient(circle, rgba(50,50,50,0.4) 0%, transparent 70%); animation: floatOrb2 30s ease-in-out infinite; }
+        .orb-3 { width: 350px; height: 350px; top: 50%; left: 50%; transform: translate(-50%,-50%); background: radial-gradient(circle, rgba(40,40,40,0.3) 0%, transparent 70%); animation: floatOrb3 20s ease-in-out infinite; }
+
+        @keyframes floatOrb1 {
+            0%,100% { transform: translate(0,0); }
+            33%     { transform: translate(60px,40px); }
+            66%     { transform: translate(-30px,70px); }
+        }
+        @keyframes floatOrb2 {
+            0%,100% { transform: translate(0,0); }
+            33%     { transform: translate(-70px,-50px); }
+            66%     { transform: translate(40px,-80px); }
+        }
+        @keyframes floatOrb3 {
+            0%,100% { transform: translate(-50%,-50%) scale(1); }
+            50%     { transform: translate(-50%,-50%) scale(1.15); }
+        }
+
+        /* Scanline */
+        .scanline {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.01) 3px, rgba(255,255,255,0.01) 4px);
+            animation: scanlineMove 8s linear infinite;
+        }
+        @keyframes scanlineMove {
+            0%   { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background: rgba(8,8,8,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px; z-index: 100;
+        }
+        .topbar-logo {
+            font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 800;
+            letter-spacing: -0.03em; color: #fff; text-decoration: none;
+        }
+        .topbar-logo span { color: rgba(255,255,255,0.4); }
+        .topbar-badge {
+            background: rgba(255,68,68,0.15); border: 1px solid rgba(255,68,68,0.3);
+            color: #ff4444; font-family: 'Montserrat', sans-serif; font-size: 0.7rem;
+            font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            padding: 4px 12px; border-radius: 999px;
+        }
+
+        /* ── User pill ── */
+        .user-pill { position: fixed; top: 12px; right: 32px; z-index: 200; }
+        .user-pill-btn {
+            display: flex; align-items: center; gap: 9px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 999px; padding: 5px 14px 5px 5px;
+            cursor: pointer; color: #fff;
+            font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700;
+            transition: background 0.2s;
+        }
+        .user-pill-btn:hover { background: rgba(255,255,255,0.11); }
+        #pill-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+        .chevron { font-size: 0.65rem; color: rgba(255,255,255,0.45); margin-left: 2px; transition: transform 0.2s; }
+        .user-pill.open .chevron { transform: rotate(180deg); }
+        .dropdown {
+            position: absolute; top: calc(100% + 10px); right: 0; min-width: 190px;
+            background: rgba(14,14,14,0.98); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 7px; box-shadow: 0 16px 48px rgba(0,0,0,0.75);
+            opacity: 0; pointer-events: none; transform: translateY(6px);
+            transition: opacity 0.16s, transform 0.16s; z-index: 300;
+        }
+        .user-pill.open .dropdown { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .dd-item {
+            display: flex; align-items: center; gap: 11px; padding: 10px 13px;
+            border-radius: 8px; font-family: 'Montserrat', sans-serif;
+            font-size: 0.87rem; font-weight: 700; color: rgba(255,255,255,0.7);
+            text-decoration: none; cursor: pointer; border: none; background: none;
+            width: 100%; text-align: left; transition: background 0.15s, color 0.15s;
+        }
+        .dd-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+        .dd-item i { width: 16px; text-align: center; }
+        .dd-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 5px 0; }
+        .dd-item.red { color: rgba(255,80,80,0.8); }
+        .dd-item.red:hover { background: rgba(255,50,50,0.1); color: #ff5555; }
+
+        /* ── Loading / No-access ── */
+        #loading {
+            position: fixed; inset: 0; background: #000;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 999; flex-direction: column; gap: 14px;
+        }
+        #loading .spin {
+            width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        #loading p { font-size: 0.8rem; color: rgba(255,255,255,0.35); font-family: 'Montserrat', sans-serif; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #no-access {
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; min-height: 100vh; text-align: center; padding: 2rem;
+        }
+        #no-access .icon { font-size: 3rem; color: rgba(255,68,68,0.6); margin-bottom: 20px; }
+        #no-access h2 { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+        #no-access p { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-bottom: 24px; }
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 9px; padding: 12px 26px;
+            background: rgba(255,255,255,0.07); color: #fff; border: 1px solid rgba(255,255,255,0.12);
+            font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.88rem;
+            border-radius: 10px; text-decoration: none; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.12); }
+
+        /* ── Main layout ── */
+        .wrap { padding: 88px 32px 60px; max-width: 1200px; margin: 0 auto; }
+
+        .page-header { margin-bottom: 36px; }
+        .page-header h1 {
+            font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 800;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 12px;
+        }
+        .page-header h1 i { color: #ff4444; font-size: 1.4rem; }
+        .page-header p { color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+
+        /* ── Stats row ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 36px; }
+        .stat-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 18px 20px;
+        }
+        .stat-card .label { font-family: 'Montserrat', sans-serif; font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+        .stat-card .value { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; }
+
+        /* ── Section title ── */
+        .sec-title {
+            font-family: 'Montserrat', sans-serif; font-size: 0.72rem; font-weight: 700;
+            color: rgba(255,255,255,0.28); letter-spacing: 0.12em; text-transform: uppercase;
+            margin: 0 0 14px;
+        }
+
+        /* ── Table panel ── */
+        .panel {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; overflow: hidden; margin-bottom: 36px;
+        }
+        .panel-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 22px; border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .panel-head-title { font-family: 'Montserrat', sans-serif; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+        .panel-head-title i { color: rgba(255,255,255,0.4); }
+        .panel-count { font-family: 'Montserrat', sans-serif; font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.06); padding: 3px 10px; border-radius: 999px; }
+
+        /* ── User rows ── */
+        .user-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 22px; border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.15s;
+        }
+        .user-row:last-child { border-bottom: none; }
+        .user-row:hover { background: rgba(255,255,255,0.03); }
+
+        .user-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .user-info { flex: 1; min-width: 0; }
+        .user-name { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-id { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+        .user-license { font-family: 'Montserrat', sans-serif; font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.06em; flex-shrink: 0; }
+
+        .badge { padding: 3px 11px; border-radius: 999px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; flex-shrink: 0; }
+        .badge-active   { background: rgba(0,200,80,0.15); color: #00c850; }
+        .badge-free     { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.3); }
+        .badge-banned   { background: rgba(255,68,68,0.15); color: #ff4444; }
+        .badge-customer { background: rgba(240,165,0,0.15); color: #f0a500; }
+        .badge-admin    { background: rgba(255,68,68,0.15); color: #ff4444; }
+
+        .user-joined { font-size: 0.72rem; color: rgba(255,255,255,0.25); flex-shrink: 0; min-width: 90px; text-align: right; }
+
+        /* ── Action buttons ── */
+        .btn-ban {
+            padding: 6px 14px; border-radius: 8px; font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem; font-weight: 700; cursor: pointer; border: none;
+            background: rgba(255,68,68,0.12); color: #ff4444;
+            border: 1px solid rgba(255,68,68,0.2);
+            transition: background 0.15s; flex-shrink: 0;
+        }
+        .btn-ban:hover { background: rgba(255,68,68,0.22); }
+        .btn-unban {
+            padding: 6px 14px; border-radius: 8px; font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem; font-weight: 700; cursor: pointer; border: none;
+            background: rgba(0,200,80,0.1); color: #00c850;
+            border: 1px solid rgba(0,200,80,0.2);
+            transition: background 0.15s; flex-shrink: 0;
+        }
+        .btn-unban:hover { background: rgba(0,200,80,0.2); }
+
+        /* ── Empty state ── */
+        .empty-state {
+            padding: 48px 22px; text-align: center;
+            color: rgba(255,255,255,0.2); font-size: 0.85rem;
+        }
+        .empty-state i { font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.4; }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(20,20,20,0.97); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 12px 22px;
+            font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 700;
+            color: #fff; z-index: 9999; opacity: 0; pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 640px) {
+            .user-license, .user-joined { display: none; }
+            .wrap { padding: 80px 16px 40px; }
+        }
+    </style>
+</head>
+<body>
+
+
+<!-- Animated background layers -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="scanline"></div>
+
+<!-- Loading -->
+<div id="loading">
+    <div class="spin"></div>
+    <p>Verifying access...</p>
+</div>
+
+<!-- No access -->
+<div id="no-access">
+    <div class="icon"><i class="fa fa-shield-halved"></i></div>
+    <h2>Access Denied</h2>
+    <p>This panel is restricted to Fuse administrators only.</p>
+    <a class="btn-back" href="/dashboard"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<!-- Top bar -->
+<header class="topbar">
+    <a class="topbar-logo" href="https://fusebypass.fun">fusebypass<span>.fun</span></a>
+    <span class="topbar-badge"><i class="fa fa-shield-halved"></i> &nbsp;Admin Panel</span>
+</header>
+
+<!-- User pill -->
+<div class="user-pill" id="user-pill">
+    <button class="user-pill-btn" onclick="toggleDD()">
+        <img id="pill-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
+        <span id="pill-name">—</span>
+        <i class="fa fa-chevron-down chevron"></i>
+    </button>
+    <div class="dropdown">
+        <a class="dd-item" href="/dashboard"><i class="fa fa-gauge"></i> Dashboard</a>
+        <a class="dd-item" href="https://fusebypass.fun/home"><i class="fa fa-house"></i> Home</a>
+        <div class="dd-sep"></div>
+        <button class="dd-item red" onclick="logout()"><i class="fa fa-right-from-bracket"></i> Logout</button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Main panel -->
+<main class="wrap" id="panel" style="display:none;">
+
+    <div class="page-header">
+        <h1><i class="fa fa-shield-halved"></i> Admin Panel</h1>
+        <p>Manage authorized users, licenses, and bans.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="label">Total Users</div>
+            <div class="value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Customers</div>
+            <div class="value" id="stat-customers" style="color:#f0a500;">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Active Licenses</div>
+            <div class="value" id="stat-licenses" style="color:#00c850;">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Banned</div>
+            <div class="value" id="stat-banned" style="color:#ff4444;">0</div>
+        </div>
+    </div>
+
+    <!-- Active users list -->
+    <div class="sec-title">Authorized Users</div>
+    <div class="panel">
+        <div class="panel-head">
+            <span class="panel-head-title"><i class="fa fa-users"></i> Users who have signed in</span>
+            <span class="panel-count" id="active-count">0</span>
+        </div>
+        <div id="users-list">
+            <div class="empty-state"><i class="fa fa-user-slash"></i>No users have authorized yet.</div>
+        </div>
+    </div>
+
+    <!-- Banned users list -->
+    <div class="sec-title">Banned Users</div>
+    <div class="panel">
+        <div class="panel-head">
+            <span class="panel-head-title"><i class="fa fa-ban"></i> Banned accounts</span>
+            <span class="panel-count" id="banned-count">0</span>
+        </div>
+        <div id="banned-list">
+            <div class="empty-state"><i class="fa fa-check-circle"></i>No banned users.</div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    var DISCORD_CLIENT_ID = '1460340695578575041';
+    var DISCORD_REDIRECT  = 'https://fusebypass.fun/dashboard';
+    var GUILD_ID          = '1305642236880617482';
+    var ROLE_ADMIN1       = '1471974431579574538';
+    var ROLE_ADMIN2       = '1482165881315524688';
+    var ROLE_CUSTOMER     = '1489330191498084413';
+
+    /* ── Helpers ── */
+    function getRoleLabel(roles) {
+        if (!roles || !roles.length) return 'free';
+        if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+        if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
+        return 'free';
+    }
+
+    function getLicense(userId, roleLabel) {
+        if (roleLabel === 'customer' || roleLabel === 'admin') {
+            return 'FUSE-' + userId.slice(-8).toUpperCase();
+        }
+        return null;
+    }
+
+    function avatarUrl(user) {
+        return user.avatar
+            ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png?size=64'
+            : 'https://cdn.discordapp.com/embed/avatars/' + (parseInt(user.discriminator || '0') % 5) + '.png';
+    }
+
+    function timeAgo(ts) {
+        var diff = Date.now() - ts;
+        var m = Math.floor(diff / 60000);
+        if (m < 1)  return 'just now';
+        if (m < 60) return m + 'm ago';
+        var h = Math.floor(m / 60);
+        if (h < 24) return h + 'h ago';
+        return Math.floor(h / 24) + 'd ago';
+    }
+
+    function showToast(msg, color) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.borderColor = color ? 'rgba(' + color + ',0.3)' : 'rgba(255,255,255,0.1)';
+        t.classList.add('show');
+        setTimeout(function() { t.classList.remove('show'); }, 2800);
+    }
+
+    /* ── Storage keys ── */
+    var KEY_SEEN    = 'fuse_seen_users';   // array of {id, username, global_name, avatar, roles, seenAt}
+    var KEY_BANNED  = 'fuse_banned_users'; // array of {id, username, global_name, avatar, bannedAt}
+
+    function getSeenUsers()   { try { return JSON.parse(localStorage.getItem(KEY_SEEN)  || '[]'); } catch(e) { return []; } }
+    function getBannedUsers() { try { return JSON.parse(localStorage.getItem(KEY_BANNED) || '[]'); } catch(e) { return []; } }
+    function saveSeen(arr)    { localStorage.setItem(KEY_SEEN,   JSON.stringify(arr)); }
+    function saveBanned(arr)  { localStorage.setItem(KEY_BANNED, JSON.stringify(arr)); }
+
+    function isBanned(userId) {
+        return getBannedUsers().some(function(u) { return u.id === userId; });
+    }
+
+    /* ── Ban / Unban ── */
+    function banUser(userId) {
+        var seen    = getSeenUsers();
+        var banned  = getBannedUsers();
+        var user    = seen.filter(function(u) { return u.id === userId; })[0];
+        if (!user) return;
+        if (banned.some(function(u) { return u.id === userId; })) return;
+        banned.push({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
+        saveBanned(banned);
+        showToast('Banned ' + (user.global_name || user.username), '255,68,68');
+        renderLists();
+    }
+
+    function unbanUser(userId) {
+        var banned = getBannedUsers().filter(function(u) { return u.id !== userId; });
+        saveBanned(banned);
+        var name = userId;
+        showToast('Unbanned user', '0,200,80');
+        renderLists();
+    }
+
+    /* ── Render ── */
+    function renderLists() {
+        var seen   = getSeenUsers();
+        var banned = getBannedUsers();
+        var bannedIds = banned.map(function(u) { return u.id; });
+
+        // Stats
+        var customers = seen.filter(function(u) { return getRoleLabel(u.roles) === 'customer'; }).length;
+        var licenses  = seen.filter(function(u) { var r = getRoleLabel(u.roles); return r === 'customer' || r === 'admin'; }).length;
+        document.getElementById('stat-total').textContent     = seen.length;
+        document.getElementById('stat-customers').textContent = customers;
+        document.getElementById('stat-licenses').textContent  = licenses;
+        document.getElementById('stat-banned').textContent    = banned.length;
+        document.getElementById('active-count').textContent   = seen.length;
+        document.getElementById('banned-count').textContent   = banned.length;
+
+        // Active users list
+        var ul = document.getElementById('users-list');
+        if (!seen.length) {
+            ul.innerHTML = '<div class="empty-state"><i class="fa fa-user-slash"></i>No users have authorized yet.</div>';
+        } else {
+            ul.innerHTML = seen.map(function(u) {
+                var role    = getRoleLabel(u.roles);
+                var lic     = getLicense(u.id, role);
+                var isBan   = bannedIds.indexOf(u.id) > -1;
+                var badgeCls = isBan ? 'badge-banned' : (role === 'admin' ? 'badge-admin' : role === 'customer' ? 'badge-customer' : 'badge-free');
+                var badgeTxt = isBan ? 'Banned' : (role === 'admin' ? 'Admin' : role === 'customer' ? 'Customer' : 'Free');
+                return '<div class="user-row">' +
+                    '<img class="user-avatar" src="' + avatarUrl(u) + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                    '<div class="user-info">' +
+                        '<div class="user-name">' + escHtml(u.global_name || u.username) + '</div>' +
+                        '<div class="user-id">@' + escHtml(u.username) + ' &nbsp;·&nbsp; ' + u.id + '</div>' +
+                    '</div>' +
+                    (lic ? '<span class="user-license">' + lic + '</span>' : '<span class="user-license" style="color:rgba(255,255,255,0.15)">No license</span>') +
+                    '<span class="badge ' + badgeCls + '">' + badgeTxt + '</span>' +
+                    '<span class="user-joined">' + timeAgo(u.seenAt) + '</span>' +
+                    (isBan
+                        ? '<button class="btn-unban" onclick="unbanUser(\'' + u.id + '\')"><i class="fa fa-unlock"></i> Unban</button>'
+                        : '<button class="btn-ban"   onclick="banUser(\''   + u.id + '\')"><i class="fa fa-ban"></i> Ban</button>'
+                    ) +
+                '</div>';
+            }).join('');
+        }
+
+        // Banned list
+        var bl = document.getElementById('banned-list');
+        if (!banned.length) {
+            bl.innerHTML = '<div class="empty-state"><i class="fa fa-check-circle"></i>No banned users.</div>';
+        } else {
+            bl.innerHTML = banned.map(function(u) {
+                return '<div class="user-row">' +
+                    '<img class="user-avatar" src="' + avatarUrl(u) + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'" style="opacity:0.5;filter:grayscale(1)">' +
+                    '<div class="user-info">' +
+                        '<div class="user-name" style="color:rgba(255,255,255,0.5)">' + escHtml(u.global_name || u.username) + '</div>' +
+                        '<div class="user-id">@' + escHtml(u.username) + ' &nbsp;·&nbsp; ' + u.id + '</div>' +
+                    '</div>' +
+                    '<span class="badge badge-banned">Banned</span>' +
+                    '<span class="user-joined">' + timeAgo(u.bannedAt) + '</span>' +
+                    '<button class="btn-unban" onclick="unbanUser(\'' + u.id + '\')"><i class="fa fa-unlock"></i> Unban</button>' +
+                '</div>';
+            }).join('');
+        }
+    }
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── Auth ── */
+    function logout() {
+        ['fuse_token','fuse_user','fuse_roles'].forEach(function(k){ localStorage.removeItem(k); });
+        location.href = '/dashboard';
+    }
+
+    function toggleDD() { document.getElementById('user-pill').classList.toggle('open'); }
+    document.addEventListener('click', function(e) {
+        var p = document.getElementById('user-pill');
+        if (p && !p.contains(e.target)) p.classList.remove('open');
+    });
+
+    function showNoAccess() {
+        document.getElementById('loading').style.display   = 'none';
+        document.getElementById('no-access').style.display = 'flex';
+        document.getElementById('panel').style.display     = 'none';
+    }
+
+    function showPanel(user) {
+        var name   = user.global_name || user.username;
+        var avatar = avatarUrl(user);
+        document.getElementById('pill-avatar').src          = avatar;
+        document.getElementById('pill-name').textContent    = name;
+        document.getElementById('loading').style.display    = 'none';
+        document.getElementById('no-access').style.display  = 'none';
+        document.getElementById('panel').style.display      = 'block';
+        renderLists();
+    }
+
+    /* ── Register this user in the seen-users registry ── */
+    function registerUser(user, roles) {
+        var seen = getSeenUsers();
+        var idx  = seen.findIndex ? seen.findIndex(function(u){ return u.id === user.id; })
+                                  : (function(){ for(var i=0;i<seen.length;i++) if(seen[i].id===user.id) return i; return -1; })();
+        var entry = { id: user.id, username: user.username, global_name: user.global_name || user.username, avatar: user.avatar, roles: roles || [], seenAt: Date.now() };
+        if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
+        saveSeen(seen);
+    }
+
+    /* ── Boot ── */
+    function boot() {
+        var token = localStorage.getItem('fuse_token');
+        if (!token) { showNoAccess(); return; }
+
+        fetch('https://discord.com/api/v10/users/@me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(function(r) {
+            if (r.status === 401) { showNoAccess(); return null; }
+            return r.json();
+        })
+        .then(function(user) {
+            if (!user || !user.id) { showNoAccess(); return; }
+            return fetch('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : {}; })
+            .then(function(m) {
+                var roles = m.roles || [];
+                var label = getRoleLabel(roles);
+                if (label !== 'admin') { showNoAccess(); return; }
+                // Register this admin in seen list too
+                registerUser(user, roles);
+                showPanel(user);
+            });
+        })
+        .catch(function() { showNoAccess(); });
+    }
+
+    boot();
+</script>
+</body>
+</html>
