@@ -624,7 +624,11 @@
         document.getElementById('loading').style.display    = 'none';
         document.getElementById('no-access').style.display  = 'none';
         document.getElementById('panel').style.display      = 'block';
-        renderLists();
+        
+        // Wait a moment for storage to be ready, then render
+        setTimeout(function() {
+            renderLists();
+        }, 500);
     }
 
     /* ── Boot ── */
