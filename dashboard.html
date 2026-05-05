@@ -12,51 +12,19 @@
 
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
-        (function() {
-            var h = window.location.hash.substring(1);
-            if (h) {
-                var p = new URLSearchParams(h);
-                var t = p.get('access_token');
-                if (t) {
-                    localStorage.setItem('fuse_token', t);
-                    history.replaceState(null, '', window.location.pathname);
-
-                    // Fetch user + roles then register in shared store
-                    fetch('https://discord.com/api/v10/users/@me', {
-                        headers: { 'Authorization': 'Bearer ' + t }
-                    })
-                    .then(function(r) { return r.ok ? r.json() : null; })
-                    .then(function(user) {
-                        if (!user || !user.id) return;
-                        return fetch('https://discord.com/api/v10/users/@me/guilds/1305642236880617482/member', {
-                            headers: { 'Authorization': 'Bearer ' + t }
-                        })
-                        .then(function(r) { return r.ok ? r.json() : {}; })
-                        .then(function(m) { fuseRegisterUser(user, m.roles || []); });
-                    })
-                    .catch(function() {});
-                }
-            }
-        })();
-
         /* ── Shared user registry via GitHub Gist ── */
-        // SETUP: Create a public Gist at https://gist.github.com with a file
-        // named "fuse-users.json" containing: {"users":[]}
-        // Then paste the Gist ID below (the long string in the URL)
         var FUSE_GIST_ID    = '7f9e078242e1515e41b2c3b2e4cca2a7';
         var FUSE_GIST_TOKEN = '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';
 
         function fuseRegisterUser(user, roles) {
-            if (!FUSE_GIST_TOKEN || FUSE_GIST_TOKEN === 'YOUR_GITHUB_TOKEN_HERE') return;
             var entry = {
                 id: user.id,
                 username: user.username,
                 global_name: user.global_name || user.username,
                 avatar: user.avatar,
-                roles: roles,
+                roles: roles || [],
                 seenAt: Date.now()
             };
-            // Read current list via raw URL (no rate limit), then PATCH with token
             fetch('https://gist.githubusercontent.com/AxioOG/' + FUSE_GIST_ID + '/raw/fuse-users.json?t=' + Date.now())
             .then(function(r) { return r.ok ? r.json() : { users: [] }; })
             .then(function(data) {
@@ -75,6 +43,33 @@
             })
             .catch(function() {});
         }
+
+        /* ── Extract token from hash and register user immediately ── */
+        (function() {
+            var h = window.location.hash.substring(1);
+            if (h) {
+                var p = new URLSearchParams(h);
+                var t = p.get('access_token');
+                if (t) {
+                    localStorage.setItem('fuse_token', t);
+                    history.replaceState(null, '', window.location.pathname);
+
+                    fetch('https://discord.com/api/v10/users/@me', {
+                        headers: { 'Authorization': 'Bearer ' + t }
+                    })
+                    .then(function(r) { return r.ok ? r.json() : null; })
+                    .then(function(user) {
+                        if (!user || !user.id) return;
+                        return fetch('https://discord.com/api/v10/users/@me/guilds/1305642236880617482/member', {
+                            headers: { 'Authorization': 'Bearer ' + t }
+                        })
+                        .then(function(r) { return r.ok ? r.json() : {}; })
+                        .then(function(m) { fuseRegisterUser(user, m.roles || []); });
+                    })
+                    .catch(function() {});
+                }
+            }
+        })();
     </script>
 
     <style>
@@ -459,10 +454,8 @@
         localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
         localStorage.setItem('fuse_role_label', label || 'free');
 
-        // Register in shared store (covers returning users with cached token)
-        if (typeof fuseRegisterUser === 'function') {
-            fuseRegisterUser(user, roles || []);
-        }
+        // Always register/update in shared Gist store
+        fuseRegisterUser(user, roles || []);
 
         document.getElementById('loading').style.display    = 'none';
         document.getElementById('no-access').style.display  = 'none';
