@@ -411,15 +411,20 @@
     var DISCORD_CLIENT_ID = '1460340695578575041';
     var DISCORD_REDIRECT  = 'https://fusebypass.fun/dashboard';
     var GUILD_ID          = '1305642236880617482';
-    var ROLE_OWNER        = '1305642237153026068';  // Owner role (top admin)
+    var ROLE_OWNER        = '1305642237153026068';  // Owner — update if wrong
     var ROLE_ADMIN1       = '1471974431579574538';
     var ROLE_ADMIN2       = '1482165881315524688';
     var ROLE_CUSTOMER     = '1489330191498084413';
 
+    // Admin role IDs — all of these grant admin access
+    var ADMIN_ROLES = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
+
     /* ── Helpers ── */
     function getRoleLabel(roles) {
         if (!roles || !roles.length) return 'free';
-        if (roles.indexOf(ROLE_OWNER) > -1 || roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+        for (var i = 0; i < ADMIN_ROLES.length; i++) {
+            if (roles.indexOf(ADMIN_ROLES[i]) > -1) return 'admin';
+        }
         if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
         return 'free';
     }
@@ -601,6 +606,49 @@
         var token = localStorage.getItem('fuse_token');
         if (!token) { showNoAccess(); return; }
 
+        // Use the role label the dashboard already resolved — no guessing role IDs
+        var cachedUser  = localStorage.getItem('fuse_user');
+        var cachedLabel = localStorage.getItem('fuse_role_label');
+        var cachedRoles = localStorage.getItem('fuse_roles');
+
+        if (cachedUser && cachedLabel === 'admin') {
+            try {
+                var user  = JSON.parse(cachedUser);
+                var roles = JSON.parse(cachedRoles || '[]');
+                registerUser(user, roles);
+                showPanel(user);
+                setInterval(function() { renderLists(); }, 3000);
+                refreshInBackground(token);
+                return;
+            } catch(e) {}
+        }
+
+        // No valid cache — fetch fresh from Discord
+        fetchAndVerify(token);
+    }
+
+    function refreshInBackground(token) {
+        fetch('https://discord.com/api/v10/users/@me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(user) {
+            if (!user) return;
+            fetch('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(r) { return r.ok ? r.json() : {}; })
+            .then(function(m) {
+                var roles = m.roles || [];
+                localStorage.setItem('fuse_roles', JSON.stringify(roles));
+                registerUser(user, roles);
+            })
+            .catch(function() {});
+        })
+        .catch(function() {});
+    }
+
+    function fetchAndVerify(token) {
         fetch('https://discord.com/api/v10/users/@me', {
             headers: { 'Authorization': 'Bearer ' + token }
         })
@@ -618,14 +666,11 @@
                 var roles = m.roles || [];
                 var label = getRoleLabel(roles);
                 if (label !== 'admin') { showNoAccess(); return; }
-                // Register this admin in seen list too
+                localStorage.setItem('fuse_roles',      JSON.stringify(roles));
+                localStorage.setItem('fuse_role_label', 'admin');
                 registerUser(user, roles);
                 showPanel(user);
-                
-                // Auto-refresh the lists every 3 seconds to show new users
-                setInterval(function() {
-                    renderLists();
-                }, 3000);
+                setInterval(function() { renderLists(); }, 3000);
             });
         })
         .catch(function() { showNoAccess(); });
