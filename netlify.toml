@@ -1,6 +1,22 @@
 [build]
   publish = "."
   command = ""
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/members"
+  to = "/.netlify/functions/members"
+  status = 200
+
+[[redirects]]
+  from = "/api/ban"
+  to = "/.netlify/functions/ban"
+  status = 200
+
+[[redirects]]
+  from = "/adminpanel"
+  to = "/adminpanel.html"
+  status = 200
 
 [[redirects]]
   from = "/dashboard"
@@ -36,7 +52,7 @@
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Access-Control-Allow-Methods = "GET, POST, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
 
 [[headers]]
