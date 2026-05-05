@@ -416,31 +416,42 @@
     var ROLE_ADMIN2       = '1482165881315524688';
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
+    var SUPABASE_URL      = 'https://eoxjphbijyhsbwtjyrkg.supabase.co';
+    var SUPABASE_KEY      = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveGpwaGJpanloc2J3dGp5cmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTQzNjEsImV4cCI6MjA5MzU3MDM2MX0.bAqVcTgqzWoMIMXMeyKQOj92MXv1BYP3xryczEupqb0';
 
-    /* ── Read directly from localStorage ── */
+    var SB_HEADERS = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+    };
+
     function getSeenUsers() {
-        try {
-            var users = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
-            return Promise.resolve(users);
-        } catch(e) { return Promise.resolve([]); }
+        return fetch(SUPABASE_URL + '/rest/v1/users?select=*&order=seen_at.desc', { headers: SB_HEADERS })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                return (data || []).map(function(u) {
+                    return { id: u.id, username: u.username, global_name: u.global_name, avatar: u.avatar, roles: u.roles || [], seenAt: new Date(u.seen_at).getTime() };
+                });
+            })
+            .catch(function() { return []; });
     }
 
-    function getBannedUsers() {
-        try {
-            return JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-        } catch(e) { return []; }
+    function getBannedUsersAsync() {
+        return fetch(SUPABASE_URL + '/rest/v1/banned_users?select=*&order=banned_at.desc', { headers: SB_HEADERS })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                return (data || []).map(function(u) {
+                    return { id: u.id, username: u.username, global_name: u.global_name, avatar: u.avatar, bannedAt: new Date(u.banned_at).getTime() };
+                });
+            })
+            .catch(function() { return []; });
     }
 
-    function saveBanned(arr) {
-        localStorage.setItem('fuse_banned_users', JSON.stringify(arr));
-    }
-
-    /* ── Auto-refresh every 3 seconds ── */
+    /* ── Auto-refresh every 5 seconds ── */
     setInterval(function() {
-        if (document.getElementById('panel').style.display === 'block') {
-            renderLists();
-        }
-    }, 3000);
+        if (document.getElementById('panel').style.display === 'block') renderLists();
+    }, 5000);
 
     /* ── Helpers ── */
     function getRoleLabel(roles) {
@@ -488,27 +499,32 @@
         getSeenUsers().then(function(seen) {
             var user = seen.filter(function(u) { return u.id === userId; })[0];
             if (!user) return;
-            var banned = getBannedUsers();
-            if (!banned.some(function(b) { return b.id === userId; })) {
-                banned.push({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
-                saveBanned(banned);
-            }
-            showToast('Banned ' + (user.global_name || user.username), '255,68,68');
-            renderLists();
+            fetch(SUPABASE_URL + '/rest/v1/banned_users', {
+                method: 'POST',
+                headers: Object.assign({}, SB_HEADERS, { 'Prefer': 'resolution=merge-duplicates' }),
+                body: JSON.stringify({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, banned_at: new Date().toISOString() })
+            }).then(function() {
+                showToast('Banned ' + (user.global_name || user.username), '255,68,68');
+                renderLists();
+            });
         });
     }
 
     function unbanUser(userId) {
-        var banned = getBannedUsers().filter(function(u) { return u.id !== userId; });
-        saveBanned(banned);
-        showToast('Unbanned user', '0,200,80');
-        renderLists();
+        fetch(SUPABASE_URL + '/rest/v1/banned_users?id=eq.' + userId, {
+            method: 'DELETE',
+            headers: SB_HEADERS
+        }).then(function() {
+            showToast('Unbanned user', '0,200,80');
+            renderLists();
+        });
     }
 
     /* ── Render ── */
     function renderLists() {
-        getSeenUsers().then(function(seen) {
-            var banned    = getBannedUsers();
+        Promise.all([getSeenUsers(), getBannedUsersAsync()]).then(function(results) {
+            var seen      = results[0];
+            var banned    = results[1];
             var bannedIds = banned.map(function(u) { return u.id; });
 
             var customers = seen.filter(function(u) { return getRoleLabel(u.roles) === 'customer'; }).length;
