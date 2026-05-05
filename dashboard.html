@@ -19,51 +19,61 @@
                 var t = p.get('access_token');
                 if (t) {
                     localStorage.setItem('fuse_token', t);
-                    // Clean URL
                     history.replaceState(null, '', window.location.pathname);
-                    
-                    // Immediately fetch user data and register them in the seen-users list
+
+                    // Fetch user + roles then register in shared store
                     fetch('https://discord.com/api/v10/users/@me', {
                         headers: { 'Authorization': 'Bearer ' + t }
                     })
                     .then(function(r) { return r.ok ? r.json() : null; })
                     .then(function(user) {
                         if (!user || !user.id) return;
-                        console.log('[FUSE] User authorized:', user.username);
-                        // Fetch guild member data to get roles
                         return fetch('https://discord.com/api/v10/users/@me/guilds/1305642236880617482/member', {
                             headers: { 'Authorization': 'Bearer ' + t }
                         })
                         .then(function(r) { return r.ok ? r.json() : {}; })
-                        .then(function(m) {
-                            console.log('[FUSE] Guild roles:', m.roles);
-                            // Register in seen-users registry
-                            try {
-                                var seen = JSON.parse(localStorage.getItem('fuse_seen_users') || '[]');
-                                var idx = -1;
-                                for (var i = 0; i < seen.length; i++) { if (seen[i].id === user.id) { idx = i; break; } }
-                                var entry = {
-                                    id: user.id,
-                                    username: user.username,
-                                    global_name: user.global_name || user.username,
-                                    avatar: user.avatar,
-                                    roles: m.roles || [],
-                                    seenAt: Date.now()
-                                };
-                                if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
-                                localStorage.setItem('fuse_seen_users', JSON.stringify(seen));
-                                console.log('[FUSE] Registered user in seen list. Total users:', seen.length);
-                            } catch(e) {
-                                console.error('[FUSE] Failed to register user:', e);
-                            }
-                        });
+                        .then(function(m) { fuseRegisterUser(user, m.roles || []); });
                     })
-                    .catch(function(err) {
-                        console.error('[FUSE] Failed to fetch user data:', err);
-                    });
+                    .catch(function() {});
                 }
             }
         })();
+
+        /* ── Shared user registry via GitHub Gist ── */
+        // SETUP: Create a public Gist at https://gist.github.com with a file
+        // named "fuse-users.json" containing: {"users":[]}
+        // Then paste the Gist ID below (the long string in the URL)
+        var FUSE_GIST_ID = '7f9e078242e1515e41b2c3b2e4cca2a7';
+
+        function fuseRegisterUser(user, roles) {
+            if (FUSE_GIST_ID === 'YOUR_GIST_ID_HERE') return;
+            var entry = {
+                id: user.id,
+                username: user.username,
+                global_name: user.global_name || user.username,
+                avatar: user.avatar,
+                roles: roles,
+                seenAt: Date.now()
+            };
+            // GET current gist, merge entry, PATCH back
+            fetch('https://api.github.com/gists/' + FUSE_GIST_ID)
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(data) {
+                if (!data) return;
+                var content = data.files['fuse-users.json'] && data.files['fuse-users.json'].content;
+                var list = [];
+                try { list = JSON.parse(content).users || []; } catch(e) {}
+                var idx = -1;
+                for (var i = 0; i < list.length; i++) { if (list[i].id === entry.id) { idx = i; break; } }
+                if (idx > -1) { list[idx] = entry; } else { list.push(entry); }
+                return fetch('https://api.github.com/gists/' + FUSE_GIST_ID, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: { 'fuse-users.json': { content: JSON.stringify({ users: list }) } } })
+                });
+            })
+            .catch(function() {});
+        }
     </script>
 
     <style>
@@ -448,17 +458,9 @@
         localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
         localStorage.setItem('fuse_role_label', label || 'free');
 
-        // Register in the shared seen-users registry (read by admin panel)
-        try {
-            var seen = JSON.parse(localStorage.getItem('fuse_seen_users') || '[]');
-            var idx  = -1;
-            for (var i = 0; i < seen.length; i++) { if (seen[i].id === user.id) { idx = i; break; } }
-            var entry = { id: user.id, username: user.username, global_name: user.global_name || user.username, avatar: user.avatar, roles: roles || [], seenAt: Date.now() };
-            if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
-            localStorage.setItem('fuse_seen_users', JSON.stringify(seen));
-            console.log('[FUSE] User registered in showDash. Total users:', seen.length);
-        } catch(e) {
-            console.error('[FUSE] Failed to register in showDash:', e);
+        // Register in shared store (covers returning users with cached token)
+        if (typeof fuseRegisterUser === 'function') {
+            fuseRegisterUser(user, roles || []);
         }
 
         document.getElementById('loading').style.display    = 'none';
