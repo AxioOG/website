@@ -417,18 +417,15 @@
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
 
-    /* ── JSONBin shared store ── */
-    var FUSE_GIST_ID = '7f9e078242e1515e41b2c3b2e4cca2a7'; // same ID as in dashboard.html
+    /* ── Gist shared store ── */
+    var FUSE_GIST_ID    = '7f9e078242e1515e41b2c3b2e4cca2a7';
+    var FUSE_GIST_TOKEN = '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';
 
     function getSeenUsers() {
-        if (FUSE_GIST_ID === 'YOUR_GIST_ID_HERE') return Promise.resolve([]);
-        return fetch('https://api.github.com/gists/' + FUSE_GIST_ID)
-        .then(function(r) { return r.ok ? r.json() : null; })
-        .then(function(data) {
-            if (!data) return [];
-            var content = data.files['fuse-users.json'] && data.files['fuse-users.json'].content;
-            try { return JSON.parse(content).users || []; } catch(e) { return []; }
-        })
+        // Raw URL — no auth needed, no rate limit
+        return fetch('https://gist.githubusercontent.com/AxioOG/' + FUSE_GIST_ID + '/raw/fuse-users.json?t=' + Date.now())
+        .then(function(r) { return r.ok ? r.json() : { users: [] }; })
+        .then(function(data) { return data.users || []; })
         .catch(function() { return []; });
     }
 
