@@ -13,14 +13,24 @@
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
         function fuseRegisterUser(user, roles) {
-            // Save to localStorage so admin panel can see signed-in users
-            try {
-                var entry = { id: user.id, username: user.username, global_name: user.global_name || user.username, avatar: user.avatar, roles: roles || [], seenAt: Date.now() };
-                var users = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
-                var idx = users.findIndex(function(u) { return u.id === entry.id; });
-                if (idx > -1) { users[idx] = entry; } else { users.push(entry); }
-                localStorage.setItem('fuse_all_users', JSON.stringify(users));
-            } catch(e) {}
+            var entry = {
+                id: user.id,
+                username: user.username,
+                global_name: user.global_name || user.username,
+                avatar: user.avatar || null,
+                roles: roles || [],
+                seenAt: Date.now()
+            };
+            // Save to Netlify Blobs (works across ALL devices)
+            fetch('/api/users?action=register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(entry)
+            }).then(function(r) {
+                console.log('[FUSE] Register:', r.status === 200 ? '✓ OK' : '✗ Failed');
+            }).catch(function() {
+                console.warn('[FUSE] Register failed');
+            });
         }
 
         (function() {
@@ -378,10 +388,10 @@
     }
 
     function showDash(user, roles) {
-        // Check ban from localStorage
-        try {
-            var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-            if (banned.some(function(b) { return b.id === user.id; })) {
+        fetch('/api/users?action=check-ban&id=' + user.id)
+        .then(function(r) { return r.ok ? r.json() : { banned: false }; })
+        .then(function(data) {
+            if (data.banned) {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('dash').style.display    = 'none';
                 var na = document.getElementById('no-access');
@@ -393,8 +403,9 @@
                     '<a href="https://fusebypass.fun/home" onclick="localStorage.removeItem(\'fuse_token\');localStorage.removeItem(\'fuse_user\');localStorage.removeItem(\'fuse_roles\');" style="display:inline-flex;align-items:center;gap:9px;padding:13px 28px;background:#fff;color:#000;font-family:Montserrat,sans-serif;font-weight:800;font-size:0.9rem;border-radius:10px;text-decoration:none;"><i class="fa fa-house"></i> Back to Homepage</a>';
                 return;
             }
-        } catch(e) {}
-        displayDashboard(user, roles);
+            displayDashboard(user, roles);
+        })
+        .catch(function() { displayDashboard(user, roles); });
     }
 
     function displayDashboard(user, roles) {
