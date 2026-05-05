@@ -11,6 +11,22 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script>
+        firebase.initializeApp({
+            apiKey: "AIzaSyBxUWOuXvzR8REqEpJixdRrwm2hrTwX0zs",
+            authDomain: "fuse-panel-94158.firebaseapp.com",
+            databaseURL: "https://fuse-panel-94158-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "fuse-panel-94158",
+            storageBucket: "fuse-panel-94158.firebasestorage.app",
+            messagingSenderId: "348029956399",
+            appId: "1:348029956399:web:fc76e277d0a0e21790b1da"
+        });
+        var db = firebase.database();
+    </script>
+
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
         (function() {
@@ -417,27 +433,34 @@
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
 
-    /* ── Fetch users from Netlify function ── */
+    /* ── Firebase data functions ── */
     function getSeenUsers() {
-        return fetch('/api/users?action=users')
-            .then(function(r) { return r.ok ? r.json() : []; })
-            .then(function(data) {
-                console.log('[ADMIN] Loaded', data.length, 'users');
-                return data;
-            })
-            .catch(function() { return []; });
+        return db.ref('users').once('value').then(function(snap) {
+            var users = [];
+            snap.forEach(function(child) { users.push(child.val()); });
+            users.sort(function(a,b) { return (b.seenAt||0) - (a.seenAt||0); });
+            console.log('[ADMIN] Loaded', users.length, 'users from Firebase');
+            return users;
+        }).catch(function() { return []; });
     }
 
     function getBannedUsersAsync() {
-        return fetch('/api/users?action=banned')
-            .then(function(r) { return r.ok ? r.json() : []; })
-            .catch(function() { return []; });
+        return db.ref('banned').once('value').then(function(snap) {
+            var banned = [];
+            snap.forEach(function(child) { banned.push(child.val()); });
+            return banned;
+        }).catch(function() { return []; });
     }
 
     /* ── Auto-refresh every 10 seconds ── */
     setInterval(function() {
         if (document.getElementById('panel').style.display === 'block') renderLists();
     }, 10000);
+
+    /* ── Real-time listener — update instantly when new user signs in ── */
+    db.ref('users').on('value', function() {
+        if (document.getElementById('panel').style.display === 'block') renderLists();
+    });
 
     /* ── Helpers ── */
     function getRoleLabel(roles) {
@@ -485,10 +508,12 @@
         getSeenUsers().then(function(seen) {
             var user = seen.filter(function(u) { return u.id === userId; })[0];
             if (!user) return;
-            fetch('/api/users?action=ban', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() })
+            db.ref('banned/' + userId).set({
+                id: user.id,
+                username: user.username,
+                global_name: user.global_name,
+                avatar: user.avatar,
+                bannedAt: Date.now()
             }).then(function() {
                 showToast('Banned ' + (user.global_name || user.username), '255,68,68');
                 renderLists();
@@ -497,8 +522,7 @@
     }
 
     function unbanUser(userId) {
-        fetch('/api/users?action=unban&id=' + userId, { method: 'DELETE' })
-        .then(function() {
+        db.ref('banned/' + userId).remove().then(function() {
             showToast('Unbanned user', '0,200,80');
             renderLists();
         });
