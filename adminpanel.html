@@ -411,6 +411,7 @@
     var DISCORD_CLIENT_ID = '1460340695578575041';
     var DISCORD_REDIRECT  = 'https://fusebypass.fun/dashboard';
     var GUILD_ID          = '1305642236880617482';
+    var ROLE_OWNER        = '1305642237153026068';  // Owner role (top admin)
     var ROLE_ADMIN1       = '1471974431579574538';
     var ROLE_ADMIN2       = '1482165881315524688';
     var ROLE_CUSTOMER     = '1489330191498084413';
@@ -418,7 +419,7 @@
     /* ── Helpers ── */
     function getRoleLabel(roles) {
         if (!roles || !roles.length) return 'free';
-        if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+        if (roles.indexOf(ROLE_OWNER) > -1 || roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
         if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
         return 'free';
     }
@@ -620,6 +621,11 @@
                 // Register this admin in seen list too
                 registerUser(user, roles);
                 showPanel(user);
+                
+                // Auto-refresh the lists every 3 seconds to show new users
+                setInterval(function() {
+                    renderLists();
+                }, 3000);
             });
         })
         .catch(function() { showNoAccess(); });
