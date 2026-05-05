@@ -417,54 +417,27 @@
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
 
-    /* ── Fetch ALL server members via Netlify function ── */
+    /* ── Fetch users from Netlify function ── */
     function getSeenUsers() {
-        document.getElementById('users-list').innerHTML =
-            '<div class="empty-state"><div class="spin" style="margin:0 auto 12px;width:24px;height:24px;border-width:2px;"></div>Loading members from Discord...</div>';
-
-        return fetch('/api/members?action=list')
-            .then(function(r) {
-                if (!r.ok) throw new Error('Function error: ' + r.status);
-                return r.json();
-            })
+        return fetch('/api/users?action=users')
+            .then(function(r) { return r.ok ? r.json() : []; })
             .then(function(data) {
-                if (data.error) throw new Error(data.error);
-                console.log('[ADMIN] Loaded', data.members.length, 'members from Discord');
-                return data.members.map(function(m) {
-                    return {
-                        id: m.id,
-                        username: m.username,
-                        global_name: m.global_name || m.username,
-                        avatar: m.avatar,
-                        discriminator: m.discriminator || '0',
-                        roles: m.roles || [],
-                        seenAt: m.joined_at ? new Date(m.joined_at).getTime() : Date.now()
-                    };
-                });
+                console.log('[ADMIN] Loaded', data.length, 'users');
+                return data;
             })
-            .catch(function(err) {
-                console.error('[ADMIN] Failed to load members:', err.message);
-                document.getElementById('users-list').innerHTML =
-                    '<div class="empty-state"><i class="fa fa-triangle-exclamation" style="color:#ff4444;opacity:1;"></i><br>Failed to load members: ' + err.message + '</div>';
-                return [];
-            });
+            .catch(function() { return []; });
     }
 
-    /* ── Bans stored in localStorage (cross-device via ban button) ── */
     function getBannedUsersAsync() {
-        try {
-            return Promise.resolve(JSON.parse(localStorage.getItem('fuse_banned_users') || '[]'));
-        } catch(e) { return Promise.resolve([]); }
+        return fetch('/api/users?action=banned')
+            .then(function(r) { return r.ok ? r.json() : []; })
+            .catch(function() { return []; });
     }
 
-    function saveBanned(arr) {
-        localStorage.setItem('fuse_banned_users', JSON.stringify(arr));
-    }
-
-    /* ── Auto-refresh every 30 seconds (Discord API rate limits) ── */
+    /* ── Auto-refresh every 10 seconds ── */
     setInterval(function() {
         if (document.getElementById('panel').style.display === 'block') renderLists();
-    }, 30000);
+    }, 10000);
 
     /* ── Helpers ── */
     function getRoleLabel(roles) {
@@ -512,21 +485,23 @@
         getSeenUsers().then(function(seen) {
             var user = seen.filter(function(u) { return u.id === userId; })[0];
             if (!user) return;
-            var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-            if (!banned.some(function(b) { return b.id === userId; })) {
-                banned.unshift({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
-                saveBanned(banned);
-            }
-            showToast('Banned ' + (user.global_name || user.username), '255,68,68');
-            renderLists();
+            fetch('/api/users?action=ban', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() })
+            }).then(function() {
+                showToast('Banned ' + (user.global_name || user.username), '255,68,68');
+                renderLists();
+            });
         });
     }
 
     function unbanUser(userId) {
-        var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]').filter(function(u) { return u.id !== userId; });
-        saveBanned(banned);
-        showToast('Unbanned user', '0,200,80');
-        renderLists();
+        fetch('/api/users?action=unban&id=' + userId, { method: 'DELETE' })
+        .then(function() {
+            showToast('Unbanned user', '0,200,80');
+            renderLists();
+        });
     }
 
     /* ── Render ── */
