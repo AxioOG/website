@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Fuse Shared Storage</title>
+</head>
+<body>
+<script>
+// This iframe acts as a shared storage hub
+// All tabs communicate through this single iframe
+
+let users = [];
+let banned = [];
+
+// Load from localStorage
+try {
+    users = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
+    banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+} catch(e) {
+    users = [];
+    banned = [];
+}
+
+// Listen for messages from parent windows
+window.addEventListener('message', function(event) {
+    // Security: only accept messages from same origin
+    if (event.origin !== window.location.origin) return;
+
+    const { action, data } = event.data;
+
+    switch(action) {
+        case 'GET_USERS':
+            event.source.postMessage({
+                action: 'USERS_DATA',
+                users: users,
+                banned: banned
+            }, event.origin);
+            break;
+
+        case 'REGISTER_USER':
+            // Update or add user
+            const idx = users.findIndex(u => u.id === data.id);
+            if (idx > -1) {
+                users[idx] = data;
+            } else {
+                users.push(data);
+            }
+            localStorage.setItem('fuse_all_users', JSON.stringify(users));
+            
+            // Notify all listening windows
+            broadcastUpdate();
+            event.source.postMessage({ action: 'REGISTER_SUCCESS' }, event.origin);
+            break;
+
+        case 'BAN_USER':
+            if (!banned.find(u => u.id === data.id)) {
+                banned.push(data);
+                localStorage.setItem('fuse_banned_users', JSON.stringify(banned));
+                broadcastUpdate();
+            }
+            event.source.postMessage({ action: 'BAN_SUCCESS' }, event.origin);
+            break;
+
+        case 'UNBAN_USER':
+            banned = banned.filter(u => u.id !== data.id);
+            localStorage.setItem('fuse_banned_users', JSON.stringify(banned));
+            broadcastUpdate();
+            event.source.postMessage({ action: 'UNBAN_SUCCESS' }, event.origin);
+            break;
+
+        case 'CHECK_BAN':
+            const isBanned = banned.some(u => u.id === data.id);
+            event.source.postMessage({ 
+                action: 'BAN_STATUS', 
+                userId: data.id,
+                banned: isBanned 
+            }, event.origin);
+            break;
+    }
+});
+
+function broadcastUpdate() {
+    // This will trigger storage event in other tabs
+    localStorage.setItem('fuse_update_trigger', Date.now().toString());
+}
+
+// Send ready signal
+window.parent.postMessage({ action: 'STORAGE_READY' }, '*');
+</script>
+</body>
+</html>
