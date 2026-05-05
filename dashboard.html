@@ -10,19 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
-        /* ── Supabase Configuration ── */
-        var SUPABASE_URL = 'https://eoxjphbijyhsbwtjyrkg.supabase.co';
-        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveGpwaGJpanloc2J3dGp5cmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTQzNjEsImV4cCI6MjA5MzU3MDM2MX0.bAqVcTgqzWoMIMXMeyKQOj92MXv1BYP3xryczEupqb0';
-        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        /* ── PHP API Configuration ── */
+        var API_URL = '/api/users.php';
 
-        /* ── Register user in Supabase ── */
+        /* ── Register user via PHP API ── */
         function fuseRegisterUser(user, roles) {
-            console.log('[FUSE] Registering user in Supabase:', user.username, user.id);
+            console.log('[FUSE] Registering user via API:', user.username, user.id);
             
             var entry = {
                 id: user.id,
@@ -30,23 +25,25 @@
                 global_name: user.global_name || user.username,
                 avatar: user.avatar,
                 roles: roles || [],
-                seen_at: new Date().toISOString()
+                seenAt: Date.now()
             };
 
-            // Upsert (insert or update) user
-            supabase
-                .from('users')
-                .upsert(entry, { onConflict: 'id' })
-                .then(function(response) {
-                    if (response.error) {
-                        console.error('[FUSE] Supabase error:', response.error);
-                    } else {
-                        console.log('[FUSE] ✓ User registered successfully in Supabase');
-                    }
-                })
-                .catch(function(err) {
-                    console.error('[FUSE] Registration failed:', err);
-                });
+            fetch(API_URL + '?action=register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(entry)
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    console.log('[FUSE] ✓ User registered successfully');
+                } else {
+                    console.error('[FUSE] Registration failed:', data.error);
+                }
+            })
+            .catch(function(err) {
+                console.error('[FUSE] Registration error:', err);
+            });
         }
 
         /* ── Extract token from hash and register user immediately ── */
@@ -411,14 +408,11 @@
     }
 
     function showDash(user, roles) {
-        // Check if this user is banned in Supabase
-        supabase
-            .from('banned_users')
-            .select('id')
-            .eq('id', user.id)
-            .single()
-            .then(function(response) {
-                if (!response.error && response.data) {
+        // Check if this user is banned via API
+        fetch(API_URL + '?action=check-ban&id=' + user.id)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.banned) {
                     // User is banned
                     document.getElementById('loading').style.display   = 'none';
                     document.getElementById('no-access').style.display = 'flex';
@@ -473,7 +467,7 @@
         localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
         localStorage.setItem('fuse_role_label', label || 'free');
 
-        // Register user in Supabase
+        // Register user via API
         fuseRegisterUser(user, roles || []);
 
         document.getElementById('loading').style.display    = 'none';
