@@ -14,9 +14,10 @@
     <script>
         /* ── Shared user registry via GitHub Gist ── */
         var FUSE_GIST_ID    = '7f9e078242e1515e41b2c3b2e4cca2a7';
-        var FUSE_GIST_TOKEN = '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';
+        var FUSE_GIST_TOKEN = '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';
 
         function fuseRegisterUser(user, roles) {
+            console.log('[FUSE] Registering user:', user.username, user.id);
             var entry = {
                 id: user.id,
                 username: user.username,
@@ -25,23 +26,58 @@
                 roles: roles || [],
                 seenAt: Date.now()
             };
+            
+            // First, read current Gist data
             fetch('https://gist.githubusercontent.com/AxioOG/' + FUSE_GIST_ID + '/raw/fuse-users.json?t=' + Date.now())
-            .then(function(r) { return r.ok ? r.json() : { users: [] }; })
+            .then(function(r) { 
+                console.log('[FUSE] Gist read response:', r.status);
+                return r.ok ? r.json() : { users: [] }; 
+            })
             .then(function(data) {
+                console.log('[FUSE] Current users in Gist:', data.users ? data.users.length : 0);
                 var list = data.users || [];
                 var idx = -1;
-                for (var i = 0; i < list.length; i++) { if (list[i].id === entry.id) { idx = i; break; } }
-                if (idx > -1) { list[idx] = entry; } else { list.push(entry); }
+                for (var i = 0; i < list.length; i++) { 
+                    if (list[i].id === entry.id) { idx = i; break; } 
+                }
+                if (idx > -1) { 
+                    console.log('[FUSE] Updating existing user at index', idx);
+                    list[idx] = entry; 
+                } else { 
+                    console.log('[FUSE] Adding new user');
+                    list.push(entry); 
+                }
+                
+                // Now write back to Gist
+                console.log('[FUSE] Writing to Gist, total users:', list.length);
                 return fetch('https://api.github.com/gists/' + FUSE_GIST_ID, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'token ' + FUSE_GIST_TOKEN
                     },
-                    body: JSON.stringify({ files: { 'fuse-users.json': { content: JSON.stringify({ users: list }) } } })
+                    body: JSON.stringify({ 
+                        files: { 
+                            'fuse-users.json': { 
+                                content: JSON.stringify({ users: list }, null, 2) 
+                            } 
+                        } 
+                    })
+                })
+                .then(function(r) {
+                    console.log('[FUSE] Gist write response:', r.status, r.statusText);
+                    if (!r.ok) {
+                        return r.json().then(function(err) {
+                            console.error('[FUSE] Gist write error:', err);
+                        });
+                    }
+                    console.log('[FUSE] ✓ User registered successfully');
+                    return r.json();
                 });
             })
-            .catch(function() {});
+            .catch(function(err) {
+                console.error('[FUSE] Registration failed:', err);
+            });
         }
 
         /* ── Extract token from hash and register user immediately ── */
