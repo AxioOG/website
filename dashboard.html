@@ -24,6 +24,17 @@
                 roles: roles || [],
                 seen_at: new Date().toISOString()
             };
+
+            // Always save to localStorage first (instant, always works)
+            try {
+                var local = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
+                var idx = local.findIndex(function(u) { return u.id === entry.id; });
+                var localEntry = { id: entry.id, username: entry.username, global_name: entry.global_name, avatar: entry.avatar, roles: entry.roles, seenAt: Date.now() };
+                if (idx > -1) { local[idx] = localEntry; } else { local.push(localEntry); }
+                localStorage.setItem('fuse_all_users', JSON.stringify(local));
+            } catch(e) {}
+
+            // Also try Supabase (works across all devices)
             fetch(SUPABASE_URL + '/rest/v1/users', {
                 method: 'POST',
                 headers: {
@@ -34,10 +45,11 @@
                 },
                 body: JSON.stringify(entry)
             }).then(function(r) {
-                console.log('[FUSE] Register response:', r.status);
-            }).catch(function(e) {
-                console.error('[FUSE] Register error:', e);
-            });
+                console.log('[FUSE] Supabase register:', r.status, r.status === 201 || r.status === 200 ? '✓ OK' : '✗ Failed');
+                if (r.status === 404 || r.status === 400) {
+                    r.json().then(function(e) { console.error('[FUSE] Supabase error:', e); });
+                }
+            }).catch(function(e) { console.warn('[FUSE] Supabase unavailable, using localStorage only'); });
         }
 
         (function() {
