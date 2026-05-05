@@ -10,16 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Fuse Storage API (Pure Client-Side) -->
-    <script src="/storage-api.js"></script>
-
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
-        /* ── Register user via Storage API ── */
-        async function fuseRegisterUser(user, roles) {
-            console.log('[FUSE] Registering user:', user.username, user.id);
-            
-            const entry = {
+        /* ── Save user directly to localStorage ── */
+        function fuseRegisterUser(user, roles) {
+            var entry = {
                 id: user.id,
                 username: user.username,
                 global_name: user.global_name || user.username,
@@ -27,12 +22,14 @@
                 roles: roles || [],
                 seenAt: Date.now()
             };
-
             try {
-                await window.FuseAPI.registerUser(entry);
-                console.log('[FUSE] ✓ User registered successfully');
-            } catch(err) {
-                console.error('[FUSE] Registration failed:', err);
+                var users = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
+                var idx = users.findIndex(function(u) { return u.id === entry.id; });
+                if (idx > -1) { users[idx] = entry; } else { users.push(entry); }
+                localStorage.setItem('fuse_all_users', JSON.stringify(users));
+                console.log('[FUSE] ✓ Saved to localStorage. Total users:', users.length);
+            } catch(e) {
+                console.error('[FUSE] Failed to save user:', e);
             }
         }
 
@@ -45,7 +42,6 @@
                 if (t) {
                     localStorage.setItem('fuse_token', t);
                     history.replaceState(null, '', window.location.pathname);
-
                     fetch('https://discord.com/api/v10/users/@me', {
                         headers: { 'Authorization': 'Bearer ' + t }
                     })
@@ -398,9 +394,10 @@
     }
 
     function showDash(user, roles) {
-        // Check if this user is banned
-        window.FuseAPI.checkBan(user.id).then(function(isBanned) {
-            if (isBanned) {
+        // Check ban directly from localStorage
+        try {
+            var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+            if (banned.some(function(b) { return b.id === user.id; })) {
                 document.getElementById('loading').style.display   = 'none';
                 document.getElementById('no-access').style.display = 'flex';
                 document.getElementById('no-access').querySelector('h2').textContent = 'Account Banned';
@@ -408,10 +405,8 @@
                 document.getElementById('dash').style.display = 'none';
                 return;
             }
-            displayDashboard(user, roles);
-        }).catch(function() {
-            displayDashboard(user, roles);
-        });
+        } catch(e) {}
+        displayDashboard(user, roles);
     }
 
     function displayDashboard(user, roles) {
@@ -450,7 +445,7 @@
         localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
         localStorage.setItem('fuse_role_label', label || 'free');
 
-        // Register user via API
+        // Register user directly to localStorage
         fuseRegisterUser(user, roles || []);
 
         document.getElementById('loading').style.display    = 'none';
