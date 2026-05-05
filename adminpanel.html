@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Fuse Storage API (Pure Client-Side) -->
+    <script src="/storage-api.js"></script>
+
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
         (function() {
@@ -417,17 +420,13 @@
     var ROLE_CUSTOMER     = '1489330191498084413';
     var ADMIN_ROLES       = [ROLE_OWNER, ROLE_ADMIN1, ROLE_ADMIN2];
 
-    /* ── PHP API Configuration ── */
-    var API_URL = '/api/users.php';
-
-    /* ── Get users from API ── */
+    /* ── Get users from Storage API ── */
     function getSeenUsers() {
-        console.log('[ADMIN] Loading users from API...');
-        return fetch(API_URL + '?action=users')
-            .then(function(r) { return r.json(); })
-            .then(function(users) {
-                console.log('[ADMIN] Users loaded:', users.length);
-                return users;
+        console.log('[ADMIN] Loading users...');
+        return window.FuseAPI.getUsers()
+            .then(function(data) {
+                console.log('[ADMIN] Users loaded:', data.users ? data.users.length : 0);
+                return data.users || [];
             })
             .catch(function(err) {
                 console.error('[ADMIN] Failed to load users:', err);
@@ -435,16 +434,22 @@
             });
     }
 
-    /* ── Get banned users from API ── */
+    /* ── Get banned users ── */
     function getBannedUsers() {
-        console.log('[ADMIN] Loading banned users from API...');
-        return fetch(API_URL + '?action=banned')
-            .then(function(r) { return r.json(); })
-            .then(function(banned) {
-                return banned;
+        return window.FuseAPI.getUsers()
+            .then(function(data) {
+                return data.banned || [];
             })
             .catch(function() { return []; });
     }
+
+    /* ── Listen for updates from other tabs ── */
+    window.onFuseStorageUpdate = function() {
+        console.log('[ADMIN] Storage updated, refreshing...');
+        if (document.getElementById('panel').style.display === 'block') {
+            renderLists();
+        }
+    };
 
     /* ── Auto-refresh every 5 seconds ── */
     setInterval(function() {
@@ -508,41 +513,21 @@
                 bannedAt: Date.now()
             };
 
-            fetch(API_URL + '?action=ban', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(banEntry)
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    showToast('Banned ' + (user.global_name || user.username), '255,68,68');
-                    renderLists();
-                } else {
-                    showToast('Failed to ban user', '255,68,68');
-                }
-            })
-            .catch(function() {
-                showToast('Error banning user', '255,68,68');
+            window.FuseAPI.banUser(banEntry).then(function() {
+                showToast('Banned ' + (user.global_name || user.username), '255,68,68');
+                renderLists();
+            }).catch(function() {
+                showToast('Failed to ban user', '255,68,68');
             });
         });
     }
 
     function unbanUser(userId) {
-        fetch(API_URL + '?action=unban&id=' + userId, {
-            method: 'DELETE'
-        })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            if (data.success) {
-                showToast('Unbanned user', '0,200,80');
-                renderLists();
-            } else {
-                showToast('Failed to unban user', '255,68,68');
-            }
-        })
-        .catch(function() {
-            showToast('Error unbanning user', '255,68,68');
+        window.FuseAPI.unbanUser(userId).then(function() {
+            showToast('Unbanned user', '0,200,80');
+            renderLists();
+        }).catch(function() {
+            showToast('Failed to unban user', '255,68,68');
         });
     }
 
