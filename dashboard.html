@@ -10,8 +10,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
+        // Firebase config
+        var firebaseConfig = {
+            apiKey: "AIzaSyBxUWOuXvzR8REqEpJixdRrwm2hrTwX0zs",
+            authDomain: "fuse-panel-94158.firebaseapp.com",
+            databaseURL: "https://fuse-panel-94158-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "fuse-panel-94158",
+            storageBucket: "fuse-panel-94158.firebasestorage.app",
+            messagingSenderId: "348029956399",
+            appId: "1:348029956399:web:fc76e277d0a0e21790b1da"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+
         function fuseRegisterUser(user, roles) {
             var entry = {
                 id: user.id,
@@ -21,16 +38,9 @@
                 roles: roles || [],
                 seenAt: Date.now()
             };
-            // Save to Netlify Blobs (works across ALL devices)
-            fetch('/api/users?action=register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(entry)
-            }).then(function(r) {
-                console.log('[FUSE] Register:', r.status === 200 ? '✓ OK' : '✗ Failed');
-            }).catch(function() {
-                console.warn('[FUSE] Register failed');
-            });
+            db.ref('users/' + user.id).set(entry)
+              .then(function() { console.log('[FUSE] ✓ Registered in Firebase'); })
+              .catch(function(e) { console.error('[FUSE] Firebase error:', e); });
         }
 
         (function() {
@@ -388,10 +398,8 @@
     }
 
     function showDash(user, roles) {
-        fetch('/api/users?action=check-ban&id=' + user.id)
-        .then(function(r) { return r.ok ? r.json() : { banned: false }; })
-        .then(function(data) {
-            if (data.banned) {
+        db.ref('banned/' + user.id).once('value').then(function(snap) {
+            if (snap.exists()) {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('dash').style.display    = 'none';
                 var na = document.getElementById('no-access');
@@ -404,8 +412,7 @@
                 return;
             }
             displayDashboard(user, roles);
-        })
-        .catch(function() { displayDashboard(user, roles); });
+        }).catch(function() { displayDashboard(user, roles); });
     }
 
     function displayDashboard(user, roles) {
@@ -444,7 +451,7 @@
         localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
         localStorage.setItem('fuse_role_label', label || 'free');
 
-        // Register user directly to localStorage
+        // Register user in Firebase
         fuseRegisterUser(user, roles || []);
 
         document.getElementById('loading').style.display    = 'none';
