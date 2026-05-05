@@ -419,14 +419,24 @@
 
     /* ── Gist shared store ── */
     var FUSE_GIST_ID    = '7f9e078242e1515e41b2c3b2e4cca2a7';
-    var FUSE_GIST_TOKEN = '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';
+    var FUSE_GIST_TOKEN = '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';
 
     function getSeenUsers() {
         // Raw URL — no auth needed, no rate limit
+        console.log('[ADMIN] Fetching users from Gist...');
         return fetch('https://gist.githubusercontent.com/AxioOG/' + FUSE_GIST_ID + '/raw/fuse-users.json?t=' + Date.now())
-        .then(function(r) { return r.ok ? r.json() : { users: [] }; })
-        .then(function(data) { return data.users || []; })
-        .catch(function() { return []; });
+        .then(function(r) { 
+            console.log('[ADMIN] Gist read response:', r.status);
+            return r.ok ? r.json() : { users: [] }; 
+        })
+        .then(function(data) { 
+            console.log('[ADMIN] Users loaded:', data.users ? data.users.length : 0);
+            return data.users || []; 
+        })
+        .catch(function(err) { 
+            console.error('[ADMIN] Failed to load users:', err);
+            return []; 
+        });
     }
 
     /* ── Helpers ── */
