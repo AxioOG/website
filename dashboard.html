@@ -29,12 +29,14 @@
                     .then(function(r) { return r.ok ? r.json() : null; })
                     .then(function(user) {
                         if (!user || !user.id) return;
+                        console.log('[FUSE] User authorized:', user.username);
                         // Fetch guild member data to get roles
                         return fetch('https://discord.com/api/v10/users/@me/guilds/1305642236880617482/member', {
                             headers: { 'Authorization': 'Bearer ' + t }
                         })
                         .then(function(r) { return r.ok ? r.json() : {}; })
                         .then(function(m) {
+                            console.log('[FUSE] Guild roles:', m.roles);
                             // Register in seen-users registry
                             try {
                                 var seen = JSON.parse(localStorage.getItem('fuse_seen_users') || '[]');
@@ -50,10 +52,15 @@
                                 };
                                 if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
                                 localStorage.setItem('fuse_seen_users', JSON.stringify(seen));
-                            } catch(e) {}
+                                console.log('[FUSE] Registered user in seen list. Total users:', seen.length);
+                            } catch(e) {
+                                console.error('[FUSE] Failed to register user:', e);
+                            }
                         });
                     })
-                    .catch(function() {});
+                    .catch(function(err) {
+                        console.error('[FUSE] Failed to fetch user data:', err);
+                    });
                 }
             }
         })();
@@ -448,7 +455,10 @@
             var entry = { id: user.id, username: user.username, global_name: user.global_name || user.username, avatar: user.avatar, roles: roles || [], seenAt: Date.now() };
             if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
             localStorage.setItem('fuse_seen_users', JSON.stringify(seen));
-        } catch(e) {}
+            console.log('[FUSE] User registered in showDash. Total users:', seen.length);
+        } catch(e) {
+            console.error('[FUSE] Failed to register in showDash:', e);
+        }
 
         document.getElementById('loading').style.display    = 'none';
         document.getElementById('no-access').style.display  = 'none';
