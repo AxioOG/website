@@ -10,74 +10,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
-        /* ── Shared user registry via GitHub Gist ── */
-        var FUSE_GIST_ID    = '7f9e078242e1515e41b2c3b2e4cca2a7';
-        var FUSE_GIST_TOKEN = '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';
+        /* ── Supabase Configuration ── */
+        var SUPABASE_URL = 'https://eoxjphbijyhsbwtjyrkg.supabase.co';
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVveGpwaGJpanloc2J3dGp5cmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTQzNjEsImV4cCI6MjA5MzU3MDM2MX0.bAqVcTgqzWoMIMXMeyKQOj92MXv1BYP3xryczEupqb0';
+        var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        /* ── Register user in Supabase ── */
         function fuseRegisterUser(user, roles) {
-            console.log('[FUSE] Registering user:', user.username, user.id);
+            console.log('[FUSE] Registering user in Supabase:', user.username, user.id);
+            
             var entry = {
                 id: user.id,
                 username: user.username,
                 global_name: user.global_name || user.username,
                 avatar: user.avatar,
                 roles: roles || [],
-                seenAt: Date.now()
+                seen_at: new Date().toISOString()
             };
-            
-            // First, read current Gist data
-            fetch('https://gist.githubusercontent.com/AxioOG/' + FUSE_GIST_ID + '/raw/fuse-users.json?t=' + Date.now())
-            .then(function(r) { 
-                console.log('[FUSE] Gist read response:', r.status);
-                return r.ok ? r.json() : { users: [] }; 
-            })
-            .then(function(data) {
-                console.log('[FUSE] Current users in Gist:', data.users ? data.users.length : 0);
-                var list = data.users || [];
-                var idx = -1;
-                for (var i = 0; i < list.length; i++) { 
-                    if (list[i].id === entry.id) { idx = i; break; } 
-                }
-                if (idx > -1) { 
-                    console.log('[FUSE] Updating existing user at index', idx);
-                    list[idx] = entry; 
-                } else { 
-                    console.log('[FUSE] Adding new user');
-                    list.push(entry); 
-                }
-                
-                // Now write back to Gist
-                console.log('[FUSE] Writing to Gist, total users:', list.length);
-                return fetch('https://api.github.com/gists/' + FUSE_GIST_ID, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'token ' + FUSE_GIST_TOKEN
-                    },
-                    body: JSON.stringify({ 
-                        files: { 
-                            'fuse-users.json': { 
-                                content: JSON.stringify({ users: list }, null, 2) 
-                            } 
-                        } 
-                    })
-                })
-                .then(function(r) {
-                    console.log('[FUSE] Gist write response:', r.status, r.statusText);
-                    if (!r.ok) {
-                        return r.json().then(function(err) {
-                            console.error('[FUSE] Gist write error:', err);
-                        });
+
+            // Upsert (insert or update) user
+            supabase
+                .from('users')
+                .upsert(entry, { onConflict: 'id' })
+                .then(function(response) {
+                    if (response.error) {
+                        console.error('[FUSE] Supabase error:', response.error);
+                    } else {
+                        console.log('[FUSE] ✓ User registered successfully in Supabase');
                     }
-                    console.log('[FUSE] ✓ User registered successfully');
-                    return r.json();
+                })
+                .catch(function(err) {
+                    console.error('[FUSE] Registration failed:', err);
                 });
-            })
-            .catch(function(err) {
-                console.error('[FUSE] Registration failed:', err);
-            });
         }
 
         /* ── Extract token from hash and register user immediately ── */
@@ -442,19 +411,33 @@
     }
 
     function showDash(user, roles) {
-        // Check if this user is banned
-        try {
-            var banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
-            if (banned.some(function(b) { return b.id === user.id; })) {
-                document.getElementById('loading').style.display   = 'none';
-                document.getElementById('no-access').style.display = 'flex';
-                document.getElementById('no-access').querySelector('h2').textContent = 'Account Banned';
-                document.getElementById('no-access').querySelector('p').textContent  = 'Your account has been banned. Contact support on Discord.';
-                document.getElementById('dash').style.display = 'none';
-                return;
-            }
-        } catch(e) {}
+        // Check if this user is banned in Supabase
+        supabase
+            .from('banned_users')
+            .select('id')
+            .eq('id', user.id)
+            .single()
+            .then(function(response) {
+                if (!response.error && response.data) {
+                    // User is banned
+                    document.getElementById('loading').style.display   = 'none';
+                    document.getElementById('no-access').style.display = 'flex';
+                    document.getElementById('no-access').querySelector('h2').textContent = 'Account Banned';
+                    document.getElementById('no-access').querySelector('p').textContent  = 'Your account has been banned. Contact support on Discord.';
+                    document.getElementById('dash').style.display = 'none';
+                    return;
+                }
 
+                // User is not banned, show dashboard
+                displayDashboard(user, roles);
+            })
+            .catch(function() {
+                // Error checking ban status, show dashboard anyway
+                displayDashboard(user, roles);
+            });
+    }
+
+    function displayDashboard(user, roles) {
         var label  = getRoleLabel(roles);
         var name   = user.global_name || user.username;
         var avatar = user.avatar
@@ -490,7 +473,7 @@
         localStorage.setItem('fuse_roles',      JSON.stringify(roles || []));
         localStorage.setItem('fuse_role_label', label || 'free');
 
-        // Always register/update in shared Gist store
+        // Register user in Supabase
         fuseRegisterUser(user, roles || []);
 
         document.getElementById('loading').style.display    = 'none';
