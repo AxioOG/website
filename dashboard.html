@@ -21,6 +21,39 @@
                     localStorage.setItem('fuse_token', t);
                     // Clean URL
                     history.replaceState(null, '', window.location.pathname);
+                    
+                    // Immediately fetch user data and register them in the seen-users list
+                    fetch('https://discord.com/api/v10/users/@me', {
+                        headers: { 'Authorization': 'Bearer ' + t }
+                    })
+                    .then(function(r) { return r.ok ? r.json() : null; })
+                    .then(function(user) {
+                        if (!user || !user.id) return;
+                        // Fetch guild member data to get roles
+                        return fetch('https://discord.com/api/v10/users/@me/guilds/1305642236880617482/member', {
+                            headers: { 'Authorization': 'Bearer ' + t }
+                        })
+                        .then(function(r) { return r.ok ? r.json() : {}; })
+                        .then(function(m) {
+                            // Register in seen-users registry
+                            try {
+                                var seen = JSON.parse(localStorage.getItem('fuse_seen_users') || '[]');
+                                var idx = -1;
+                                for (var i = 0; i < seen.length; i++) { if (seen[i].id === user.id) { idx = i; break; } }
+                                var entry = {
+                                    id: user.id,
+                                    username: user.username,
+                                    global_name: user.global_name || user.username,
+                                    avatar: user.avatar,
+                                    roles: m.roles || [],
+                                    seenAt: Date.now()
+                                };
+                                if (idx > -1) { seen[idx] = entry; } else { seen.push(entry); }
+                                localStorage.setItem('fuse_seen_users', JSON.stringify(seen));
+                            } catch(e) {}
+                        });
+                    })
+                    .catch(function() {});
                 }
             }
         })();
@@ -326,6 +359,7 @@
     var DISCORD_CLIENT_ID = '1460340695578575041';
     var DISCORD_REDIRECT  = 'https://fusebypass.fun/dashboard';
     var GUILD_ID          = '1305642236880617482';
+    var ROLE_OWNER        = '1305642237153026068';  // Owner role (top admin)
     var ROLE_ADMIN1       = '1471974431579574538';
     var ROLE_ADMIN2       = '1482165881315524688';
     var ROLE_CUSTOMER     = '1489330191498084413';
@@ -353,7 +387,7 @@
 
     function getRoleLabel(roles) {
         if (!roles || !roles.length) return null;
-        if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+        if (roles.indexOf(ROLE_OWNER) > -1 || roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
         if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
         return null;
     }
