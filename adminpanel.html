@@ -512,11 +512,27 @@
         getSeenUsers().then(function(seen) {
             var user = seen.filter(function(u) { return u.id === userId; })[0];
             if (!user) return;
+            var bannedEntry = { id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, banned_at: new Date().toISOString() };
             fetch(SUPABASE_URL + '/rest/v1/banned_users', {
                 method: 'POST',
                 headers: Object.assign({}, SB_HEADERS, { 'Prefer': 'resolution=merge-duplicates' }),
-                body: JSON.stringify({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, banned_at: new Date().toISOString() })
+                body: JSON.stringify(bannedEntry)
+            }).catch(function() {
+                // Supabase failed — save to localStorage fallback
+                try {
+                    var stored = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+                    stored = stored.filter(function(u) { return u.id !== userId; });
+                    stored.unshift({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
+                    localStorage.setItem('fuse_banned_users', JSON.stringify(stored));
+                } catch(e) {}
             }).then(function() {
+                // Also keep localStorage in sync as a fallback mirror
+                try {
+                    var stored = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+                    stored = stored.filter(function(u) { return u.id !== userId; });
+                    stored.unshift({ id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar, bannedAt: Date.now() });
+                    localStorage.setItem('fuse_banned_users', JSON.stringify(stored));
+                } catch(e) {}
                 showToast('Banned ' + (user.global_name || user.username), '255,68,68');
                 renderLists();
             });
@@ -527,7 +543,13 @@
         fetch(SUPABASE_URL + '/rest/v1/banned_users?id=eq.' + userId, {
             method: 'DELETE',
             headers: SB_HEADERS
-        }).then(function() {
+        }).catch(function() {}).then(function() {
+            // Remove from localStorage fallback too
+            try {
+                var stored = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+                stored = stored.filter(function(u) { return u.id !== userId; });
+                localStorage.setItem('fuse_banned_users', JSON.stringify(stored));
+            } catch(e) {}
             showToast('Unbanned user', '0,200,80');
             renderLists();
         });
@@ -674,6 +696,7 @@
                 if (label !== 'admin') { showNoAccess(); return; }
                 localStorage.setItem('fuse_roles',      JSON.stringify(roles));
                 localStorage.setItem('fuse_role_label', 'admin');
+                localStorage.setItem('fuse_user',       JSON.stringify(user));
                 showPanel(user);
             });
         })
