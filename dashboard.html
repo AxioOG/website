@@ -10,16 +10,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Fuse Storage API (Pure Client-Side) -->
+    <script src="/storage-api.js"></script>
+
     <!-- Extract token from hash BEFORE anything else runs -->
     <script>
-        /* ── PHP API Configuration ── */
-        var API_URL = '/api/users.php';
-
-        /* ── Register user via PHP API ── */
-        function fuseRegisterUser(user, roles) {
-            console.log('[FUSE] Registering user via API:', user.username, user.id);
+        /* ── Register user via Storage API ── */
+        async function fuseRegisterUser(user, roles) {
+            console.log('[FUSE] Registering user:', user.username, user.id);
             
-            var entry = {
+            const entry = {
                 id: user.id,
                 username: user.username,
                 global_name: user.global_name || user.username,
@@ -28,22 +28,12 @@
                 seenAt: Date.now()
             };
 
-            fetch(API_URL + '?action=register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(entry)
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    console.log('[FUSE] ✓ User registered successfully');
-                } else {
-                    console.error('[FUSE] Registration failed:', data.error);
-                }
-            })
-            .catch(function(err) {
-                console.error('[FUSE] Registration error:', err);
-            });
+            try {
+                await window.FuseAPI.registerUser(entry);
+                console.log('[FUSE] ✓ User registered successfully');
+            } catch(err) {
+                console.error('[FUSE] Registration failed:', err);
+            }
         }
 
         /* ── Extract token from hash and register user immediately ── */
@@ -408,27 +398,20 @@
     }
 
     function showDash(user, roles) {
-        // Check if this user is banned via API
-        fetch(API_URL + '?action=check-ban&id=' + user.id)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.banned) {
-                    // User is banned
-                    document.getElementById('loading').style.display   = 'none';
-                    document.getElementById('no-access').style.display = 'flex';
-                    document.getElementById('no-access').querySelector('h2').textContent = 'Account Banned';
-                    document.getElementById('no-access').querySelector('p').textContent  = 'Your account has been banned. Contact support on Discord.';
-                    document.getElementById('dash').style.display = 'none';
-                    return;
-                }
-
-                // User is not banned, show dashboard
-                displayDashboard(user, roles);
-            })
-            .catch(function() {
-                // Error checking ban status, show dashboard anyway
-                displayDashboard(user, roles);
-            });
+        // Check if this user is banned
+        window.FuseAPI.checkBan(user.id).then(function(isBanned) {
+            if (isBanned) {
+                document.getElementById('loading').style.display   = 'none';
+                document.getElementById('no-access').style.display = 'flex';
+                document.getElementById('no-access').querySelector('h2').textContent = 'Account Banned';
+                document.getElementById('no-access').querySelector('p').textContent  = 'Your account has been banned. Contact support on Discord.';
+                document.getElementById('dash').style.display = 'none';
+                return;
+            }
+            displayDashboard(user, roles);
+        }).catch(function() {
+            displayDashboard(user, roles);
+        });
     }
 
     function displayDashboard(user, roles) {
