@@ -70,12 +70,21 @@
         body {
             font-family: 'DM Sans', sans-serif;
             background: #000;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 120px 120px;
             min-height: 100vh;
             color: #fff;
+        }
+
+        /* White glow */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255,255,255,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 30% at 20% 100%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 30% at 80% 100%, rgba(255,255,255,0.04) 0%, transparent 60%);
         }
 
         /* ── Top bar ── */
