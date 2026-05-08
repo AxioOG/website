@@ -16,7 +16,7 @@
         :root {
             --on: 0;
 
-            /* Lamp colours � all driven by --on (0 = off, 1 = on) */
+            /* Lamp colours ï¿½ all driven by --on (0 = off, 1 = on) */
             --opening: hsl(0, 0%, calc((18 + var(--on) * 68) * 1%));
             --base-top: hsl(0, 0%, calc((30 + var(--on) * 38) * 1%));
             --base-side: hsl(0, 0%, calc((15 + var(--on) * 35) * 1%));
@@ -101,7 +101,7 @@
             align-items: center;
         }
 
-        /* Ambient room glow � only visible on account page */
+        /* Ambient room glow ï¿½ only visible on account page */
         #page-account::after {
             content: '';
             position: fixed;
@@ -144,7 +144,7 @@
             opacity: var(--on);
         }
 
-        /* SVG fill helpers � resolved from CSS variables */
+        /* SVG fill helpers ï¿½ resolved from CSS variables */
         .fill-opening {
             fill: var(--opening);
         }
@@ -773,9 +773,9 @@
             box-shadow: none !important;
         }
 
-        /* ═══════════════════════════════════════════
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
            FANCY ENHANCEMENTS
-        ═══════════════════════════════════════════ */
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
         /* Background glow */
         body::before {
@@ -908,7 +908,7 @@
             background: rgba(255,255,255,0.07) !important;
         }
 
-        /* Store pricing cards — enhanced */
+        /* Store pricing cards â€” enhanced */
         #page-store > div > div {
             transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
         }
@@ -918,7 +918,7 @@
             border-color: rgba(255,255,255,0.2) !important;
         }
 
-        /* Nav items — subtle glow on active */
+        /* Nav items â€” subtle glow on active */
         #main-nav .nav-item.active {
             color: #fff !important;
             text-shadow: 0 0 18px rgba(255,255,255,0.5);
@@ -930,7 +930,7 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-        /* ── Games Ticker ── */
+        /* â”€â”€ Games Ticker â”€â”€ */
         .games-ticker-wrap {
             width: 100%;
             padding: 0 0 4rem;
@@ -1046,7 +1046,7 @@
 
 <body>
 
-    <!-- ══ Logo Intro ══ -->
+    <!-- â•â• Logo Intro â•â• -->
     <div id="logo-intro" style="position:fixed;inset:0;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;">
         <div style="position:relative;width:70px;height:70px;">
             <svg style="position:absolute;inset:0;animation:spin 1.2s linear infinite;" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1173,7 +1173,7 @@
                 <button class="btn-discord" onclick="loginWithDiscord()"><i class="fab fa-discord"></i> <span data-i18n="login_btn_discord">Sign in with Discord</span></button>
                 <div class="divider-or"><div class="divider-line"></div><span class="divider-text" data-i18n="login_or">or</span><div class="divider-line"></div></div>
                 <div class="field"><label data-i18n="login_email_label">Email</label><div class="field-wrap"><i class="field-icon fas fa-envelope"></i><input type="email" data-i18n-ph="login_email_ph" placeholder="your@email.com"></div></div>
-                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="••••••••"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
+                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
                 <div class="forgot"><a href="#" data-i18n="login_forgot">Forgot password?</a></div>
                 <button class="btn-submit" data-i18n="login_btn_submit">Sign In</button>
                 <div class="signup"><span data-i18n="login_no_account">Don't have an account?</span> <a href="#" data-i18n="login_create">Create one</a></div>
@@ -1216,14 +1216,14 @@
         </div>
 
         <div style="width:100%; max-width:760px; padding:6rem 2rem 0; margin:0 auto; text-align:center; position:relative; z-index:1;">
-            <p class="hero-sub">You Can’t Stop<br>What You Can’t Detect.</p>
+            <p class="hero-sub">You Cant Stop<br>What You Cant Detect.</p>
             <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-bottom:3.5rem;">
                 <button class="btn-primary" onclick="navigateTo('store')">Purchase</button>
                 <button class="btn-ghost" onclick="navigateTo('status')">View Status</button>
             </div>
 
             <!-- Supported Games Ticker -->
-            <h2 class="section-label" style="margin-bottom:1.5rem;">✦ SUPPORTED GAMES</h2>
+            <h2 class="section-label" style="margin-bottom:1.5rem;">SUPPORTED GAMES</h2>
         </div>
 
         <div class="games-ticker-wrap" style="position:relative;z-index:1;">
@@ -1241,7 +1241,7 @@
             #team-grid { grid-template-columns: 1fr; }
         }
 
-        /* ── Floating Badges ── */
+        /* â”€â”€ Floating Badges â”€â”€ */
         .float-badge {
             position: absolute;
             display: flex;
@@ -1309,7 +1309,7 @@
     </style>
 
     <script>
-        // Hardcoded team data — no API dependency, always loads instantly
+        // Hardcoded team data â€” no API dependency, always loads instantly
         const TEAM_MEMBERS = [
             {
                 id: '838411101645045821',
@@ -1320,7 +1320,7 @@
             {
                 id: '704440841317384206',
                 role: 'Owner',
-                name: '!𝐌𝐨𝐢𝐤𝐚𝐧',
+                name: 'Moikan',
                 avatar: 'https://cdn.discordapp.com/avatars/704440841317384206/93c41dfb0d15d96630a751f9762a0219.png?size=128'
             },
             {
@@ -1354,7 +1354,7 @@
                         <div class="team-name">${m.name}</div>
                         <div class="team-role">${m.role}</div>
                     </div>
-                    <span class="team-arrow">↗</span>
+                    <span class="team-arrow">â†—</span>
                 </a>
             `).join('');
         }
@@ -1393,7 +1393,7 @@
                         <div style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Advanced Bypass Solution - Private Version</div>
                     </div>
                 </div>
-                <span style="background:rgba(0, 200, 80, 0.2); color:#00c850; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">UNDETECTED</span>
+                <span class="badge-undetected">UNDETECTED</span>
             </div>
 
             <div onclick="document.querySelector('[data-page=store]').click()" style="
@@ -1428,7 +1428,7 @@
             <!-- Scanner list + Radar side by side -->
             <div style="display:flex; gap:2rem; align-items:flex-start;">
 
-                <!-- Scanner list — original full width style -->
+                <!-- Scanner list â€” original full width style -->
                 <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
                     <div class="scanner-row">
                         <div style="display:flex; align-items:center; gap:1rem;">
@@ -1829,23 +1829,6 @@
 
     <!-- -- Dock Navbar -- -->
     <nav id="main-nav" style="position:fixed;top:0;right:0;z-index:9998;display:flex;align-items:center;gap:2rem;padding:18px 60px;background:transparent;">
-        <div id="lang-selector" style="position:relative;">
-            <button id="lang-btn" onclick="document.getElementById('lang-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:6px 13px;cursor:pointer;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:background 0.2s;">
-                <span id="lang-flag">🌐</span>
-                <span id="lang-label">EN</span>
-                <i class="fa fa-chevron-down" style="font-size:0.6rem;color:rgba(255,255,255,0.4);"></i>
-            </button>
-            <div id="lang-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:160px;background:rgba(12,12,12,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.8);z-index:9999;">
-                <div class="lang-opt" data-lang="en" onclick="setLang('en')">English</div>
-                <div class="lang-opt" data-lang="de" onclick="setLang('de')">Deutsch</div>
-                <div class="lang-opt" data-lang="fr" onclick="setLang('fr')">Français</div>
-                <div class="lang-opt" data-lang="es" onclick="setLang('es')">Español</div>
-                <div class="lang-opt" data-lang="pr" onclick="setLang('pr')">Português</div>
-                <div class="lang-opt" data-lang="tr" onclick="setLang('tr')">Türkçe</div>
-                <div class="lang-opt" data-lang="ru" onclick="setLang('ru')">Русский</div>
-                <div class="lang-opt" data-lang="ar" onclick="setLang('ar')">العربية</div>
-            </div>
-        </div>
         <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_home">Home</a>
         <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_pricing">Pricing</a>
         <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_status">Status</a>
@@ -1855,26 +1838,7 @@
 
     <iframe id="yt-player" src="" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
 
-    <style>
-        #lang-dropdown.open { display:block !important; }
-        .lang-opt {
-            padding:9px 13px;border-radius:8px;cursor:pointer;
-            font-family:'DM Sans',sans-serif;font-size:0.88rem;color:rgba(255,255,255,0.7);
-            transition:background 0.15s,color 0.15s;
-        }
-        .lang-opt:hover { background:rgba(255,255,255,0.07);color:#fff; }
-        .lang-opt.active { color:#fff;background:rgba(255,255,255,0.1); }
-    </style>
-
     <script>
-
-        // Close lang dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            var sel = document.getElementById('lang-selector');
-            if (sel && !sel.contains(e.target)) {
-                document.getElementById('lang-dropdown').classList.remove('open');
-            }
-        });
 
         function startBackgroundMusic() {
             var ytFrame = document.getElementById('yt-player');
@@ -1883,263 +1847,10 @@
         }
         document.addEventListener('pointerdown', startBackgroundMusic, { once: true });
         document.addEventListener('touchstart', startBackgroundMusic, { once: true });
-
-        // ── Translations ──────────────────────────────────────────────
-        var LANGS = {
-            en: { flag:'🇬🇧', label:'EN',
-                // Nav
-                nav_home:'Home', nav_pricing:'Pricing', nav_status:'Status', nav_discord:'Discord', nav_policy:'Policy', nav_signin:'Sign In',
-                // Login page
-                login_brand_tag:'Bypass', login_title:'Welcome Back', login_sub:'Sign in with Discord to continue',
-                login_btn_discord:'Sign in with Discord', login_or:'or', login_email_label:'Email',
-                login_email_ph:'your@email.com', login_pass_label:'Password', login_forgot:'Forgot password?',
-                login_btn_submit:'Sign In', login_no_account:"Don't have an account?", login_create:'Create one',
-                login_popup_store:'View Store', login_popup_signout:'Sign Out',
-                // Home page
-                badge1:'Try Fuse Today!', badge2:'Best in the Market', badge3:'Trusted Worldwide',
-                hero_line1:'You Can\'t Stop', hero_line2:'What You Can\'t Detect.',
-                hero_btn_purchase:'Purchase', hero_btn_status:'View Status',
-                games_label:'✦ SUPPORTED GAMES', games_available:'Available',
-                // Status page
-                status_products_title:'Available Products',
-                status_products_sub:'Currently available products & operational status of Fuse.',
-                status_live:'Live status:',
-                product1_name:'Fuse Private Version', product1_desc:'Advanced Bypass Solution - Private Version',
-                product2_name:'Fuse Public Version', product2_desc:'Advanced Bypass Solution - Public Version',
-                badge_undetected:'UNDETECTED', badge_coming_soon:'COMING SOON',
-                scanner_title:'Scanner Condition',
-                scanner_sub:'Current detection status from scanners. This applies to all of our products.',
-                // Store page
-                store_1mo:'1 Month Access', store_6mo:'6 Months Access', store_private:'Private\nVersion.',
-                store_feature1:'Ultimate Bypass Utility', store_feature2:'Full Software Access',
-                store_feature3:'Fully Undetected', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'24/7 Client Support', store_feature6:'6 Months Software Access',
-                store_btn:'Purchase Now',
-                // Team
-                team_btn:'Team'
-            },
-            de: { flag:'��', label:'DE',
-                nav_home:'Startseite', nav_pricing:'Preise', nav_status:'Status', nav_discord:'Discord', nav_policy:'Richtlinie', nav_signin:'Anmelden',
-                login_brand_tag:'Bypass', login_title:'Willkommen zurück', login_sub:'Mit Discord anmelden um fortzufahren',
-                login_btn_discord:'Mit Discord anmelden', login_or:'oder', login_email_label:'E-Mail',
-                login_email_ph:'deine@email.com', login_pass_label:'Passwort', login_forgot:'Passwort vergessen?',
-                login_btn_submit:'Anmelden', login_no_account:'Noch kein Konto?', login_create:'Erstellen',
-                login_popup_store:'Shop ansehen', login_popup_signout:'Abmelden',
-                badge1:'Fuse ausprobieren!', badge2:'Bestes auf dem Markt', badge3:'Weltweit vertraut',
-                hero_line1:'Du kannst nicht stoppen,', hero_line2:'was du nicht erkennen kannst.',
-                hero_btn_purchase:'Kaufen', hero_btn_status:'Status ansehen',
-                games_label:'✦ UNTERSTÜTZTE SPIELE', games_available:'Verfügbar',
-                status_products_title:'Verfügbare Produkte',
-                status_products_sub:'Aktuell verfügbare Produkte & Betriebsstatus von Fuse.',
-                status_live:'Live-Status:',
-                product1_name:'Fuse Private Version', product1_desc:'Erweiterte Bypass-Lösung - Private Version',
-                product2_name:'Fuse Public Version', product2_desc:'Erweiterte Bypass-Lösung - Public Version',
-                badge_undetected:'UNENTDECKT', badge_coming_soon:'DEMNÄCHST',
-                scanner_title:'Scanner-Zustand',
-                scanner_sub:'Aktueller Erkennungsstatus der Scanner. Gilt für alle unsere Produkte.',
-                store_1mo:'1 Monat Zugang', store_6mo:'6 Monate Zugang', store_private:'Private\nVersion.',
-                store_feature1:'Ultimatives Bypass-Tool', store_feature2:'Vollständiger Software-Zugang',
-                store_feature3:'Vollständig unentdeckt', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'24/7 Kundensupport', store_feature6:'6 Monate Software-Zugang',
-                store_btn:'Jetzt kaufen', team_btn:'Team'
-            },
-            fr: { flag:'🇫🇷', label:'FR',
-                nav_home:'Accueil', nav_pricing:'Tarifs', nav_status:'Statut', nav_discord:'Discord', nav_policy:'Politique', nav_signin:'Connexion',
-                login_brand_tag:'Bypass', login_title:'Bon retour', login_sub:'Connectez-vous avec Discord pour continuer',
-                login_btn_discord:'Se connecter avec Discord', login_or:'ou', login_email_label:'E-mail',
-                login_email_ph:'votre@email.com', login_pass_label:'Mot de passe', login_forgot:'Mot de passe oublié?',
-                login_btn_submit:'Se connecter', login_no_account:'Pas de compte?', login_create:'Créer un',
-                login_popup_store:'Voir la boutique', login_popup_signout:'Se déconnecter',
-                badge1:'Essayez Fuse!', badge2:'Meilleur du marché', badge3:'Approuvé mondialement',
-                hero_line1:'Vous ne pouvez pas arrêter', hero_line2:'ce que vous ne pouvez pas détecter.',
-                hero_btn_purchase:'Acheter', hero_btn_status:'Voir le statut',
-                games_label:'✦ JEUX SUPPORTÉS', games_available:'Disponible',
-                status_products_title:'Produits disponibles',
-                status_products_sub:'Produits actuellement disponibles & statut opérationnel de Fuse.',
-                status_live:'Statut en direct:',
-                product1_name:'Fuse Version Privée', product1_desc:'Solution Bypass Avancée - Version Privée',
-                product2_name:'Fuse Version Publique', product2_desc:'Solution Bypass Avancée - Version Publique',
-                badge_undetected:'INDÉTECTABLE', badge_coming_soon:'BIENTÔT',
-                scanner_title:'État du Scanner',
-                scanner_sub:'Statut de détection actuel des scanners. S\'applique à tous nos produits.',
-                store_1mo:'1 Mois d\'accès', store_6mo:'6 Mois d\'accès', store_private:'Version\nPrivée.',
-                store_feature1:'Outil Bypass Ultime', store_feature2:'Accès complet au logiciel',
-                store_feature3:'Totalement indétectable', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'Support client 24/7', store_feature6:'6 mois d\'accès logiciel',
-                store_btn:'Acheter maintenant', team_btn:'Équipe'
-            },
-            es: { flag:'🇪🇸', label:'ES',
-                nav_home:'Inicio', nav_pricing:'Precios', nav_status:'Estado', nav_discord:'Discord', nav_policy:'Política', nav_signin:'Iniciar sesión',
-                login_brand_tag:'Bypass', login_title:'Bienvenido de nuevo', login_sub:'Inicia sesión con Discord para continuar',
-                login_btn_discord:'Iniciar sesión con Discord', login_or:'o', login_email_label:'Correo',
-                login_email_ph:'tu@correo.com', login_pass_label:'Contraseña', login_forgot:'¿Olvidaste tu contraseña?',
-                login_btn_submit:'Iniciar sesión', login_no_account:'¿No tienes cuenta?', login_create:'Crear una',
-                login_popup_store:'Ver tienda', login_popup_signout:'Cerrar sesión',
-                badge1:'¡Prueba Fuse hoy!', badge2:'El mejor del mercado', badge3:'Confiado mundialmente',
-                hero_line1:'No puedes detener', hero_line2:'lo que no puedes detectar.',
-                hero_btn_purchase:'Comprar', hero_btn_status:'Ver estado',
-                games_label:'✦ JUEGOS COMPATIBLES', games_available:'Disponible',
-                status_products_title:'Productos disponibles',
-                status_products_sub:'Productos actualmente disponibles y estado operativo de Fuse.',
-                status_live:'Estado en vivo:',
-                product1_name:'Fuse Versión Privada', product1_desc:'Solución Bypass Avanzada - Versión Privada',
-                product2_name:'Fuse Versión Pública', product2_desc:'Solución Bypass Avanzada - Versión Pública',
-                badge_undetected:'INDETECTABLE', badge_coming_soon:'PRÓXIMAMENTE',
-                scanner_title:'Estado del Escáner',
-                scanner_sub:'Estado de detección actual de los escáneres. Se aplica a todos nuestros productos.',
-                store_1mo:'1 Mes de acceso', store_6mo:'6 Meses de acceso', store_private:'Versión\nPrivada.',
-                store_feature1:'Herramienta Bypass Definitiva', store_feature2:'Acceso completo al software',
-                store_feature3:'Totalmente indetectable', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'Soporte 24/7', store_feature6:'6 meses de acceso al software',
-                store_btn:'Comprar ahora', team_btn:'Equipo'
-            },
-            tr: { flag:'🇹🇷', label:'TR',
-                nav_home:'Ana Sayfa', nav_pricing:'Fiyatlar', nav_status:'Durum', nav_discord:'Discord', nav_policy:'Politika', nav_signin:'Giriş Yap',
-                login_brand_tag:'Bypass', login_title:'Tekrar Hoşgeldiniz', login_sub:'Devam etmek için Discord ile giriş yapın',
-                login_btn_discord:'Discord ile Giriş Yap', login_or:'veya', login_email_label:'E-posta',
-                login_email_ph:'senin@email.com', login_pass_label:'Şifre', login_forgot:'Şifremi unuttum?',
-                login_btn_submit:'Giriş Yap', login_no_account:'Hesabın yok mu?', login_create:'Oluştur',
-                login_popup_store:'Mağazayı Gör', login_popup_signout:'Çıkış Yap',
-                badge1:'Fuse\'u Dene!', badge2:'Piyasanın En İyisi', badge3:'Dünya Genelinde Güvenilir',
-                hero_line1:'Durduramayacaksın', hero_line2:'Tespit Edemediğini.',
-                hero_btn_purchase:'Satın Al', hero_btn_status:'Durumu Gör',
-                games_label:'✦ DESTEKLENEN OYUNLAR', games_available:'Mevcut',
-                status_products_title:'Mevcut Ürünler',
-                status_products_sub:'Şu anda mevcut ürünler ve Fuse\'un operasyonel durumu.',
-                status_live:'Canlı durum:',
-                product1_name:'Fuse Özel Sürüm', product1_desc:'Gelişmiş Bypass Çözümü - Özel Sürüm',
-                product2_name:'Fuse Genel Sürüm', product2_desc:'Gelişmiş Bypass Çözümü - Genel Sürüm',
-                badge_undetected:'TESPİT EDİLEMEZ', badge_coming_soon:'YAKINDA',
-                scanner_title:'Tarayıcı Durumu',
-                scanner_sub:'Tarayıcılardan güncel tespit durumu. Tüm ürünlerimiz için geçerlidir.',
-                store_1mo:'1 Aylık Erişim', store_6mo:'6 Aylık Erişim', store_private:'Özel\nSürüm.',
-                store_feature1:'Nihai Bypass Aracı', store_feature2:'Tam Yazılım Erişimi',
-                store_feature3:'Tamamen Tespit Edilemez', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'7/24 Müşteri Desteği', store_feature6:'6 Aylık Yazılım Erişimi',
-                store_btn:'Şimdi Satın Al', team_btn:'Ekip'
-            },
-            ru: { flag:'🇷🇺', label:'RU',
-                nav_home:'Главная', nav_pricing:'Цены', nav_status:'Статус', nav_discord:'Discord', nav_policy:'Политика', nav_signin:'Войти',
-                login_brand_tag:'Bypass', login_title:'С возвращением', login_sub:'Войдите через Discord чтобы продолжить',
-                login_btn_discord:'Войти через Discord', login_or:'или', login_email_label:'Эл. почта',
-                login_email_ph:'ваш@email.com', login_pass_label:'Пароль', login_forgot:'Забыли пароль?',
-                login_btn_submit:'Войти', login_no_account:'Нет аккаунта?', login_create:'Создать',
-                login_popup_store:'Открыть магазин', login_popup_signout:'Выйти',
-                badge1:'Попробуй Fuse!', badge2:'Лучший на рынке', badge3:'Доверяют по всему миру',
-                hero_line1:'Нельзя остановить', hero_line2:'то, что нельзя обнаружить.',
-                hero_btn_purchase:'Купить', hero_btn_status:'Смотреть статус',
-                games_label:'✦ ПОДДЕРЖИВАЕМЫЕ ИГРЫ', games_available:'Доступно',
-                status_products_title:'Доступные продукты',
-                status_products_sub:'Текущие доступные продукты и операционный статус Fuse.',
-                status_live:'Статус в реальном времени:',
-                product1_name:'Fuse Приватная версия', product1_desc:'Расширенное решение Bypass - Приватная версия',
-                product2_name:'Fuse Публичная версия', product2_desc:'Расширенное решение Bypass - Публичная версия',
-                badge_undetected:'НЕ ОБНАРУЖЕН', badge_coming_soon:'СКОРО',
-                scanner_title:'Состояние сканера',
-                scanner_sub:'Текущий статус обнаружения сканерами. Применяется ко всем нашим продуктам.',
-                store_1mo:'Доступ на 1 месяц', store_6mo:'Доступ на 6 месяцев', store_private:'Приватная\nверсия.',
-                store_feature1:'Лучший инструмент Bypass', store_feature2:'Полный доступ к ПО',
-                store_feature3:'Полностью необнаруживаемый', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'Поддержка 24/7', store_feature6:'6 месяцев доступа к ПО',
-                store_btn:'Купить сейчас', team_btn:'Команда'
-            },
-            ar: { flag:'🇸🇦', label:'AR',
-                nav_home:'الرئيسية', nav_pricing:'الأسعار', nav_status:'الحالة', nav_discord:'ديسكورد', nav_policy:'السياسة', nav_signin:'تسجيل الدخول',
-                login_brand_tag:'Bypass', login_title:'مرحباً بعودتك', login_sub:'سجل الدخول بديسكورد للمتابعة',
-                login_btn_discord:'تسجيل الدخول بديسكورد', login_or:'أو', login_email_label:'البريد الإلكتروني',
-                login_email_ph:'بريدك@email.com', login_pass_label:'كلمة المرور', login_forgot:'نسيت كلمة المرور؟',
-                login_btn_submit:'تسجيل الدخول', login_no_account:'ليس لديك حساب؟', login_create:'إنشاء حساب',
-                login_popup_store:'عرض المتجر', login_popup_signout:'تسجيل الخروج',
-                badge1:'جرب Fuse اليوم!', badge2:'الأفضل في السوق', badge3:'موثوق عالمياً',
-                hero_line1:'لا يمكنك إيقاف', hero_line2:'ما لا يمكنك اكتشافه.',
-                hero_btn_purchase:'شراء', hero_btn_status:'عرض الحالة',
-                games_label:'✦ الألعاب المدعومة', games_available:'متاح',
-                status_products_title:'المنتجات المتاحة',
-                status_products_sub:'المنتجات المتاحة حالياً وحالة تشغيل Fuse.',
-                status_live:'الحالة المباشرة:',
-                product1_name:'Fuse النسخة الخاصة', product1_desc:'حل Bypass متقدم - النسخة الخاصة',
-                product2_name:'Fuse النسخة العامة', product2_desc:'حل Bypass متقدم - النسخة العامة',
-                badge_undetected:'غير مكتشف', badge_coming_soon:'قريباً',
-                scanner_title:'حالة الماسح',
-                scanner_sub:'حالة الكشف الحالية من الماسحات. ينطبق على جميع منتجاتنا.',
-                store_1mo:'وصول لمدة شهر', store_6mo:'وصول لمدة 6 أشهر', store_private:'النسخة\nالخاصة.',
-                store_feature1:'أداة Bypass المثالية', store_feature2:'وصول كامل للبرنامج',
-                store_feature3:'غير قابل للكشف تماماً', store_feature4:'Fivem Bypasser Aura',
-                store_feature5:'دعم عملاء 24/7', store_feature6:'وصول للبرنامج لمدة 6 أشهر',
-                store_btn:'اشتر الآن', team_btn:'الفريق'
-            }
-        };
-
-        var currentLang = localStorage.getItem('fuse_lang') || 'en';
-
-        function setLang(lang) {
-            if (!LANGS[lang]) return;
-            currentLang = lang;
-            localStorage.setItem('fuse_lang', lang);
-            var t = LANGS[lang];
-
-            // Update selector UI
-            document.getElementById('lang-flag').textContent  = t.flag;
-            document.getElementById('lang-label').textContent = t.label;
-            document.getElementById('lang-dropdown').classList.remove('open');
-            document.querySelectorAll('.lang-opt').forEach(function(el) {
-                el.classList.toggle('active', el.dataset.lang === lang);
-            });
-
-            // RTL for Arabic
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-
-            // Translate all data-i18n elements
-            document.querySelectorAll('[data-i18n]').forEach(function(el) {
-                var key = el.getAttribute('data-i18n');
-                if (t[key] !== undefined) el.textContent = t[key];
-            });
-
-            // Translate placeholders
-            document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
-                var key = el.getAttribute('data-i18n-ph');
-                if (t[key] !== undefined) el.placeholder = t[key];
-            });
-
-            // ── Translate floating badges ──
-            var badges = document.querySelectorAll('.float-badge-text');
-            if (badges[0]) badges[0].textContent = t.badge1;
-            if (badges[1]) badges[1].textContent = t.badge2;
-            if (badges[2]) badges[2].textContent = t.badge3;
-
-            // ── Translate hero section ──
-            var heroSub = document.querySelector('.hero-sub');
-            if (heroSub) heroSub.innerHTML = t.hero_line1 + '<br>' + t.hero_line2;
-
-            var heroBtns = document.querySelectorAll('#page-home .btn-primary, #page-home .btn-ghost');
-            if (heroBtns[0]) heroBtns[0].textContent = t.hero_btn_purchase;
-            if (heroBtns[1]) heroBtns[1].textContent = t.hero_btn_status;
-
-            var gamesLabel = document.querySelector('.section-label');
-            if (gamesLabel) gamesLabel.textContent = t.games_label;
-
-            var gameStatus = document.querySelector('.game-status.available');
-            if (gameStatus) gameStatus.textContent = t.games_available;
-
-            // ── Translate status page ──
-            var el;
-            el = document.getElementById('status-products-title');
-            if (el) el.textContent = t.status_products_title;
-            el = document.getElementById('status-products-sub');
-            if (el) el.textContent = t.status_products_sub;
-            el = document.getElementById('status-live-label');
-            if (el) el.textContent = t.status_live;
-            el = document.getElementById('scanner-title');
-            if (el) el.textContent = t.scanner_title;
-            el = document.getElementById('scanner-sub');
-            if (el) el.textContent = t.scanner_sub;
-        }
-
-        // Apply saved language on load
-        setLang(currentLang);
+    </script>
     </script>
     <script>
-        // Page name → URL slug mapping
+        // Page name â†’ URL slug mapping
         const PAGE_SLUGS = {
             
             home:    '/home',
@@ -2175,7 +1886,7 @@
 
         // On load, read the URL and activate the right page
         (function () {
-            // Check for redirect from 404.html — restore path and hash
+            // Check for redirect from 404.html â€” restore path and hash
             const params = new URLSearchParams(window.location.search);
             const redirectedPath = params.get('p');
             const redirectedHash = params.get('h');
@@ -2477,7 +2188,7 @@
 
         <!-- Bottom Bar -->
         <div class="footer-bottom">
-            <p class="footer-copyright">© 2026 Fuse Bypass. All rights reserved.</p>
+            <p class="footer-copyright">Â© 2026 Fuse Bypass. All rights reserved.</p>
         </div>
     </div>
 </footer>
