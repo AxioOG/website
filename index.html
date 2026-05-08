@@ -785,9 +785,15 @@
             z-index: -1;
             pointer-events: none;
             background:
-                radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255,255,255,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 70% 55% at 50% 45%, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 45%, transparent 72%),
                 radial-gradient(ellipse 50% 30% at 20% 100%, rgba(255,255,255,0.04) 0%, transparent 60%),
                 radial-gradient(ellipse 50% 30% at 80% 100%, rgba(255,255,255,0.04) 0%, transparent 60%);
+            animation: glowPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.72; }
         }
 
         /* Hero title */
@@ -1141,7 +1147,6 @@
             <i class="fa fa-chevron-down widget-chevron"></i>
         </div>
         <div class="widget-dropdown">
-            <a class="widget-dd-item" href="/dashboard"><i class="fa fa-house"></i> Dashboard</a>
             <a class="widget-dd-item" href="/home"><i class="fa fa-cart-shopping"></i> Home</a>
             <div class="widget-dd-sep"></div>
             <button class="widget-dd-item red" id="discord-logout"><i class="fa fa-right-from-bracket"></i> Sign Out</button>
@@ -1858,7 +1863,6 @@
         <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_status">Status</a>
         <a href="https://discord.gg/yVUxWkrPT9" target="_blank" class="nav-item" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_discord">Discord</a>
         <a href="#" class="nav-item" data-page="tos" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_policy">Policy</a>
-        <a href="#" class="nav-item" id="nav-sign-in" onclick="loginWithDiscord();return false;" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_signin">Sign In</a>
     </nav>
 
     <iframe id="yt-player" src="" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
@@ -2210,8 +2214,8 @@
                 var t = p.get('access_token');
                 if (t) {
                     localStorage.setItem('fuse_pending_token', t);
-                    // Redirect to dashboard to handle the token there
-                    window.location.replace('/dashboard.html');
+                    // Clear hash without redirecting to dashboard
+                    history.replaceState(null, '', window.location.pathname);
                     return;
                 }
             }
@@ -2220,12 +2224,11 @@
             if (pt) {
                 localStorage.setItem('fuse_pending_token', pt);
                 localStorage.removeItem('fuse_pending_token_404');
-                window.location.replace('/dashboard.html');
             }
         })();
 
         var DISCORD_CLIENT_ID = '1460340695578575041';
-        var DISCORD_REDIRECT  = window.location.origin + '/dashboard';
+        var DISCORD_REDIRECT  = window.location.origin + '/home';
         var GUILD_ID          = '1305642236880617482';
         var ROLE_ADMIN1       = '1471974431579574538';
         var ROLE_ADMIN2       = '1482165881315524688';
@@ -2479,6 +2482,38 @@
     });
 })();
 </script>
+
+<!-- Footer Section -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <!-- Main Footer Content -->
+        <div class="footer-main">
+            <!-- Brand Section -->
+            <div class="footer-brand">
+                <h2 class="footer-brand-title">Fuse Bypass</h2>
+                <p class="footer-brand-desc">Founded in 2026, Fuse Bypass is a unique bypass tool that remains undetected.</p>
+            </div>
+
+            <!-- Links Section -->
+            <div class="footer-links">
+                <div>
+                    <a href="#" onclick="navigateTo('home'); return false;" class="footer-link">Showcases</a>
+                </div>
+                <div>
+                    <a href="#" onclick="navigateTo('tos'); return false;" class="footer-link">Terms of Service</a>
+                </div>
+                <div>
+                    <a href="#" onclick="navigateTo('store'); return false;" class="footer-link">Store</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="footer-bottom">
+            <p class="footer-copyright">© 2026 Fuse Bypass. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
 
 </body>
 
