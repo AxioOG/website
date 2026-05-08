@@ -1836,31 +1836,29 @@
 
     <!-- -- Dock Navbar -- -->
     <nav id="main-nav" style="position:fixed;top:0;right:0;z-index:9998;display:flex;align-items:center;gap:2rem;padding:18px 60px;background:transparent;">
+        <div id="lang-selector" style="position:relative;">
+            <button id="lang-btn" onclick="document.getElementById('lang-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:6px 13px;cursor:pointer;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:background 0.2s;">
+                <span id="lang-flag">🌐</span>
+                <span id="lang-label">EN</span>
+                <i class="fa fa-chevron-down" style="font-size:0.6rem;color:rgba(255,255,255,0.4);"></i>
+            </button>
+            <div id="lang-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:160px;background:rgba(12,12,12,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.8);z-index:9999;">
+                <div class="lang-opt" data-lang="en" onclick="setLang('en')">English</div>
+                <div class="lang-opt" data-lang="de" onclick="setLang('de')">Deutsch</div>
+                <div class="lang-opt" data-lang="fr" onclick="setLang('fr')">Français</div>
+                <div class="lang-opt" data-lang="es" onclick="setLang('es')">Español</div>
+                <div class="lang-opt" data-lang="pr" onclick="setLang('pr')">Português</div>
+                <div class="lang-opt" data-lang="tr" onclick="setLang('tr')">Türkçe</div>
+                <div class="lang-opt" data-lang="ru" onclick="setLang('ru')">Русский</div>
+                <div class="lang-opt" data-lang="ar" onclick="setLang('ar')">العربية</div>
+            </div>
+        </div>
         <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_home">Home</a>
         <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_pricing">Pricing</a>
         <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_status">Status</a>
         <a href="https://discord.gg/yVUxWkrPT9" target="_blank" class="nav-item" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_discord">Discord</a>
         <a href="#" class="nav-item" data-page="tos" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_policy">Policy</a>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.45rem;">
-            <a href="#" class="nav-item" id="nav-sign-in" onclick="loginWithDiscord();return false;" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_signin">Sign In</a>
-            <div id="lang-selector" style="position:relative;">
-                <button id="lang-btn" onclick="document.getElementById('lang-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:6px 13px;cursor:pointer;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:background 0.2s;">
-                    <span id="lang-flag">🌐</span>
-                    <span id="lang-label">EN</span>
-                    <i class="fa fa-chevron-down" style="font-size:0.6rem;color:rgba(255,255,255,0.4);"></i>
-                </button>
-                <div id="lang-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:160px;background:rgba(12,12,12,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.8);z-index:9999;">
-                    <div class="lang-opt" data-lang="en" onclick="setLang('en')">English</div>
-                    <div class="lang-opt" data-lang="de" onclick="setLang('de')">Deutsch</div>
-                    <div class="lang-opt" data-lang="fr" onclick="setLang('fr')">Français</div>
-                    <div class="lang-opt" data-lang="es" onclick="setLang('es')">Español</div>
-                    <div class="lang-opt" data-lang="pr" onclick="setLang('pr')">Português</div>
-                    <div class="lang-opt" data-lang="tr" onclick="setLang('tr')">Türkçe</div>
-                    <div class="lang-opt" data-lang="ru" onclick="setLang('ru')">Русский</div>
-                    <div class="lang-opt" data-lang="ar" onclick="setLang('ar')">العربية</div>
-                </div>
-            </div>
-        </div>
+        <a href="#" class="nav-item" id="nav-sign-in" onclick="loginWithDiscord();return false;" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_signin">Sign In</a>
     </nav>
 
     <iframe id="yt-player" src="" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
