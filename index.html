@@ -1139,19 +1139,7 @@
         .team-arrow { display:none; }
     </style>
 
-    <!-- -- Discord User Widget (top-right pill with dropdown) -- -->
-    <div id="discord-user-widget" style="display:none;">
-        <div class="widget-pill" onclick="document.getElementById('discord-user-widget').classList.toggle('open')">
-            <img id="discord-avatar" src="" alt="avatar">
-            <span id="discord-username"></span>
-            <i class="fa fa-chevron-down widget-chevron"></i>
-        </div>
-        <div class="widget-dropdown">
-            <a class="widget-dd-item" href="/home"><i class="fa fa-cart-shopping"></i> Home</a>
-            <div class="widget-dd-sep"></div>
-            <button class="widget-dd-item red" id="discord-logout"><i class="fa fa-right-from-bracket"></i> Sign Out</button>
-        </div>
-    </div>
+
 
 
 
@@ -2248,21 +2236,11 @@
         }
 
         function applyUI(user, roles) {
-            var avatarUrl = getAvatarUrl(user);
-            var name = user.global_name || user.username;
-
-            var w  = document.getElementById('discord-user-widget');
-            var wa = document.getElementById('discord-avatar');
-            var wn = document.getElementById('discord-username');
-            if (w) {
-                if (wa) wa.src = avatarUrl;
-                if (wn) wn.textContent = name;
-                w.style.display = 'block';
-            }
-
             var pa = document.getElementById('popup-avatar');
             var pu = document.getElementById('popup-username');
             var pt = document.getElementById('popup-tag');
+            var avatarUrl = getAvatarUrl(user);
+            var name = user.global_name || user.username;
             if (pa) pa.src = avatarUrl;
             if (pu) pu.textContent = name;
             if (pt) pt.textContent = '@' + user.username;
@@ -2272,10 +2250,6 @@
         }
 
         function clearUI() {
-            var w = document.getElementById('discord-user-widget');
-            if (w) w.style.display = 'none';
-            var pn = document.getElementById('nav-customer-panel');
-            if (pn) pn.style.display = 'none';
             localStorage.removeItem('fuse_user');
             localStorage.removeItem('fuse_roles');
             localStorage.removeItem('fuse_token');
@@ -2326,13 +2300,6 @@
             window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
         }
 
-        document.getElementById('discord-logout').addEventListener('click', function() { clearUI(); });
-
-        // Close widget dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            var w = document.getElementById('discord-user-widget');
-            if (w && !w.contains(e.target)) w.classList.remove('open');
-        });
         document.getElementById('popup-logout-btn').addEventListener('click', function() {
             clearUI();
             lightOn = false;
