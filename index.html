@@ -1858,17 +1858,6 @@
                 <div class="lang-opt" data-lang="ru" onclick="setLang('ru')">Русский</div>
                 <div class="lang-opt" data-lang="ar" onclick="setLang('ar')">العربية</div>
             </div>
-        </div>
-
-        <!-- Music Player -->
-        <div id="music-player" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:6px 14px 6px 10px;">
-            <button id="music-btn" onclick="toggleMusic()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.7);font-size:0.95rem;padding:0;display:flex;align-items:center;transition:color 0.2s;" title="Toggle music">
-                <i class="fa fa-music" id="music-icon"></i>
-            </button>
-            <div id="music-bars" style="display:flex;align-items:center;gap:2px;height:14px;">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            </div>
-        </div>
     </nav>
 
     <style>
@@ -1880,46 +1869,9 @@
         }
         .lang-opt:hover { background:rgba(255,255,255,0.07);color:#fff; }
         .lang-opt.active { color:#fff;background:rgba(255,255,255,0.1); }
-
-        /* Music bars animation */
-        .bar {
-            display:inline-block;width:3px;background:#fff;border-radius:2px;
-            animation:barBounce 0.8s ease-in-out infinite;
-            opacity:0.6;
-        }
-        .bar:nth-child(1){height:6px;animation-delay:0s;}
-        .bar:nth-child(2){height:10px;animation-delay:0.15s;}
-        .bar:nth-child(3){height:7px;animation-delay:0.3s;}
-        .bar:nth-child(4){height:4px;animation-delay:0.45s;}
-        @keyframes barBounce {
-            0%,100%{transform:scaleY(1);}
-            50%{transform:scaleY(1.8);}
-        }
-        #music-bars.paused .bar { animation-play-state:paused;opacity:0.25; }
     </style>
 
-    <!-- Hidden YouTube iframe for music -->
-    <iframe id="yt-player" src="https://www.youtube.com/embed/-xDI41_oo_I?autoplay=1&loop=1&playlist=-xDI41_oo_I&controls=0&mute=0&enablejsapi=1" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
-
     <script>
-        // ── Music Player ──────────────────────────────────────────────
-        var musicPlaying = true;
-        var ytFrame = document.getElementById('yt-player');
-
-        function toggleMusic() {
-            musicPlaying = !musicPlaying;
-            var icon = document.getElementById('music-icon');
-            var bars = document.getElementById('music-bars');
-            if (musicPlaying) {
-                ytFrame.src = 'https://www.youtube.com/embed/-xDI41_oo_I?autoplay=1&loop=1&playlist=-xDI41_oo_I&controls=0&mute=0&enablejsapi=1';
-                icon.className = 'fa fa-music';
-                bars.classList.remove('paused');
-            } else {
-                ytFrame.src = '';
-                icon.className = 'fa fa-pause';
-                bars.classList.add('paused');
-            }
-        }
 
         // Close lang dropdown when clicking outside
         document.addEventListener('click', function(e) {
