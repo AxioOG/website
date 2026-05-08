@@ -1071,7 +1071,7 @@
     <!-- Team Dropdown (bottom-left) -->
     <div style="position:fixed;bottom:24px;left:20px;z-index:9999;">
         <button onclick="document.getElementById('team-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:8px 16px 8px 10px;cursor:pointer;color:#fff;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;transition:background 0.2s;">
-            <i class="fa fa-users" style="font-size:0.85rem;color:rgba(255,255,255,0.6);"></i> Team
+            <i class="fa fa-users" style="font-size:0.85rem;color:rgba(255,255,255,0.6);"></i> <span data-i18n="team_btn">Team</span>
             <i class="fa fa-chevron-up" style="font-size:0.6rem;color:rgba(255,255,255,0.4);transition:transform 0.2s;" id="team-chevron"></i>
         </button>
         <div id="team-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;background:rgba(12,12,12,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.8);">
@@ -1172,18 +1172,18 @@
             <div class="card" id="js-card">
                 <div class="brand">
                     <div class="brand-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg></div>
-                    <div><div class="brand-name">Fuse</div><div class="brand-tag">Bypass</div></div>
+                    <div><div class="brand-name">Fuse</div><div class="brand-tag" data-i18n="login_brand_tag">Bypass</div></div>
                 </div>
                 <div class="card-sep"></div>
-                <h2 class="card-title">Welcome Back</h2>
-                <p class="card-sub">Sign in with Discord to continue</p>
-                <button class="btn-discord" onclick="loginWithDiscord()"><i class="fab fa-discord"></i> Sign in with Discord</button>
-                <div class="divider-or"><div class="divider-line"></div><span class="divider-text">or</span><div class="divider-line"></div></div>
-                <div class="field"><label>Email</label><div class="field-wrap"><i class="field-icon fas fa-envelope"></i><input type="email" placeholder="your@email.com"></div></div>
-                <div class="field"><label>Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="••••••••"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
-                <div class="forgot"><a href="#">Forgot password?</a></div>
-                <button class="btn-submit">Sign In</button>
-                <div class="signup">Don't have an account? <a href="#">Create one</a></div>
+                <h2 class="card-title" data-i18n="login_title">Welcome Back</h2>
+                <p class="card-sub" data-i18n="login_sub">Sign in with Discord to continue</p>
+                <button class="btn-discord" onclick="loginWithDiscord()"><i class="fab fa-discord"></i> <span data-i18n="login_btn_discord">Sign in with Discord</span></button>
+                <div class="divider-or"><div class="divider-line"></div><span class="divider-text" data-i18n="login_or">or</span><div class="divider-line"></div></div>
+                <div class="field"><label data-i18n="login_email_label">Email</label><div class="field-wrap"><i class="field-icon fas fa-envelope"></i><input type="email" data-i18n-ph="login_email_ph" placeholder="your@email.com"></div></div>
+                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="••••••••"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
+                <div class="forgot"><a href="#" data-i18n="login_forgot">Forgot password?</a></div>
+                <button class="btn-submit" data-i18n="login_btn_submit">Sign In</button>
+                <div class="signup"><span data-i18n="login_no_account">Don't have an account?</span> <a href="#" data-i18n="login_create">Create one</a></div>
             </div>
         </div>
         <div id="discord-profile-popup" class="card" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;display:none;">
@@ -1191,8 +1191,8 @@
                 <img id="popup-avatar" src="" alt="avatar" style="width:80px;height:80px;border-radius:50%;margin-bottom:1rem;border:3px solid rgba(255,255,255,0.2);">
                 <div id="popup-username" style="font-size:1.2rem;font-weight:700;margin-bottom:0.5rem;"></div>
                 <div id="popup-tag" style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:1.5rem;"></div>
-                <button class="btn-primary" onclick="navigateTo('store')" style="width:100%;margin-bottom:0.5rem;">View Store</button>
-                <button class="btn-ghost" id="popup-logout-btn" style="width:100%;">Sign Out</button>
+                <button class="btn-primary" onclick="navigateTo('store')" style="width:100%;margin-bottom:0.5rem;" data-i18n="login_popup_store">View Store</button>
+                <button class="btn-ghost" id="popup-logout-btn" style="width:100%;" data-i18n="login_popup_signout">Sign Out</button>
             </div>
         </div>
     </div>
@@ -1374,9 +1374,9 @@
         <div style="width:100%; max-width:1100px; padding:6rem 2rem 4rem; margin:0 auto;">
 
             <!-- Available Products -->
-            <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Available Products</h2>
-            <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Currently available products & operational status of Fuse.</p>
-            <p style="color:rgba(255,255,255,0.35); text-align:center; margin-bottom:2rem; font-size:0.85rem;">Live status: <a href="https://fusebypass.fun/status" target="_blank" style="color:rgba(255,255,255,0.6); text-decoration:underline;">fusebypass.fun/status</a></p>
+            <h2 id="status-products-title" style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Available Products</h2>
+            <p id="status-products-sub" style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Currently available products & operational status of Fuse.</p>
+            <p style="color:rgba(255,255,255,0.35); text-align:center; margin-bottom:2rem; font-size:0.85rem;"><span id="status-live-label">Live status:</span> <a href="https://fusebypass.fun/status" target="_blank" style="color:rgba(255,255,255,0.6); text-decoration:underline;">fusebypass.fun/status</a></p>
 
             <div onclick="document.querySelector('[data-page=store]').click()" style="
                 background:rgba(255,255,255,0.04);
@@ -1429,8 +1429,8 @@
             </div>
 
             <!-- Scanner Status -->
-            <h2 style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Scanner Condition</h2>
-            <p style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Current detection status from scanners. This applies to all of our products.</p>
+            <h2 id="scanner-title" style="font-family:'Montserrat',sans-serif; font-size:2rem; color:#fff; text-align:center; margin-bottom:0.5rem;">Scanner Condition</h2>
+            <p id="scanner-sub" style="color:rgba(255,255,255,0.4); text-align:center; margin-bottom:2rem; font-size:0.95rem;">Current detection status from scanners. This applies to all of our products.</p>
 
             <!-- Scanner list + Radar side by side -->
             <div style="display:flex; gap:2rem; align-items:flex-start;">
@@ -1634,60 +1634,60 @@
     <!-- -- PAGE: TOS -- -->
     <div class="page" id="page-tos">
         <div style="max-width:700px; width:100%; padding:6rem 2rem 4rem; color:#fff; font-family:'DM Sans',sans-serif; margin:0 auto;">
-            <h1 style="font-family:'Roboto',sans-serif; font-size:2.2rem; margin-bottom:2.5rem;">Please Read Our Policy Terms</h1>
+            <h1 id="tos-main-title" style="font-family:'Roboto',sans-serif; font-size:2.2rem; margin-bottom:2.5rem;">Please Read Our Policy Terms</h1>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Reverse Engineering</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You may not decompile, disassemble, alter, or otherwise reverse engineer the software in any form. Any violation will result in a permanent ban and blacklisting.</p>
+                <h2 id="tos-t1" style="font-size:1.1rem; margin-bottom:0.6rem;">Reverse Engineering</h2>
+                <p id="tos-p1" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You may not decompile, disassemble, alter, or otherwise reverse engineer the software in any form. Any violation will result in a permanent ban and blacklisting.</p>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">No Refunds</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">All sales are final. Refunds are not provided for any reason, including detections, bans, or compatibility problems.</p>
+                <h2 id="tos-t2" style="font-size:1.1rem; margin-bottom:0.6rem;">No Refunds</h2>
+                <p id="tos-p2" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">All sales are final. Refunds are not provided for any reason, including detections, bans, or compatibility problems.</p>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Chargebacks</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Filing a chargeback will lead to:</p>
-                <ul style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
-                    <li>Permanent removal of your license</li>
-                    <li>A ban from all current and future services</li>
-                    <li>Reports being submitted to payment providers</li>
+                <h2 id="tos-t3" style="font-size:1.1rem; margin-bottom:0.6rem;">Chargebacks</h2>
+                <p id="tos-p3" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Filing a chargeback will lead to:</p>
+                <ul id="tos-ul3" style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
+                    <li id="tos-ul3-1">Permanent removal of your license</li>
+                    <li id="tos-ul3-2">A ban from all current and future services</li>
+                    <li id="tos-ul3-3">Reports being submitted to payment providers</li>
                 </ul>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Use at Your Own Risk</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We take no responsibility for bans or any other consequences. You acknowledge and accept all risks associated with using cheat software.</p>
+                <h2 id="tos-t4" style="font-size:1.1rem; margin-bottom:0.6rem;">Use at Your Own Risk</h2>
+                <p id="tos-p4" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We take no responsibility for bans or any other consequences. You acknowledge and accept all risks associated with using cheat software.</p>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">HWID Lock</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Licenses are locked to a single hardware ID. HWID resets are granted at our discretion and may be refused if misuse is suspected.</p>
+                <h2 id="tos-t5" style="font-size:1.1rem; margin-bottom:0.6rem;">HWID Lock</h2>
+                <p id="tos-p5" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">Licenses are locked to a single hardware ID. HWID resets are granted at our discretion and may be refused if misuse is suspected.</p>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Account Responsibility</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You are solely responsible for securing your account and license. Sharing, selling, or leaking your license will result in an immediate ban without notice.</p>
+                <h2 id="tos-t6" style="font-size:1.1rem; margin-bottom:0.6rem;">Account Responsibility</h2>
+                <p id="tos-p6" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You are solely responsible for securing your account and license. Sharing, selling, or leaking your license will result in an immediate ban without notice.</p>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Prohibited Actions</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You must not:</p>
-                <ul style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
-                    <li>Share, sell, or redistribute the software</li>
-                    <li>Use the software for commercial purposes without authorization</li>
+                <h2 id="tos-t7" style="font-size:1.1rem; margin-bottom:0.6rem;">Prohibited Actions</h2>
+                <p id="tos-p7" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">You must not:</p>
+                <ul id="tos-ul7" style="color:rgba(255,255,255,0.55); font-size:0.9rem; padding-left:1.2rem; margin-top:0.5rem; line-height:2;">
+                    <li id="tos-ul7-1">Share, sell, or redistribute the software</li>
+                    <li id="tos-ul7-2">Use the software for commercial purposes without authorization</li>
                 </ul>
             </div>
 
             <div class="tos-item">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Software Availability</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We do not guarantee uninterrupted service or undetected operation. Downtime, maintenance, or bans do not qualify for refunds.</p>
+                <h2 id="tos-t8" style="font-size:1.1rem; margin-bottom:0.6rem;">Software Availability</h2>
+                <p id="tos-p8" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">We do not guarantee uninterrupted service or undetected operation. Downtime, maintenance, or bans do not qualify for refunds.</p>
             </div>
 
             <div class="tos-item" style="border-bottom:none !important;">
-                <h2 style="font-size:1.1rem; margin-bottom:0.6rem;">Agreement</h2>
-                <p style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">By using this software, you agree to all terms listed above and accept full responsibility.</p>
+                <h2 id="tos-t9" style="font-size:1.1rem; margin-bottom:0.6rem;">Agreement</h2>
+                <p id="tos-p9" style="color:rgba(255,255,255,0.55); line-height:1.7; font-size:0.9rem;">By using this software, you agree to all terms listed above and accept full responsibility.</p>
             </div>
         </div>
     </div>
@@ -1836,14 +1836,353 @@
 
     <!-- -- Dock Navbar -- -->
     <nav id="main-nav" style="position:fixed;top:0;right:0;z-index:9998;display:flex;align-items:center;gap:2rem;padding:18px 60px;background:transparent;">
-        <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;">Home</a>
-        <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;">Pricing</a>
-        <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;">Status</a>
-        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" class="nav-item" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;">Discord</a>
-        <a href="#" class="nav-item" data-page="tos" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;">Policy</a>
-        <a href="#" class="nav-item" id="nav-sign-in" onclick="loginWithDiscord();return false;" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;">Sign In</a>
-        
+        <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_home">Home</a>
+        <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_pricing">Pricing</a>
+        <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_status">Status</a>
+        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" class="nav-item" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_discord">Discord</a>
+        <a href="#" class="nav-item" data-page="tos" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_policy">Policy</a>
+        <a href="#" class="nav-item" id="nav-sign-in" onclick="loginWithDiscord();return false;" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_signin">Sign In</a>
+        <div id="lang-selector" style="position:relative;">
+            <button id="lang-btn" onclick="document.getElementById('lang-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:6px 13px;cursor:pointer;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:background 0.2s;">
+                <span id="lang-flag">🌐</span>
+                <span id="lang-label">EN</span>
+                <i class="fa fa-chevron-down" style="font-size:0.6rem;color:rgba(255,255,255,0.4);"></i>
+            </button>
+            <div id="lang-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:160px;background:rgba(12,12,12,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.8);z-index:9999;">
+                <div class="lang-opt" data-lang="en" onclick="setLang('en')">English</div>
+                <div class="lang-opt" data-lang="de" onclick="setLang('de')">Deutsch</div>
+                <div class="lang-opt" data-lang="fr" onclick="setLang('fr')">Français</div>
+                <div class="lang-opt" data-lang="es" onclick="setLang('es')">Español</div>
+                <div class="lang-opt" data-lang="pr" onclick="setLang('pr')">Português</div>
+                <div class="lang-opt" data-lang="tr" onclick="setLang('tr')">Türkçe</div>
+                <div class="lang-opt" data-lang="ru" onclick="setLang('ru')">Русский</div>
+                <div class="lang-opt" data-lang="ar" onclick="setLang('ar')">العربية</div>
+            </div>
+        </div>
+
+        <!-- Music Player -->
+        <div id="music-player" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:6px 14px 6px 10px;">
+            <button id="music-btn" onclick="toggleMusic()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.7);font-size:0.95rem;padding:0;display:flex;align-items:center;transition:color 0.2s;" title="Toggle music">
+                <i class="fa fa-music" id="music-icon"></i>
+            </button>
+            <div id="music-bars" style="display:flex;align-items:center;gap:2px;height:14px;">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </div>
+        </div>
     </nav>
+
+    <style>
+        #lang-dropdown.open { display:block !important; }
+        .lang-opt {
+            padding:9px 13px;border-radius:8px;cursor:pointer;
+            font-family:'DM Sans',sans-serif;font-size:0.88rem;color:rgba(255,255,255,0.7);
+            transition:background 0.15s,color 0.15s;
+        }
+        .lang-opt:hover { background:rgba(255,255,255,0.07);color:#fff; }
+        .lang-opt.active { color:#fff;background:rgba(255,255,255,0.1); }
+
+        /* Music bars animation */
+        .bar {
+            display:inline-block;width:3px;background:#fff;border-radius:2px;
+            animation:barBounce 0.8s ease-in-out infinite;
+            opacity:0.6;
+        }
+        .bar:nth-child(1){height:6px;animation-delay:0s;}
+        .bar:nth-child(2){height:10px;animation-delay:0.15s;}
+        .bar:nth-child(3){height:7px;animation-delay:0.3s;}
+        .bar:nth-child(4){height:4px;animation-delay:0.45s;}
+        @keyframes barBounce {
+            0%,100%{transform:scaleY(1);}
+            50%{transform:scaleY(1.8);}
+        }
+        #music-bars.paused .bar { animation-play-state:paused;opacity:0.25; }
+    </style>
+
+    <!-- Hidden YouTube iframe for music -->
+    <iframe id="yt-player" src="https://www.youtube.com/embed/-xDI41_oo_I?autoplay=1&loop=1&playlist=-xDI41_oo_I&controls=0&mute=0&enablejsapi=1" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
+
+    <script>
+        // ── Music Player ──────────────────────────────────────────────
+        var musicPlaying = true;
+        var ytFrame = document.getElementById('yt-player');
+
+        function toggleMusic() {
+            musicPlaying = !musicPlaying;
+            var icon = document.getElementById('music-icon');
+            var bars = document.getElementById('music-bars');
+            if (musicPlaying) {
+                ytFrame.src = 'https://www.youtube.com/embed/-xDI41_oo_I?autoplay=1&loop=1&playlist=-xDI41_oo_I&controls=0&mute=0&enablejsapi=1';
+                icon.className = 'fa fa-music';
+                bars.classList.remove('paused');
+            } else {
+                ytFrame.src = '';
+                icon.className = 'fa fa-pause';
+                bars.classList.add('paused');
+            }
+        }
+
+        // Close lang dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            var sel = document.getElementById('lang-selector');
+            if (sel && !sel.contains(e.target)) {
+                document.getElementById('lang-dropdown').classList.remove('open');
+            }
+        });
+
+        // ── Translations ──────────────────────────────────────────────
+        var LANGS = {
+            en: { flag:'🇬🇧', label:'EN',
+                // Nav
+                nav_home:'Home', nav_pricing:'Pricing', nav_status:'Status', nav_discord:'Discord', nav_policy:'Policy', nav_signin:'Sign In',
+                // Login page
+                login_brand_tag:'Bypass', login_title:'Welcome Back', login_sub:'Sign in with Discord to continue',
+                login_btn_discord:'Sign in with Discord', login_or:'or', login_email_label:'Email',
+                login_email_ph:'your@email.com', login_pass_label:'Password', login_forgot:'Forgot password?',
+                login_btn_submit:'Sign In', login_no_account:"Don't have an account?", login_create:'Create one',
+                login_popup_store:'View Store', login_popup_signout:'Sign Out',
+                // Home page
+                badge1:'Try Fuse Today!', badge2:'Best in the Market', badge3:'Trusted Worldwide',
+                hero_line1:'You Can\'t Stop', hero_line2:'What You Can\'t Detect.',
+                hero_btn_purchase:'Purchase', hero_btn_status:'View Status',
+                games_label:'✦ SUPPORTED GAMES', games_available:'Available',
+                // Status page
+                status_products_title:'Available Products',
+                status_products_sub:'Currently available products & operational status of Fuse.',
+                status_live:'Live status:',
+                product1_name:'Fuse Private Version', product1_desc:'Advanced Bypass Solution - Private Version',
+                product2_name:'Fuse Public Version', product2_desc:'Advanced Bypass Solution - Public Version',
+                badge_undetected:'UNDETECTED', badge_coming_soon:'COMING SOON',
+                scanner_title:'Scanner Condition',
+                scanner_sub:'Current detection status from scanners. This applies to all of our products.',
+                // Store page
+                store_1mo:'1 Month Access', store_6mo:'6 Months Access', store_private:'Private\nVersion.',
+                store_feature1:'Ultimate Bypass Utility', store_feature2:'Full Software Access',
+                store_feature3:'Fully Undetected', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'24/7 Client Support', store_feature6:'6 Months Software Access',
+                store_btn:'Purchase Now',
+                // Team
+                team_btn:'Team'
+            },
+            de: { flag:'��', label:'DE',
+                nav_home:'Startseite', nav_pricing:'Preise', nav_status:'Status', nav_discord:'Discord', nav_policy:'Richtlinie', nav_signin:'Anmelden',
+                login_brand_tag:'Bypass', login_title:'Willkommen zurück', login_sub:'Mit Discord anmelden um fortzufahren',
+                login_btn_discord:'Mit Discord anmelden', login_or:'oder', login_email_label:'E-Mail',
+                login_email_ph:'deine@email.com', login_pass_label:'Passwort', login_forgot:'Passwort vergessen?',
+                login_btn_submit:'Anmelden', login_no_account:'Noch kein Konto?', login_create:'Erstellen',
+                login_popup_store:'Shop ansehen', login_popup_signout:'Abmelden',
+                badge1:'Fuse ausprobieren!', badge2:'Bestes auf dem Markt', badge3:'Weltweit vertraut',
+                hero_line1:'Du kannst nicht stoppen,', hero_line2:'was du nicht erkennen kannst.',
+                hero_btn_purchase:'Kaufen', hero_btn_status:'Status ansehen',
+                games_label:'✦ UNTERSTÜTZTE SPIELE', games_available:'Verfügbar',
+                status_products_title:'Verfügbare Produkte',
+                status_products_sub:'Aktuell verfügbare Produkte & Betriebsstatus von Fuse.',
+                status_live:'Live-Status:',
+                product1_name:'Fuse Private Version', product1_desc:'Erweiterte Bypass-Lösung - Private Version',
+                product2_name:'Fuse Public Version', product2_desc:'Erweiterte Bypass-Lösung - Public Version',
+                badge_undetected:'UNENTDECKT', badge_coming_soon:'DEMNÄCHST',
+                scanner_title:'Scanner-Zustand',
+                scanner_sub:'Aktueller Erkennungsstatus der Scanner. Gilt für alle unsere Produkte.',
+                store_1mo:'1 Monat Zugang', store_6mo:'6 Monate Zugang', store_private:'Private\nVersion.',
+                store_feature1:'Ultimatives Bypass-Tool', store_feature2:'Vollständiger Software-Zugang',
+                store_feature3:'Vollständig unentdeckt', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'24/7 Kundensupport', store_feature6:'6 Monate Software-Zugang',
+                store_btn:'Jetzt kaufen', team_btn:'Team'
+            },
+            fr: { flag:'🇫🇷', label:'FR',
+                nav_home:'Accueil', nav_pricing:'Tarifs', nav_status:'Statut', nav_discord:'Discord', nav_policy:'Politique', nav_signin:'Connexion',
+                login_brand_tag:'Bypass', login_title:'Bon retour', login_sub:'Connectez-vous avec Discord pour continuer',
+                login_btn_discord:'Se connecter avec Discord', login_or:'ou', login_email_label:'E-mail',
+                login_email_ph:'votre@email.com', login_pass_label:'Mot de passe', login_forgot:'Mot de passe oublié?',
+                login_btn_submit:'Se connecter', login_no_account:'Pas de compte?', login_create:'Créer un',
+                login_popup_store:'Voir la boutique', login_popup_signout:'Se déconnecter',
+                badge1:'Essayez Fuse!', badge2:'Meilleur du marché', badge3:'Approuvé mondialement',
+                hero_line1:'Vous ne pouvez pas arrêter', hero_line2:'ce que vous ne pouvez pas détecter.',
+                hero_btn_purchase:'Acheter', hero_btn_status:'Voir le statut',
+                games_label:'✦ JEUX SUPPORTÉS', games_available:'Disponible',
+                status_products_title:'Produits disponibles',
+                status_products_sub:'Produits actuellement disponibles & statut opérationnel de Fuse.',
+                status_live:'Statut en direct:',
+                product1_name:'Fuse Version Privée', product1_desc:'Solution Bypass Avancée - Version Privée',
+                product2_name:'Fuse Version Publique', product2_desc:'Solution Bypass Avancée - Version Publique',
+                badge_undetected:'INDÉTECTABLE', badge_coming_soon:'BIENTÔT',
+                scanner_title:'État du Scanner',
+                scanner_sub:'Statut de détection actuel des scanners. S\'applique à tous nos produits.',
+                store_1mo:'1 Mois d\'accès', store_6mo:'6 Mois d\'accès', store_private:'Version\nPrivée.',
+                store_feature1:'Outil Bypass Ultime', store_feature2:'Accès complet au logiciel',
+                store_feature3:'Totalement indétectable', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'Support client 24/7', store_feature6:'6 mois d\'accès logiciel',
+                store_btn:'Acheter maintenant', team_btn:'Équipe'
+            },
+            es: { flag:'🇪🇸', label:'ES',
+                nav_home:'Inicio', nav_pricing:'Precios', nav_status:'Estado', nav_discord:'Discord', nav_policy:'Política', nav_signin:'Iniciar sesión',
+                login_brand_tag:'Bypass', login_title:'Bienvenido de nuevo', login_sub:'Inicia sesión con Discord para continuar',
+                login_btn_discord:'Iniciar sesión con Discord', login_or:'o', login_email_label:'Correo',
+                login_email_ph:'tu@correo.com', login_pass_label:'Contraseña', login_forgot:'¿Olvidaste tu contraseña?',
+                login_btn_submit:'Iniciar sesión', login_no_account:'¿No tienes cuenta?', login_create:'Crear una',
+                login_popup_store:'Ver tienda', login_popup_signout:'Cerrar sesión',
+                badge1:'¡Prueba Fuse hoy!', badge2:'El mejor del mercado', badge3:'Confiado mundialmente',
+                hero_line1:'No puedes detener', hero_line2:'lo que no puedes detectar.',
+                hero_btn_purchase:'Comprar', hero_btn_status:'Ver estado',
+                games_label:'✦ JUEGOS COMPATIBLES', games_available:'Disponible',
+                status_products_title:'Productos disponibles',
+                status_products_sub:'Productos actualmente disponibles y estado operativo de Fuse.',
+                status_live:'Estado en vivo:',
+                product1_name:'Fuse Versión Privada', product1_desc:'Solución Bypass Avanzada - Versión Privada',
+                product2_name:'Fuse Versión Pública', product2_desc:'Solución Bypass Avanzada - Versión Pública',
+                badge_undetected:'INDETECTABLE', badge_coming_soon:'PRÓXIMAMENTE',
+                scanner_title:'Estado del Escáner',
+                scanner_sub:'Estado de detección actual de los escáneres. Se aplica a todos nuestros productos.',
+                store_1mo:'1 Mes de acceso', store_6mo:'6 Meses de acceso', store_private:'Versión\nPrivada.',
+                store_feature1:'Herramienta Bypass Definitiva', store_feature2:'Acceso completo al software',
+                store_feature3:'Totalmente indetectable', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'Soporte 24/7', store_feature6:'6 meses de acceso al software',
+                store_btn:'Comprar ahora', team_btn:'Equipo'
+            },
+            tr: { flag:'🇹🇷', label:'TR',
+                nav_home:'Ana Sayfa', nav_pricing:'Fiyatlar', nav_status:'Durum', nav_discord:'Discord', nav_policy:'Politika', nav_signin:'Giriş Yap',
+                login_brand_tag:'Bypass', login_title:'Tekrar Hoşgeldiniz', login_sub:'Devam etmek için Discord ile giriş yapın',
+                login_btn_discord:'Discord ile Giriş Yap', login_or:'veya', login_email_label:'E-posta',
+                login_email_ph:'senin@email.com', login_pass_label:'Şifre', login_forgot:'Şifremi unuttum?',
+                login_btn_submit:'Giriş Yap', login_no_account:'Hesabın yok mu?', login_create:'Oluştur',
+                login_popup_store:'Mağazayı Gör', login_popup_signout:'Çıkış Yap',
+                badge1:'Fuse\'u Dene!', badge2:'Piyasanın En İyisi', badge3:'Dünya Genelinde Güvenilir',
+                hero_line1:'Durduramayacaksın', hero_line2:'Tespit Edemediğini.',
+                hero_btn_purchase:'Satın Al', hero_btn_status:'Durumu Gör',
+                games_label:'✦ DESTEKLENEN OYUNLAR', games_available:'Mevcut',
+                status_products_title:'Mevcut Ürünler',
+                status_products_sub:'Şu anda mevcut ürünler ve Fuse\'un operasyonel durumu.',
+                status_live:'Canlı durum:',
+                product1_name:'Fuse Özel Sürüm', product1_desc:'Gelişmiş Bypass Çözümü - Özel Sürüm',
+                product2_name:'Fuse Genel Sürüm', product2_desc:'Gelişmiş Bypass Çözümü - Genel Sürüm',
+                badge_undetected:'TESPİT EDİLEMEZ', badge_coming_soon:'YAKINDA',
+                scanner_title:'Tarayıcı Durumu',
+                scanner_sub:'Tarayıcılardan güncel tespit durumu. Tüm ürünlerimiz için geçerlidir.',
+                store_1mo:'1 Aylık Erişim', store_6mo:'6 Aylık Erişim', store_private:'Özel\nSürüm.',
+                store_feature1:'Nihai Bypass Aracı', store_feature2:'Tam Yazılım Erişimi',
+                store_feature3:'Tamamen Tespit Edilemez', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'7/24 Müşteri Desteği', store_feature6:'6 Aylık Yazılım Erişimi',
+                store_btn:'Şimdi Satın Al', team_btn:'Ekip'
+            },
+            ru: { flag:'🇷🇺', label:'RU',
+                nav_home:'Главная', nav_pricing:'Цены', nav_status:'Статус', nav_discord:'Discord', nav_policy:'Политика', nav_signin:'Войти',
+                login_brand_tag:'Bypass', login_title:'С возвращением', login_sub:'Войдите через Discord чтобы продолжить',
+                login_btn_discord:'Войти через Discord', login_or:'или', login_email_label:'Эл. почта',
+                login_email_ph:'ваш@email.com', login_pass_label:'Пароль', login_forgot:'Забыли пароль?',
+                login_btn_submit:'Войти', login_no_account:'Нет аккаунта?', login_create:'Создать',
+                login_popup_store:'Открыть магазин', login_popup_signout:'Выйти',
+                badge1:'Попробуй Fuse!', badge2:'Лучший на рынке', badge3:'Доверяют по всему миру',
+                hero_line1:'Нельзя остановить', hero_line2:'то, что нельзя обнаружить.',
+                hero_btn_purchase:'Купить', hero_btn_status:'Смотреть статус',
+                games_label:'✦ ПОДДЕРЖИВАЕМЫЕ ИГРЫ', games_available:'Доступно',
+                status_products_title:'Доступные продукты',
+                status_products_sub:'Текущие доступные продукты и операционный статус Fuse.',
+                status_live:'Статус в реальном времени:',
+                product1_name:'Fuse Приватная версия', product1_desc:'Расширенное решение Bypass - Приватная версия',
+                product2_name:'Fuse Публичная версия', product2_desc:'Расширенное решение Bypass - Публичная версия',
+                badge_undetected:'НЕ ОБНАРУЖЕН', badge_coming_soon:'СКОРО',
+                scanner_title:'Состояние сканера',
+                scanner_sub:'Текущий статус обнаружения сканерами. Применяется ко всем нашим продуктам.',
+                store_1mo:'Доступ на 1 месяц', store_6mo:'Доступ на 6 месяцев', store_private:'Приватная\nверсия.',
+                store_feature1:'Лучший инструмент Bypass', store_feature2:'Полный доступ к ПО',
+                store_feature3:'Полностью необнаруживаемый', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'Поддержка 24/7', store_feature6:'6 месяцев доступа к ПО',
+                store_btn:'Купить сейчас', team_btn:'Команда'
+            },
+            ar: { flag:'🇸🇦', label:'AR',
+                nav_home:'الرئيسية', nav_pricing:'الأسعار', nav_status:'الحالة', nav_discord:'ديسكورد', nav_policy:'السياسة', nav_signin:'تسجيل الدخول',
+                login_brand_tag:'Bypass', login_title:'مرحباً بعودتك', login_sub:'سجل الدخول بديسكورد للمتابعة',
+                login_btn_discord:'تسجيل الدخول بديسكورد', login_or:'أو', login_email_label:'البريد الإلكتروني',
+                login_email_ph:'بريدك@email.com', login_pass_label:'كلمة المرور', login_forgot:'نسيت كلمة المرور؟',
+                login_btn_submit:'تسجيل الدخول', login_no_account:'ليس لديك حساب؟', login_create:'إنشاء حساب',
+                login_popup_store:'عرض المتجر', login_popup_signout:'تسجيل الخروج',
+                badge1:'جرب Fuse اليوم!', badge2:'الأفضل في السوق', badge3:'موثوق عالمياً',
+                hero_line1:'لا يمكنك إيقاف', hero_line2:'ما لا يمكنك اكتشافه.',
+                hero_btn_purchase:'شراء', hero_btn_status:'عرض الحالة',
+                games_label:'✦ الألعاب المدعومة', games_available:'متاح',
+                status_products_title:'المنتجات المتاحة',
+                status_products_sub:'المنتجات المتاحة حالياً وحالة تشغيل Fuse.',
+                status_live:'الحالة المباشرة:',
+                product1_name:'Fuse النسخة الخاصة', product1_desc:'حل Bypass متقدم - النسخة الخاصة',
+                product2_name:'Fuse النسخة العامة', product2_desc:'حل Bypass متقدم - النسخة العامة',
+                badge_undetected:'غير مكتشف', badge_coming_soon:'قريباً',
+                scanner_title:'حالة الماسح',
+                scanner_sub:'حالة الكشف الحالية من الماسحات. ينطبق على جميع منتجاتنا.',
+                store_1mo:'وصول لمدة شهر', store_6mo:'وصول لمدة 6 أشهر', store_private:'النسخة\nالخاصة.',
+                store_feature1:'أداة Bypass المثالية', store_feature2:'وصول كامل للبرنامج',
+                store_feature3:'غير قابل للكشف تماماً', store_feature4:'Fivem Bypasser Aura',
+                store_feature5:'دعم عملاء 24/7', store_feature6:'وصول للبرنامج لمدة 6 أشهر',
+                store_btn:'اشتر الآن', team_btn:'الفريق'
+            }
+        };
+
+        var currentLang = localStorage.getItem('fuse_lang') || 'en';
+
+        function setLang(lang) {
+            if (!LANGS[lang]) return;
+            currentLang = lang;
+            localStorage.setItem('fuse_lang', lang);
+            var t = LANGS[lang];
+
+            // Update selector UI
+            document.getElementById('lang-flag').textContent  = t.flag;
+            document.getElementById('lang-label').textContent = t.label;
+            document.getElementById('lang-dropdown').classList.remove('open');
+            document.querySelectorAll('.lang-opt').forEach(function(el) {
+                el.classList.toggle('active', el.dataset.lang === lang);
+            });
+
+            // RTL for Arabic
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Translate all data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n');
+                if (t[key] !== undefined) el.textContent = t[key];
+            });
+
+            // Translate placeholders
+            document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n-ph');
+                if (t[key] !== undefined) el.placeholder = t[key];
+            });
+
+            // ── Translate floating badges ──
+            var badges = document.querySelectorAll('.float-badge-text');
+            if (badges[0]) badges[0].textContent = t.badge1;
+            if (badges[1]) badges[1].textContent = t.badge2;
+            if (badges[2]) badges[2].textContent = t.badge3;
+
+            // ── Translate hero section ──
+            var heroSub = document.querySelector('.hero-sub');
+            if (heroSub) heroSub.innerHTML = t.hero_line1 + '<br>' + t.hero_line2;
+
+            var heroBtns = document.querySelectorAll('#page-home .btn-primary, #page-home .btn-ghost');
+            if (heroBtns[0]) heroBtns[0].textContent = t.hero_btn_purchase;
+            if (heroBtns[1]) heroBtns[1].textContent = t.hero_btn_status;
+
+            var gamesLabel = document.querySelector('.section-label');
+            if (gamesLabel) gamesLabel.textContent = t.games_label;
+
+            var gameStatus = document.querySelector('.game-status.available');
+            if (gameStatus) gameStatus.textContent = t.games_available;
+
+            // ── Translate status page ──
+            var el;
+            el = document.getElementById('status-products-title');
+            if (el) el.textContent = t.status_products_title;
+            el = document.getElementById('status-products-sub');
+            if (el) el.textContent = t.status_products_sub;
+            el = document.getElementById('status-live-label');
+            if (el) el.textContent = t.status_live;
+            el = document.getElementById('scanner-title');
+            if (el) el.textContent = t.scanner_title;
+            el = document.getElementById('scanner-sub');
+            if (el) el.textContent = t.scanner_sub;
+        }
+
+        // Apply saved language on load
+        setLang(currentLang);
+    </script>
     <script>
         // Page name → URL slug mapping
         const PAGE_SLUGS = {
