@@ -1234,6 +1234,132 @@
             </div>
         </div>
 
+    <!-- FAQ Section (home page only) -->
+    <style>
+        .faq-section {
+            width: 100%;
+            max-width: 760px;
+            padding: 4rem 2rem 5rem;
+            margin: 0 auto;
+        }
+        .faq-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.02em;
+        }
+        .faq-sub {
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+        .faq-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .faq-item:hover { border-color: rgba(255,255,255,0.14); }
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: left;
+            gap: 1rem;
+        }
+        .faq-question i {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            transition: transform 0.25s ease;
+        }
+        .faq-item.open .faq-question i { transform: rotate(180deg); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.25s ease;
+            padding: 0 1.5rem;
+            color: rgba(255,255,255,0.55);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 300px;
+            padding: 0 1.5rem 1.2rem;
+        }
+    </style>
+
+    <div class="faq-section" id="faq-home" style="position:relative;z-index:1;">
+        <h2 class="faq-title">Frequently Asked Questions</h2>
+        <p class="faq-sub">Still have questions? Ask them now</p>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                How does Fuse perform?
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">The development team knew their objective clearly: to make our software as stealthy as possible, prioritizing customer trust and safety — and they delivered. Fuse is loaded with various mechanisms to counteract those who try to limit us.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                Sounds interesting, can I get a free test license?
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">No.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                How much does the Fuse FiveM executor cost?
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">Check our pricing page for the latest plans and pricing. All plans include full software access, bypass utility, and instant delivery with no hidden fees.</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                How do I download and install Fuse?
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">If you are not a customer , fuck off</div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+                Can I use Fuse while streaming on Twitch or YouTube?
+                <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="faq-answer">Yes. Fuse includes a built-in stream-proof mode that hides the executor from all capture software including OBS, Streamlabs, and Discord screen share. You can stream safely.</div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(btn) {
+            var item = btn.closest('.faq-item');
+            var isOpen = item.classList.contains('open');
+            document.querySelectorAll('.faq-item.open').forEach(function(el) { el.classList.remove('open'); });
+            if (!isOpen) item.classList.add('open');
+        }
+    </script>
+
     </div><!-- end page-home -->
 
     <style>
