@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -86,33 +86,28 @@
 
         /* Pages fill the full viewport */
         .page {
-            display: none;
+            display: flex;
             width: 100%;
             min-height: 100vh;
             position: relative;
             z-index: 1;
-        }
-
-        .page.active {
-            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        #page-account.active {
-            height: 100vh;
-            overflow: hidden;
+        #page-account {
+            display: none;
         }
 
-        #page-home.active,
-        #page-tos.active,
-        #page-store.active,
-        #page-status.active {
+        #page-home,
+        #page-tos,
+        #page-store,
+        #page-status {
             align-items: flex-start;
-            overflow-y: auto;
+            overflow-y: visible;
         }
 
-        #page-home.active {
+        #page-home {
             flex-direction: column;
             align-items: center;
         }
@@ -1106,15 +1101,15 @@
 
             // Green bloom (corners) — bigger, like the reference
             var g1 = ctx.createRadialGradient(W * 0.08, H * 0.14, 0, W * 0.08, H * 0.14, Math.max(W, H) * 0.95);
-            g1.addColorStop(0, 'rgba(0,255,120,0.20)');
-            g1.addColorStop(0.35, 'rgba(0,220,95,0.10)');
+            g1.addColorStop(0, 'rgba(0,255,120,0.60)');
+            g1.addColorStop(0.35, 'rgba(0,220,95,0.25)');
             g1.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = g1;
             ctx.fillRect(0, 0, W, H);
 
             var g2 = ctx.createRadialGradient(W * 0.94, H * 0.90, 0, W * 0.94, H * 0.90, Math.max(W, H) * 0.98);
-            g2.addColorStop(0, 'rgba(0,255,120,0.18)');
-            g2.addColorStop(0.40, 'rgba(0,220,95,0.08)');
+            g2.addColorStop(0, 'rgba(0,255,120,0.60)');
+            g2.addColorStop(0.40, 'rgba(0,220,95,0.25)');
             g2.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = g2;
             ctx.fillRect(0, 0, W, H);
@@ -2467,12 +2462,17 @@
             
         };
 
+        const NAV_HEIGHT = 65;
+
         function navigateTo(target) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.querySelector(`.nav-item[data-page="${target}"]`)?.classList.add('active');
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + target)?.classList.add('active');
-            const slug = PAGE_SLUGS[target] || '/';
+            document.querySelector('.nav-item[data-page="' + target + '"]')?.classList.add('active');
+            const el = document.getElementById('page-' + target);
+            if (el) {
+                const top = el.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+            const slug = PAGE_SLUGS[target] || '/home';
             history.pushState({ page: target }, '', slug);
         }
 
@@ -2978,6 +2978,40 @@
     });
 })();
 </script>
+
+<!-- Footer -->
+<footer style="
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(0,200,80,0.15);
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1.4rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+">
+    <!-- Brand -->
+    <span style="font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-0.02em;">
+        <span style="color:#57df87;">fuse</span><span style="color:rgba(255,255,255,0.5);">bypass</span>
+    </span>
+
+    <!-- Links -->
+    <nav style="display:flex;align-items:center;gap:2rem;">
+        <a onclick="navigateTo('store');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#57df87'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Pricing</a>
+        <a onclick="navigateTo('tos');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#57df87'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Terms</a>
+        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#57df87'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Discord</a>
+    </nav>
+
+    <!-- Copyright -->
+    <span style="font-family:'DM Sans',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.25);">
+        &copy; 2026 Fusebypass. All rights reserved.
+    </span>
+</footer>
 
 </body>
 
