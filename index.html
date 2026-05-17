@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Roboto:wght@700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="./styles.css?v=2">
+    <link rel="stylesheet" href="./styles.css?v=3">
     <style>
         /* --- Design Tokens --------------------------------------- */
         :root {
@@ -85,18 +85,28 @@
         }
 
         /* Pages fill the full viewport */
+        /* ── Smooth page transitions ── */
         .page {
-            display: flex;
+            transition: none;
+        }
+        /* Force all pages visible — scroll-based layout */
+        .page, .page:not(.active) {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            display: flex !important;
+        }
+        #page-account {
+            display: none !important;
+        }
+
+        /* Pages fill the full viewport */
+        .page {
             width: 100%;
             min-height: 100vh;
             position: relative;
             z-index: 1;
             align-items: center;
             justify-content: center;
-        }
-
-        #page-account {
-            display: none;
         }
 
         #page-home,
