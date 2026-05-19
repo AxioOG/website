@@ -547,6 +547,7 @@
 
         .nav-item i {
             font-size: 0.95rem;
+            color: #ffffff;
             transition: transform 0.25s ease;
         }
 
@@ -2440,12 +2441,12 @@
     </script>
 
     <!-- -- Dock Navbar -- -->
-    <nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;justify-content:flex-end;gap:2rem;padding:18px 60px;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07);">
-        <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_home">Home</a>
-        <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_pricing">Pricing</a>
-        <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_status">Status</a>
-        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" class="nav-item" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_discord">Discord</a>
-        <a href="#" class="nav-item" data-page="tos" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;" data-i18n="nav_policy">Policy</a>
+    <nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;justify-content:flex-end;gap:2rem;padding:18px 60px;background:linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(8,45,25,0.95) 100%);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07);">
+        <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-house"></i><span class="label" data-i18n="nav_home">Home</span></a>
+        <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-cart-shopping"></i><span class="label" data-i18n="nav_pricing">Pricing</span></a>
+        <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-signal"></i><span class="label" data-i18n="nav_status">Status</span></a>
+        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" class="nav-item" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-brands fa-discord"></i><span class="label" data-i18n="nav_discord">Discord</span></a>
+        <a href="#" class="nav-item" data-page="tos" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-book"></i><span class="label" data-i18n="nav_policy">Policy</span></a>
     </nav>
 
     <iframe id="yt-player" src="" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
@@ -3018,7 +3019,7 @@
     </nav>
 
     <!-- Copyright -->
-    <span style="font-family:'DM Sans',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.25);">
+    <span style="font-family:'Montserrat',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.25);">
         &copy; 2026 Fusebypass. All rights reserved.
     </span>
 </footer>
