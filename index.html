@@ -16,7 +16,7 @@
         :root {
             --on: 0;
 
-            /* Lamp colours ï¿½ all driven by --on (0 = off, 1 = on) */
+            /* Lamp colours � all driven by --on (0 = off, 1 = on) */
             --opening: hsl(0, 0%, calc((18 + var(--on) * 68) * 1%));
             --base-top: hsl(0, 0%, calc((30 + var(--on) * 38) * 1%));
             --base-side: hsl(0, 0%, calc((15 + var(--on) * 35) * 1%));
@@ -31,7 +31,7 @@
             --cord-l: calc((38 + var(--on) * 52) * 1%);
 
             /* App palette */
-            --bg: #050f08;
+            --bg: #0f050f;
             --pm: #ffffff;
             --pg: #080808;
             --pb: #ffffff;
@@ -66,11 +66,12 @@
         /* --- Base ------------------------------------------------- */
         body {
             font-family: 'DM Sans', sans-serif;
-            background: #050606;
+            background: #0f050f;
+            color: #ffffff;
             min-height: 100vh;
         }
 
-        /* NOTE: Side “shadow bars” were caused by body::before/::after.
+        /* NOTE: Side �shadow bars� were caused by body::before/::after.
            We keep all shading inside the canvas instead for a cleaner look. */
         body::before,
         body::after { display: none; }
@@ -85,11 +86,11 @@
         }
 
         /* Pages fill the full viewport */
-        /* ── Smooth page transitions ── */
+        /* -- Smooth page transitions -- */
         .page {
             transition: none;
         }
-        /* Force all pages visible — scroll-based layout */
+        /* Force all pages visible � scroll-based layout */
         .page, .page:not(.active) {
             opacity: 1 !important;
             pointer-events: auto !important;
@@ -122,7 +123,7 @@
             align-items: center;
         }
 
-        /* Ambient room glow ï¿½ only visible on account page */
+        /* Ambient room glow � only visible on account page */
         #page-account::after {
             content: '';
             position: fixed;
@@ -165,7 +166,7 @@
             opacity: var(--on);
         }
 
-        /* SVG fill helpers ï¿½ resolved from CSS variables */
+        /* SVG fill helpers � resolved from CSS variables */
         .fill-opening {
             fill: var(--opening);
         }
@@ -404,7 +405,7 @@
             width: 100%;
             padding: 11px;
             background: linear-gradient(135deg, var(--pm), var(--pg));
-            color: #fff;
+            color: #110b14;
             font-family: 'Montserrat', sans-serif;
             font-size: .87rem;
             font-weight: 700;
@@ -415,7 +416,7 @@
             position: relative;
             overflow: hidden;
             transition: transform .18s, box-shadow .28s;
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 20px rgba(17, 11, 20, 0.10);
         }
 
         .btn-submit::after {
@@ -609,7 +610,7 @@
 
         .badge-undetected {
             background: rgba(0, 120, 40, 0.5);
-            color: #00ff66;
+            color: #36b43c;
             padding: 0.35rem 1rem;
             border-radius: 999px;
             font-size: 0.72rem;
@@ -761,14 +762,14 @@
             text-align: left;
             transition: background 0.15s, color 0.15s;
         }
-        .widget-dd-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+        .widget-dd-item:hover { background: rgba(252,128,233,0.10); color: #110b14; }
         .widget-dd-item i { width: 16px; text-align: center; }
-        .widget-dd-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 5px 0; }
+        .widget-dd-sep { height: 1px; background: rgba(252,128,233,0.12); margin: 5px 0; }
         .widget-dd-item.red { color: rgba(255,80,80,0.8); }
         .widget-dd-item.red:hover { background: rgba(255,50,50,0.1); color: #ff5555; }
 
         .nav-item:hover, .nav-item.active {
-            color: #57df87 !important;
+            color: rgba(252,128,233,0.75) !important;
         }
         #main-nav .nav-item {
             position: relative;
@@ -781,24 +782,24 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: #57df87;
+            background: rgba(252,128,233,0.45);
             transform: scaleX(0);
             transition: transform 0.2s ease;
             border-radius: 2px;
-            box-shadow: 0 0 8px #57df87;
+            box-shadow: 0 0 8px rgba(252,128,233,0.22);
         }
         #main-nav .nav-item:hover::after {
             transform: scaleX(1);
         }
         #main-nav .nav-item:hover {
-            color: #57df87 !important;
+            color: rgba(252,128,233,0.75) !important;
             background: none !important;
             box-shadow: none !important;
         }
 
-        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        /* ═══════════════════════════════════════════
            FANCY ENHANCEMENTS
-        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        ═══════════════════════════════════════════ */
 
         /* Hero title */
         .hero-title {
@@ -824,7 +825,7 @@
             line-height: 1.15;
             margin-bottom: 2.5rem;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #fff 30%, #57df87 100%);
+            background: linear-gradient(135deg, #fff 30%, #fc80e9 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -869,7 +870,7 @@
         /* Ghost button */
         .btn-ghost {
             padding: 13px 32px;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.08);
             color: #fff;
             font-family: 'Montserrat', sans-serif;
             font-weight: 800;
@@ -881,7 +882,7 @@
             transition: background 0.2s, border-color 0.2s, transform 0.18s;
             animation: fadeUp 0.7s 0.25s cubic-bezier(0.22,1,0.36,1) both;
         }
-        .btn-ghost:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); transform: translateY(-3px); }
+        .btn-ghost:hover { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.22); transform: translateY(-3px); }
         .btn-ghost:active { transform: scale(0.97); }
 
         /* Section label */
@@ -889,7 +890,7 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 0.7rem;
             font-weight: 700;
-            color: rgba(255,255,255,0.28);
+            color: rgba(17,11,20,0.45);
             letter-spacing: 0.18em;
             text-transform: uppercase;
             margin-bottom: 1.5rem;
@@ -912,7 +913,7 @@
             background: rgba(255,255,255,0.07) !important;
         }
 
-        /* Store pricing cards â€” enhanced */
+        /* Store pricing cards — enhanced */
         #page-store > div > div {
             transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
         }
@@ -922,7 +923,7 @@
             border-color: rgba(255,255,255,0.2) !important;
         }
 
-        /* Nav items â€” subtle glow on active */
+        /* Nav items — subtle glow on active */
         #main-nav .nav-item.active {
             color: #fff !important;
             text-shadow: 0 0 18px rgba(255,255,255,0.5);
@@ -934,7 +935,7 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-        /* â”€â”€ Games Ticker â”€â”€ */
+        /* ── Games Ticker ── */
         .games-ticker-wrap {
             width: 100%;
             padding: 0 0 4rem;
@@ -1037,9 +1038,9 @@
         }
         .game-status.available {
             background: rgba(0, 80, 30, 0.7);
-            color: #00ff66;
+            color: #2dd35f;
             border: 1px solid rgba(0, 150, 50, 0.6);
-            border: 1px solid rgba(0,200,80,0.3);
+            border: 1px solid rgba(252,128,233,0.3);
         }
         .game-status.soon {
             background: rgba(255,255,255,0.06);
@@ -1079,7 +1080,7 @@
                 boxes.push({
                     xN: r1[1], // normalized 0..1
                     yN: r2[1],
-                    // Larger, more “UI panel” like shapes
+                    // Larger, more �UI panel� like shapes
                     wN: 0.16 + r3[1] * 0.28,
                     hN: 0.10 + r4[1] * 0.22,
                     sp: 0.10 + r5[1] * 0.40,
@@ -1098,11 +1099,11 @@
             var W = canvas.width, H = canvas.height;
             ctx.clearRect(0, 0, W, H);
 
-            // Base: deep black with slight green tint (matches reference)
-            ctx.fillStyle = '#050606';
+            // Base: deep dark background for pink glow
+            ctx.fillStyle = '#0f050f';
             ctx.fillRect(0, 0, W, H);
 
-            // Grey haze (soft, center-left)
+            // Soft white haze (center-left)
             var haze = ctx.createRadialGradient(W * 0.33, H * 0.42, 0, W * 0.33, H * 0.42, Math.max(W, H) * 0.85);
             haze.addColorStop(0, 'rgba(255,255,255,0.06)');
             haze.addColorStop(0.35, 'rgba(255,255,255,0.03)');
@@ -1110,32 +1111,30 @@
             ctx.fillStyle = haze;
             ctx.fillRect(0, 0, W, H);
 
-            // Green bloom (corners) — bigger, like the reference
+            // Pink bloom (corners)
             var g1 = ctx.createRadialGradient(W * 0.08, H * 0.14, 0, W * 0.08, H * 0.14, Math.max(W, H) * 0.95);
-            g1.addColorStop(0, 'rgba(0,255,120,0.60)');
-            g1.addColorStop(0.35, 'rgba(0,220,95,0.25)');
-            g1.addColorStop(1, 'rgba(0,0,0,0)');
+            g1.addColorStop(0, 'rgba(252,128,233,0.45)');
+            g1.addColorStop(0.35, 'rgba(252,128,233,0.18)');
+            g1.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.fillStyle = g1;
             ctx.fillRect(0, 0, W, H);
 
             var g2 = ctx.createRadialGradient(W * 0.94, H * 0.90, 0, W * 0.94, H * 0.90, Math.max(W, H) * 0.98);
-            g2.addColorStop(0, 'rgba(0,255,120,0.60)');
-            g2.addColorStop(0.40, 'rgba(0,220,95,0.25)');
-            g2.addColorStop(1, 'rgba(0,0,0,0)');
+            g2.addColorStop(0, 'rgba(252,128,233,0.45)');
+            g2.addColorStop(0.40, 'rgba(252,128,233,0.18)');
+            g2.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.fillStyle = g2;
             ctx.fillRect(0, 0, W, H);
 
-            // Side-depth glows disabled while we debug “side shadows”
-
-            // Mid-page green glow (soft, subtle)
+            // Mid-page pink glow (soft, subtle)
             var g3 = ctx.createRadialGradient(W * 0.55, H * 0.40, 0, W * 0.55, H * 0.40, Math.max(W, H) * 0.62);
-            g3.addColorStop(0, 'rgba(0,255,120,0.09)');
-            g3.addColorStop(0.35, 'rgba(0,210,90,0.04)');
-            g3.addColorStop(1, 'rgba(0,0,0,0)');
+            g3.addColorStop(0, 'rgba(252,128,233,0.16)');
+            g3.addColorStop(0.35, 'rgba(252,128,233,0.08)');
+            g3.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.fillStyle = g3;
             ctx.fillRect(0, 0, W, H);
 
-            // Vignette disabled while we debug “side shadows”
+            
 
             // Animated background boxes (rounded rectangle outlines)
             ctx.save();
@@ -1159,7 +1158,7 @@
                 ctx.lineWidth = 1.25;
                 ctx.strokeStyle = 'rgba(210,210,210,' + (alpha * 0.62).toFixed(4) + ')';
                 ctx.shadowBlur = 22;
-                ctx.shadowColor = 'rgba(0,255,120,' + (alpha * 0.20).toFixed(4) + ')';
+                ctx.shadowColor = 'rgba(252,128,233,' + (alpha * 0.20).toFixed(4) + ')';
 
                 // small rounding keeps it crisp/modern
                 var r = Math.max(3, Math.min(12, Math.min(w, h) * 0.12));
@@ -1204,12 +1203,12 @@
 
 
 
-    <!-- â•â• Logo Intro â•â• -->
-    <div id="logo-intro" style="position:fixed;inset:0;background:#050606;z-index:99999;display:flex;align-items:center;justify-content:center;">
+    <!-- ══ Logo Intro ══ -->
+    <div id="logo-intro" style="position:fixed;inset:0;background:#ffffff;z-index:99999;display:flex;align-items:center;justify-content:center;">
         <div style="position:relative;width:70px;height:70px;">
             <svg style="position:absolute;inset:0;animation:spin 1.2s linear infinite;" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="35" cy="35" r="30" stroke="rgba(0,200,80,0.12)" stroke-width="3"/>
-                <path d="M35 5 A30 30 0 0 1 65 35" stroke="#00c850" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="35" cy="35" r="30" stroke="rgba(252,128,233,0.25)" stroke-width="3"/>
+                <path d="M35 5 A30 30 0 0 1 65 35" stroke="#f5d5ea" stroke-width="3" stroke-linecap="round"/>
             </svg>
         </div>
     </div>
@@ -1229,16 +1228,16 @@
 
     <!-- Top-left domain text -->
     <div style="position:fixed;top:16px;left:20px;z-index:9999;font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;line-height:1;">
-        <span style="color:#57df87;">fusebypass</span><span style="color:#ffffff;">.fun</span>
+        <span style="color:#ffffff;">fuse</span><span style="color:#ffffff;">bypass</span><span style="color:#fd99da;">.fun</span>
     </div>
 
     <!-- Team Dropdown (bottom-left) -->
-    <div style="position:fixed;bottom:24px;left:20px;z-index:9999;">
-        <button onclick="document.getElementById('team-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:8px 16px 8px 10px;cursor:pointer;color:#fff;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;transition:background 0.2s;">
-            <i class="fa fa-users" style="font-size:0.85rem;color:rgba(255,255,255,0.6);"></i> <span data-i18n="team_btn">Team</span>
-            <i class="fa fa-chevron-up" style="font-size:0.6rem;color:rgba(255,255,255,0.4);transition:transform 0.2s;" id="team-chevron"></i>
+    <div style="position:fixed;bottom:44px;left:20px;z-index:9999;">
+        <button onclick="document.getElementById('team-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;background:#0f050f;border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:8px 16px 8px 10px;cursor:pointer;color:#ffffff;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;transition:background 0.2s;">
+            <i class="fa fa-users" style="font-size:0.85rem;color:#ffffff;"></i> <span data-i18n="team_btn">Team</span>
+            <i class="fa fa-chevron-up" style="font-size:0.6rem;color:#ffffff;transition:transform 0.2s;" id="team-chevron"></i>
         </button>
-        <div id="team-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;background:rgba(12,12,12,0.97);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.8);">
+        <div id="team-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;background:#0f050f;border:1px solid rgba(255,255,255,0.16);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.35);">
             <div id="team-grid"></div>
         </div>
     </div>
@@ -1258,7 +1257,7 @@
             text-decoration: none;
             position: relative;
         }
-        .team-card:hover { background: rgba(255,255,255,0.07); }
+        .team-card:hover { background: rgba(252,128,233,0.10); }
         .team-avatar {
             width: 36px;
             height: 36px;
@@ -1331,7 +1330,7 @@
                 <button class="btn-discord" onclick="loginWithDiscord()"><i class="fab fa-discord"></i> <span data-i18n="login_btn_discord">Sign in with Discord</span></button>
                 <div class="divider-or"><div class="divider-line"></div><span class="divider-text" data-i18n="login_or">or</span><div class="divider-line"></div></div>
                 <div class="field"><label data-i18n="login_email_label">Email</label><div class="field-wrap"><i class="field-icon fas fa-envelope"></i><input type="email" data-i18n-ph="login_email_ph" placeholder="your@email.com"></div></div>
-                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
+                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="••••••••"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
                 <div class="forgot"><a href="#" data-i18n="login_forgot">Forgot password?</a></div>
                 <button class="btn-submit" data-i18n="login_btn_submit">Sign In</button>
                 <div class="signup"><span data-i18n="login_no_account">Don't have an account?</span> <a href="#" data-i18n="login_create">Create one</a></div>
@@ -1432,7 +1431,7 @@
                     <div class="home-scan-result-inner">
                         <div class="home-scan-result-check"><i class="fa-solid fa-check"></i></div>
                         <div class="home-scan-result-text">
-                            <div class="home-scan-result-title">SCAN COMPLETE — NOTHING FOUND</div>
+                            <div class="home-scan-result-title">SCAN COMPLETE � NOTHING FOUND</div>
                             <div id="home-scan-result-sub" class="home-scan-result-sub">System checks finished successfully.</div>
                         </div>
                     </div>
@@ -1468,7 +1467,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow:
                 0 18px 64px rgba(0, 0, 0, 0.75),
-                inset 0 0 0 1px rgba(0, 200, 80, 0.04);
+                inset 0 0 0 1px rgba(252, 128, 233, 0.08);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             overflow: hidden;
@@ -1477,7 +1476,7 @@
         .home-scan-topbar {
             height: 3px;
             width: 100%;
-            background: linear-gradient(90deg, rgba(0, 200, 80, 0.0), rgba(0, 200, 80, 1), rgba(0, 200, 80, 0.0));
+            background: linear-gradient(90deg, rgba(252, 128, 233, 0.0), rgba(252, 128, 233, 1), rgba(252, 128, 233, 0.0));
             opacity: 0.9;
         }
 
@@ -1615,10 +1614,10 @@
             color: rgba(255, 255, 255, 0.78);
         }
         .home-scan-step.is-done .home-scan-step-icon {
-            border-color: rgba(0, 200, 80, 0.45);
-            color: #00c850;
-            background: rgba(0, 200, 80, 0.10);
-            box-shadow: 0 0 16px rgba(0, 200, 80, 0.18);
+            border-color: rgba(252, 128, 233, 0.45);
+            color: #f5d5ea;
+            background: rgba(252, 128, 233, 0.10);
+            box-shadow: 0 0 16px rgba(252, 128, 233, 0.18);
         }
         .home-scan-step.is-pending {
             opacity: 0.55;
@@ -1631,9 +1630,9 @@
         }
         .home-scan-btn {
             width: min(320px, 100%);
-            border: 1px solid rgba(0, 200, 80, 0.34);
-            background: rgba(0, 200, 80, 0.14);
-            color: #bfffe0;
+            border: 1px solid rgba(252, 128, 233, 0.34);
+            background: rgba(252, 128, 233, 0.14);
+            color: #fff;
             font-family: 'Montserrat', sans-serif;
             font-size: 0.92rem;
             font-weight: 800;
@@ -1642,13 +1641,13 @@
             border-radius: 12px;
             cursor: pointer;
             transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
-            box-shadow: 0 0 0 rgba(0, 200, 80, 0.0);
+            box-shadow: 0 0 0 rgba(252, 128, 233, 0.0);
         }
         .home-scan-btn:hover {
             transform: translateY(-1px);
-            background: rgba(0, 200, 80, 0.18);
-            border-color: rgba(0, 200, 80, 0.55);
-            box-shadow: 0 0 28px rgba(0, 200, 80, 0.14);
+            background: rgba(252, 128, 233, 0.22);
+            border-color: rgba(252, 128, 233, 0.55);
+            box-shadow: 0 0 28px rgba(252, 128, 233, 0.18);
         }
         .home-scan-btn:disabled {
             opacity: 0.42;
@@ -1662,9 +1661,9 @@
         }
         .home-scan-result-inner {
             border-radius: 14px;
-            border: 1px solid rgba(0, 200, 80, 0.34);
-            background: rgba(0, 200, 80, 0.08);
-            box-shadow: 0 0 44px rgba(0, 200, 80, 0.12);
+            border: 1px solid rgba(252, 128, 233, 0.34);
+            background: rgba(252, 128, 233, 0.08);
+            box-shadow: 0 0 44px rgba(252, 128, 233, 0.12);
             padding: 16px 16px;
             display: flex;
             align-items: center;
@@ -1677,9 +1676,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 200, 80, 0.14);
-            border: 1px solid rgba(0, 200, 80, 0.45);
-            color: #00c850;
+            background: rgba(252, 128, 233, 0.14);
+            border: 1px solid rgba(252, 128, 233, 0.45);
+            color: #f5d5ea;
             flex-shrink: 0;
         }
         .home-scan-result-title {
@@ -1801,7 +1800,7 @@
                 How does Fuse perform?
                 <i class="fa fa-chevron-down"></i>
             </button>
-            <div class="faq-answer">The development team knew their objective clearly: to make our software as stealthy as possible, prioritizing customer trust and safety — and they delivered. Fuse is loaded with various mechanisms to counteract those who try to limit us.</div>
+            <div class="faq-answer">The development team knew their objective clearly: to make our software as stealthy as possible, prioritizing customer trust and safety � and they delivered. Fuse is loaded with various mechanisms to counteract those who try to limit us.</div>
         </div>
 
         <div class="faq-item">
@@ -1853,14 +1852,14 @@
             #team-grid { grid-template-columns: 1fr; }
         }
 
-        /* â”€â”€ Floating Badges â”€â”€ */
+        /* ── Floating Badges ── */
         .float-badge {
             position: absolute;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(135deg, rgba(0,40,15,0.95) 0%, rgba(0,25,10,0.98) 100%);
-            border: 1px solid rgba(0,200,80,0.25);
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 999px;
             padding: 10px 18px;
             color: rgba(255,255,255,0.85);
@@ -1868,18 +1867,18 @@
             font-size: 0.88rem;
             font-weight: 500;
             backdrop-filter: blur(12px);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,200,80,0.08);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.6), inset 0 0 30px rgba(255,255,255,0.04);
             white-space: nowrap;
             z-index: 2;
             pointer-events: none;
         }
         .float-badge-pill {
-            background: linear-gradient(135deg, rgba(0,40,15,0.95) 0%, rgba(0,25,10,0.98) 100%);
-            border: 1px solid rgba(0,200,80,0.25);
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: #fff;
             font-weight: 700;
             font-size: 0.92rem;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,200,80,0.08);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.6), inset 0 0 30px rgba(255,255,255,0.04);
         }
         .float-badge-icon {
             color: rgba(255,255,255,0.5);
@@ -1922,7 +1921,7 @@
     </style>
 
     <script>
-        // Hardcoded team data â€” no API dependency, always loads instantly
+        // Hardcoded team data — no API dependency, always loads instantly
         const TEAM_MEMBERS = [
             {
                 id: '838411101645045821',
@@ -1967,7 +1966,7 @@
                         <div class="team-name">${m.name}</div>
                         <div class="team-role">${m.role}</div>
                     </div>
-                    <span class="team-arrow">â†—</span>
+                    <span class="team-arrow">↗</span>
                 </a>
             `).join('');
         }
@@ -2031,7 +2030,7 @@
                         <div style="color:rgba(255,255,255,0.4); font-size:0.85rem;">Advanced Bypass Solution - Public Version</div>
                     </div>
                 </div>
-                <span style="background:rgba(0, 200, 80, 0.2); color:#00c850; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">COMING SOON</span>
+                <span style="background:rgba(252, 128, 233, 0.18); color:#fff; padding:0.4rem 1rem; border-radius:999px; font-size:0.75rem; font-weight:700; letter-spacing:1px; white-space:nowrap;">COMING SOON</span>
             </div>
 
             <!-- Scanner Status -->
@@ -2041,7 +2040,7 @@
             <!-- Scanner list + Radar side by side -->
             <div style="display:flex; gap:2rem; align-items:flex-start;">
 
-                <!-- Scanner list â€” original full width style -->
+                <!-- Scanner list — original full width style -->
                 <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
                     <div class="scanner-row">
                         <div style="display:flex; align-items:center; gap:1rem;">
@@ -2097,7 +2096,7 @@
                 <!-- Radar circle -->
                 <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0; padding-top:0.5rem; overflow:hidden;">
                     <canvas id="radarCanvas" width="260" height="260" style="border-radius:50%; display:block; max-width:260px;"></canvas>
-                    <div id="radarLabel" style="margin-top:1.2rem; font-family:'Courier New',monospace; font-size:0.8rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#00c850; text-shadow:0 0 10px rgba(0,200,80,0.7); min-height:1.2em; text-align:center;">&nbsp;</div>
+                    <div id="radarLabel" style="margin-top:1.2rem; font-family:'Courier New',monospace; font-size:0.8rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#f5d5ea; text-shadow:0 0 10px rgba(252,128,233,0.35); min-height:1.2em; text-align:center;">&nbsp;</div>
                 </div>
 
             </div>
@@ -2133,23 +2132,23 @@
                 <!-- Features -->
                 <ul style="list-style:none; display:flex; flex-direction:column; gap:0.85rem; margin-bottom:2rem;">
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Ultimate Bypass Utility
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Full Software Access
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Fully Undetected
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Fivem Bypasser Aura
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         24/7 Client Support
                     </li>
                 </ul>
@@ -2195,23 +2194,23 @@
 
                 <ul style="list-style:none; display:flex; flex-direction:column; gap:0.85rem; margin-bottom:2rem;">
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Ultimate Bypass Utility
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         6 Months Software Access
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Fully Undetected
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         Fivem Bypasser Aura
                     </li>
                     <li style="display:flex; align-items:center; gap:0.75rem; color:rgba(255,255,255,0.75); font-size:0.95rem;">
-                        <i class="fa fa-check" style="color:#57df87;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
+                        <i class="fa fa-check" style="color:#f5d5ea;font-size:1rem;flex-shrink:0;width:18px;text-align:center;"></i>
                         24/7 Client Support
                     </li>
                 </ul>
@@ -2441,7 +2440,7 @@
     </script>
 
     <!-- -- Dock Navbar -- -->
-    <nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;justify-content:flex-end;gap:2rem;padding:18px 60px;background:linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(8,45,25,0.95) 100%);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;justify-content:flex-end;gap:2rem;padding:18px 60px;background:linear-gradient(135deg, rgba(30, 5, 35, 0.95) 0%, rgba(90, 15, 95, 0.95) 100%);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(252,128,233,0.18);">
         <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-house"></i><span class="label" data-i18n="nav_home">Home</span></a>
         <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-cart-shopping"></i><span class="label" data-i18n="nav_pricing">Pricing</span></a>
         <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-signal"></i><span class="label" data-i18n="nav_status">Status</span></a>
@@ -2462,7 +2461,7 @@
         document.addEventListener('touchstart', startBackgroundMusic, { once: true });
     </script>
     <script>
-        // Page name â†’ URL slug mapping
+        // Page name → URL slug mapping
         const PAGE_SLUGS = {
             
             home:    '/home',
@@ -2503,7 +2502,7 @@
 
         // On load, read the URL and activate the right page
         (function () {
-            // Check for redirect from 404.html â€” restore path and hash
+            // Check for redirect from 404.html — restore path and hash
             const params = new URLSearchParams(window.location.search);
             const redirectedPath = params.get('p');
             const redirectedHash = params.get('h');
@@ -2668,7 +2667,7 @@
             ctx.fillRect(0,0,W,H);
 
             // grid
-            ctx.strokeStyle='rgba(0,200,80,0.06)';
+            ctx.strokeStyle='rgba(252,128,233,0.06)';
             ctx.lineWidth=1;
             for(var i=1;i<=14;i++){
                 ctx.beginPath();ctx.moveTo(i*20,0);ctx.lineTo(i*20,H);ctx.stroke();
@@ -2676,13 +2675,13 @@
             }
 
             // rings
-            ctx.strokeStyle='rgba(0,200,80,0.12)';
+            ctx.strokeStyle='rgba(252,128,233,0.12)';
             [0.28,0.52,0.76,1.0].forEach(function(f){
                 ctx.beginPath();ctx.arc(cx,cy,R*f,0,Math.PI*2);ctx.stroke();
             });
 
             // crosshairs
-            ctx.strokeStyle='rgba(0,200,80,0.09)';
+            ctx.strokeStyle='rgba(252,128,233,0.09)';
             ctx.beginPath();ctx.moveTo(cx,cy-R);ctx.lineTo(cx,cy+R);ctx.stroke();
             ctx.beginPath();ctx.moveTo(cx-R,cy);ctx.lineTo(cx+R,cy);ctx.stroke();
 
@@ -2695,7 +2694,7 @@
                 ctx.moveTo(cx,cy);
                 ctx.arc(cx,cy,R,a,a+trail/50);
                 ctx.closePath();
-                ctx.fillStyle='rgba(0,200,80,'+alpha+')';
+                ctx.fillStyle='rgba(252,128,233,'+alpha+')';
                 ctx.fill();
             }
 
@@ -2703,7 +2702,7 @@
             ctx.beginPath();
             ctx.moveTo(cx,cy);
             ctx.lineTo(cx+Math.cos(angle)*R, cy+Math.sin(angle)*R);
-            ctx.strokeStyle='rgba(0,255,100,0.85)';
+            ctx.strokeStyle='rgba(252,128,233,0.60)';
             ctx.lineWidth=1.5;
             ctx.stroke();
 
@@ -2714,14 +2713,14 @@
                 var fade = diff<trail?(1-diff/trail):0;
                 if(fade>0){
                     var g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,10);
-                    g.addColorStop(0,'rgba(0,255,80,'+(0.9*fade)+')');
-                    g.addColorStop(1,'rgba(0,255,80,0)');
+                    g.addColorStop(0,'rgba(252,128,233,'+(0.9*fade)+')');
+                    g.addColorStop(1,'rgba(252,128,233,0)');
                     ctx.beginPath();ctx.arc(b.x,b.y,10,0,Math.PI*2);
                     ctx.fillStyle=g;ctx.fill();
                     ctx.beginPath();ctx.arc(b.x,b.y,3,0,Math.PI*2);
-                    ctx.fillStyle='rgba(0,255,80,'+fade+')';ctx.fill();
+                    ctx.fillStyle='rgba(252,128,233,'+fade+')';ctx.fill();
                     ctx.beginPath();ctx.arc(b.x,b.y,7,0,Math.PI*2);
-                    ctx.strokeStyle='rgba(0,255,80,'+(0.5*fade)+')';
+                    ctx.strokeStyle='rgba(252,128,233,'+(0.5*fade)+')';
                     ctx.lineWidth=1;ctx.stroke();
                 }
             });
@@ -2730,7 +2729,7 @@
 
             // border
             ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
-            ctx.strokeStyle='rgba(0,200,80,0.2)';ctx.lineWidth=1.5;ctx.stroke();
+            ctx.strokeStyle='rgba(252,128,233,0.2)';ctx.lineWidth=1.5;ctx.stroke();
 
             // trigger label on each full rotation
             var fa = angle%(Math.PI*2);
@@ -2995,7 +2994,7 @@
     width: 100%;
     position: relative;
     z-index: 1;
-    border-top: 1px solid rgba(0,200,80,0.15);
+    border-top: 1px solid rgba(252,128,233,0.15);
     background: rgba(0,0,0,0.35);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -3008,14 +3007,14 @@
 ">
     <!-- Brand -->
     <span style="font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-0.02em;">
-        <span style="color:#57df87;">fuse</span><span style="color:rgba(255,255,255,0.5);">bypass</span>
+        <span style="color:#fd99da;">fuse</span><span style="color:rgba(255, 255, 255, 0.65);">bypass</span>
     </span>
 
     <!-- Links -->
     <nav style="display:flex;align-items:center;gap:2rem;">
-        <a onclick="navigateTo('store');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#57df87'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Pricing</a>
-        <a onclick="navigateTo('tos');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#57df87'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Terms</a>
-        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.45);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#57df87'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">Discord</a>
+        <a onclick="navigateTo('store');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255, 255, 255, 0.65);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#f5d5ea'" onmouseout="this.style.color='rgba(17,11,20,0.65)'">Pricing</a>
+        <a onclick="navigateTo('tos');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(253, 253, 253, 0.65);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#f5d5ea'" onmouseout="this.style.color='rgba(17,11,20,0.65)'">Terms</a>
+        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255, 255, 255, 0.65);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#f5d5ea'" onmouseout="this.style.color='rgba(17,11,20,0.65)'">Discord</a>
     </nav>
 
     <!-- Copyright -->
@@ -3029,3 +3028,7 @@
 
 </html>
 </html>
+
+
+
+
