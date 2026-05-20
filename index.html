@@ -5,12 +5,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fuse - Advanced Hiding Utility</title>
-    <link rel="icon" type="image/png" href="./images/fuselanobg.png?v=2" sizes="64x64">
+    <link rel="icon" type="image/png" href="./images/fuseggbw.png" sizes="64x64">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&family=Orbitron:wght@700;900&family=Press+Start+2P&family=Roboto:wght@700;900&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="./styles.css?v=3">
+    <link rel="stylesheet" href="./styles.css?v=4">
     <style>
         /* --- Design Tokens --------------------------------------- */
         :root {
@@ -31,7 +31,7 @@
             --cord-l: calc((38 + var(--on) * 52) * 1%);
 
             /* App palette */
-            --bg: #0f050f;
+            --bg: #000000;
             --pm: #ffffff;
             --pg: #080808;
             --pb: #ffffff;
@@ -66,7 +66,7 @@
         /* --- Base ------------------------------------------------- */
         body {
             font-family: 'DM Sans', sans-serif;
-            background: #0f050f;
+            background: #000000;
             color: #ffffff;
             min-height: 100vh;
         }
@@ -496,14 +496,12 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            background: rgba(10, 10, 10, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            border: none;
             border-radius: 999px;
             padding: 8px 14px;
             z-index: 9998;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05);
+            box-shadow: none;
         }
 
         .logo-sphere {
@@ -768,8 +766,14 @@
         .widget-dd-item.red { color: rgba(255,80,80,0.8); }
         .widget-dd-item.red:hover { background: rgba(255,50,50,0.1); color: #ff5555; }
 
-        .nav-item:hover, .nav-item.active {
-            color: rgba(252,128,233,0.75) !important;
+        #main-nav .nav-item:hover {
+            color: #ffffff !important;
+            background: none !important;
+            box-shadow: none !important;
+        }
+        #main-nav .nav-item:hover i,
+        #main-nav .nav-item:hover .label {
+            color: #ffffff !important;
         }
         #main-nav .nav-item {
             position: relative;
@@ -782,19 +786,14 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background: rgba(252,128,233,0.45);
+            background: rgba(255, 255, 255, 0.65);
             transform: scaleX(0);
             transition: transform 0.2s ease;
             border-radius: 2px;
-            box-shadow: 0 0 8px rgba(252,128,233,0.22);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
         }
         #main-nav .nav-item:hover::after {
             transform: scaleX(1);
-        }
-        #main-nav .nav-item:hover {
-            color: rgba(252,128,233,0.75) !important;
-            background: none !important;
-            box-shadow: none !important;
         }
 
         /* ═══════════════════════════════════════════
@@ -890,7 +889,7 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 0.7rem;
             font-weight: 700;
-            color: rgba(17,11,20,0.45);
+            color: rgba(253, 253, 253, 0.45);
             letter-spacing: 0.18em;
             text-transform: uppercase;
             margin-bottom: 1.5rem;
@@ -1048,6 +1047,282 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
+        /* Purchase checkout modal */
+        .purchase-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .purchase-overlay.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .purchase-panel {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            max-height: 88vh;
+            overflow-y: auto;
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 1.25rem 1.15rem 1.1rem;
+            box-shadow:
+                0 32px 80px rgba(0, 0, 0, 0.9),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transform: translateY(16px) scale(0.97);
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .purchase-overlay.is-open .purchase-panel {
+            transform: translateY(0) scale(1);
+        }
+        .purchase-panel::-webkit-scrollbar { width: 4px; }
+        .purchase-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+        .purchase-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .purchase-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .purchase-eyebrow {
+            display: inline-block;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 0.5rem;
+        }
+        .purchase-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.15rem;
+            padding-right: 1.75rem;
+        }
+        .purchase-subtitle {
+            font-family: 'Roboto', monospace;
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.55);
+            margin-bottom: 0.9rem;
+        }
+        .purchase-method {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.55rem 0.7rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            margin-bottom: 0.85rem;
+        }
+        .purchase-method i {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .purchase-method-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.35);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+        .purchase-method-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .purchase-section-head {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(245, 213, 234, 0.85);
+            margin-bottom: 0.45rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .purchase-section-head i { font-size: 0.6rem; opacity: 0.7; }
+        .purchase-note-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-bottom: 0.75rem;
+        }
+        .purchase-note-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.45rem;
+            padding: 0.45rem 0.55rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 7px;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.35;
+        }
+        .purchase-note-item i {
+            color: rgba(245, 213, 234, 0.6);
+            font-size: 0.55rem;
+            margin-top: 0.35rem;
+            flex-shrink: 0;
+        }
+        .purchase-note-item strong { color: #fff; font-weight: 600; }
+        .purchase-warn {
+            padding: 0.65rem 0.7rem 0.55rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 0.85rem;
+        }
+        .purchase-warn-head {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(245, 213, 234, 0.9);
+            margin-bottom: 0.5rem;
+        }
+        .purchase-warn ol {
+            list-style: none;
+            counter-reset: purchase-warn;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .purchase-warn li {
+            counter-increment: purchase-warn;
+            font-size: 0.68rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.5;
+            padding-left: 1.35rem;
+            position: relative;
+        }
+        .purchase-warn li::before {
+            content: counter(purchase-warn);
+            position: absolute;
+            left: 0;
+            top: 0.05em;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: rgba(245, 213, 234, 0.55);
+        }
+        .purchase-warn li em {
+            font-style: normal;
+            color: rgba(255, 255, 255, 0.82);
+        }
+        .purchase-actions {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 0.5rem;
+            margin-bottom: 0.65rem;
+        }
+        .purchase-btn-cancel {
+            padding: 0.6rem 0.65rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.65);
+            font-family: 'Syne', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .purchase-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+        .purchase-btn-pay {
+            padding: 0.6rem 0.5rem;
+            border-radius: 8px;
+            border: none;
+            background: #fff;
+            color: #000;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+        }
+        .purchase-btn-pay:hover {
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 8px 28px rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+        .purchase-btn-pay:active { transform: translateY(0); }
+        .purchase-help {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.45);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .purchase-help:hover {
+            background: rgba(88, 101, 242, 0.12);
+            border-color: rgba(88, 101, 242, 0.35);
+            color: #fff;
+        }
+        .purchase-help i { color: #5865F2; font-size: 0.95rem; }
+
     </style>
 </head>
 
@@ -1099,46 +1374,28 @@
             var W = canvas.width, H = canvas.height;
             ctx.clearRect(0, 0, W, H);
 
-            // Base: deep dark background for pink glow
-            ctx.fillStyle = '#0f050f';
+            // Base: pure black
+            ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, W, H);
 
-            // Soft white haze (center-left)
-            var haze = ctx.createRadialGradient(W * 0.33, H * 0.42, 0, W * 0.33, H * 0.42, Math.max(W, H) * 0.85);
-            haze.addColorStop(0, 'rgba(255,255,255,0.06)');
-            haze.addColorStop(0.35, 'rgba(255,255,255,0.03)');
-            haze.addColorStop(0.75, 'rgba(255,255,255,0.00)');
-            ctx.fillStyle = haze;
-            ctx.fillRect(0, 0, W, H);
-
-            // Pink bloom (corners)
+            // Barely-there corner blooms
             var g1 = ctx.createRadialGradient(W * 0.08, H * 0.14, 0, W * 0.08, H * 0.14, Math.max(W, H) * 0.95);
-            g1.addColorStop(0, 'rgba(252,128,233,0.45)');
-            g1.addColorStop(0.35, 'rgba(252,128,233,0.18)');
-            g1.addColorStop(1, 'rgba(255,255,255,0)');
+            g1.addColorStop(0, 'rgba(255,255,255,0.04)');
+            g1.addColorStop(0.35, 'rgba(255,255,255,0.012)');
+            g1.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = g1;
             ctx.fillRect(0, 0, W, H);
 
             var g2 = ctx.createRadialGradient(W * 0.94, H * 0.90, 0, W * 0.94, H * 0.90, Math.max(W, H) * 0.98);
-            g2.addColorStop(0, 'rgba(252,128,233,0.45)');
-            g2.addColorStop(0.40, 'rgba(252,128,233,0.18)');
-            g2.addColorStop(1, 'rgba(255,255,255,0)');
+            g2.addColorStop(0, 'rgba(255,255,255,0.04)');
+            g2.addColorStop(0.40, 'rgba(255,255,255,0.012)');
+            g2.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = g2;
             ctx.fillRect(0, 0, W, H);
 
-            // Mid-page pink glow (soft, subtle)
-            var g3 = ctx.createRadialGradient(W * 0.55, H * 0.40, 0, W * 0.55, H * 0.40, Math.max(W, H) * 0.62);
-            g3.addColorStop(0, 'rgba(252,128,233,0.16)');
-            g3.addColorStop(0.35, 'rgba(252,128,233,0.08)');
-            g3.addColorStop(1, 'rgba(255,255,255,0)');
-            ctx.fillStyle = g3;
-            ctx.fillRect(0, 0, W, H);
-
-            
-
             // Animated background boxes (rounded rectangle outlines)
             ctx.save();
-            ctx.globalCompositeOperation = 'screen';
+            ctx.globalCompositeOperation = 'source-over';
             for (var i = 0; i < boxes.length; i++) {
                 var b = boxes[i];
                 var driftX = Math.sin(t * 0.001 * b.sp + b.ph) * (W * 0.010);
@@ -1155,10 +1412,10 @@
                 if (y > H + h) y -= H + h * 2;
 
                 var alpha = b.a * (0.70 + 0.30 * Math.sin(t * 0.0012 + b.ph));
-                ctx.lineWidth = 1.25;
-                ctx.strokeStyle = 'rgba(210,210,210,' + (alpha * 0.62).toFixed(4) + ')';
-                ctx.shadowBlur = 22;
-                ctx.shadowColor = 'rgba(252,128,233,' + (alpha * 0.20).toFixed(4) + ')';
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(255,255,255,' + (alpha * 0.18).toFixed(4) + ')';
+                ctx.shadowBlur = 0;
+                ctx.shadowColor = 'transparent';
 
                 // small rounding keeps it crisp/modern
                 var r = Math.max(3, Math.min(12, Math.min(w, h) * 0.12));
@@ -1178,7 +1435,7 @@
             // Micro grid (very faint, slow drift)
             var size = 72;
             var off = (t * 0.012) % size;
-            ctx.strokeStyle = 'rgba(255,255,255,0.028)';
+            ctx.strokeStyle = 'rgba(255,255,255,0.012)';
             ctx.lineWidth = 1;
             ctx.beginPath();
             for (var gx = off; gx < W; gx += size) {
@@ -1204,40 +1461,165 @@
 
 
     <!-- ══ Logo Intro ══ -->
-    <div id="logo-intro" style="position:fixed;inset:0;background:#ffffff;z-index:99999;display:flex;align-items:center;justify-content:center;">
-        <div style="position:relative;width:70px;height:70px;">
-            <svg style="position:absolute;inset:0;animation:spin 1.2s linear infinite;" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="35" cy="35" r="30" stroke="rgba(252,128,233,0.25)" stroke-width="3"/>
-                <path d="M35 5 A30 30 0 0 1 65 35" stroke="#f5d5ea" stroke-width="3" stroke-linecap="round"/>
-            </svg>
+    <div id="logo-intro" class="logo-intro" role="status" aria-live="polite" aria-label="Loading site">
+        <div class="logo-intro-vignette" aria-hidden="true"></div>
+        <div class="logo-intro-inner">
+            <img class="logo-intro-icon" src="./images/fusegg.png" alt="Fuse" width="64" height="64" />
+            <div class="logo-intro-brand">
+                <span class="logo-intro-fuse">fuse</span><span class="logo-intro-bypass">bypass</span>
+            </div>
+            <div class="logo-intro-spinner" aria-hidden="true">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.1)" stroke-width="2.5"/>
+                    <path d="M24 4 A20 20 0 0 1 44 24" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <p class="logo-intro-status" id="logo-intro-status">Initializing</p>
         </div>
+        <div class="logo-intro-bar" aria-hidden="true"><div class="logo-intro-bar-fill"></div></div>
     </div>
 
     <style>
-        @keyframes spin { to { transform: rotate(360deg); } }
-        #logo-intro.fade-out { animation: fadeOutIntro 0.6s ease forwards; }
-        @keyframes fadeOutIntro { to { opacity: 0; pointer-events: none; } }
+        .logo-intro {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-intro-vignette {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 42%, rgba(255, 255, 255, 0.06) 0%, transparent 65%),
+                radial-gradient(ellipse 100% 80% at 50% 100%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .logo-intro-inner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.1rem;
+            animation: logoIntroIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes logoIntroIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo-intro-icon {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            opacity: 0.95;
+            filter: drop-shadow(0 0 28px rgba(255, 255, 255, 0.14));
+        }
+        .logo-intro-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+        .logo-intro-fuse { color: #ffffff; }
+        .logo-intro-bypass { color: rgba(255, 255, 255, 0.45); }
+        .logo-intro-spinner {
+            width: 36px;
+            height: 36px;
+            animation: logoIntroSpin 0.9s linear infinite;
+        }
+        .logo-intro-spinner svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        @keyframes logoIntroSpin { to { transform: rotate(360deg); } }
+        .logo-intro-status {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            margin: 0;
+        }
+        .logo-intro-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .logo-intro-bar-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.9));
+            animation: logoIntroProgress 1.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes logoIntroProgress { to { width: 100%; } }
+        #logo-intro.fade-out {
+            animation: fadeOutIntro 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        #logo-intro.fade-out .logo-intro-inner {
+            animation: logoIntroOut 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes fadeOutIntro {
+            to { opacity: 0; pointer-events: none; }
+        }
+        @keyframes logoIntroOut {
+            to { opacity: 0; transform: translateY(-6px) scale(0.98); }
+        }
     </style>
     <script>
-        setTimeout(function() {
+        (function () {
             var intro = document.getElementById('logo-intro');
-            intro.classList.add('fade-out');
-            setTimeout(function() { intro.remove(); }, 650);
-        }, 1500);
+            var statusEl = document.getElementById('logo-intro-status');
+            var messages = ['Initializing', 'Loading assets', 'Almost ready'];
+            var msgIdx = 0;
+            var msgTimer = setInterval(function () {
+                msgIdx = (msgIdx + 1) % messages.length;
+                if (statusEl) statusEl.textContent = messages[msgIdx] + '…';
+            }, 520);
+
+            function dismiss() {
+                clearInterval(msgTimer);
+                if (!intro) return;
+                intro.classList.add('fade-out');
+                setTimeout(function () { intro.remove(); }, 720);
+            }
+
+            var minMs = 1650;
+            var start = Date.now();
+            function scheduleDismiss() {
+                var wait = Math.max(0, minMs - (Date.now() - start));
+                setTimeout(dismiss, wait);
+            }
+
+            if (document.readyState === 'complete') {
+                scheduleDismiss();
+            } else {
+                window.addEventListener('load', scheduleDismiss);
+                setTimeout(scheduleDismiss, minMs + 800);
+            }
+        })();
     </script>
 
     <!-- Top-left domain text -->
     <div style="position:fixed;top:16px;left:20px;z-index:9999;font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;line-height:1;">
-        <span style="color:#ffffff;">fuse</span><span style="color:#ffffff;">bypass</span><span style="color:#fd99da;">.fun</span>
+        <span style="color:#ffffff;">fuse</span><span style="color:#ffffff;">bypass</span><span style="color:#ffffff;">.fun</span>
     </div>
 
     <!-- Team Dropdown (bottom-left) -->
     <div style="position:fixed;bottom:44px;left:20px;z-index:9999;">
-        <button onclick="document.getElementById('team-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;background:#0f050f;border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:8px 16px 8px 10px;cursor:pointer;color:#ffffff;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;transition:background 0.2s;">
+        <button onclick="document.getElementById('team-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;background:#000000;border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:8px 16px 8px 10px;cursor:pointer;color:#ffffff;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;transition:background 0.2s;">
             <i class="fa fa-users" style="font-size:0.85rem;color:#ffffff;"></i> <span data-i18n="team_btn">Team</span>
             <i class="fa fa-chevron-up" style="font-size:0.6rem;color:#ffffff;transition:transform 0.2s;" id="team-chevron"></i>
         </button>
-        <div id="team-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;background:#0f050f;border:1px solid rgba(255,255,255,0.16);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.35);">
+        <div id="team-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;background:#000000;border:1px solid rgba(255,255,255,0.16);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.35);">
             <div id="team-grid"></div>
         </div>
     </div>
@@ -1467,7 +1849,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow:
                 0 18px 64px rgba(0, 0, 0, 0.75),
-                inset 0 0 0 1px rgba(252, 128, 233, 0.08);
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             overflow: hidden;
@@ -1476,7 +1858,7 @@
         .home-scan-topbar {
             height: 3px;
             width: 100%;
-            background: linear-gradient(90deg, rgba(252, 128, 233, 0.0), rgba(252, 128, 233, 1), rgba(252, 128, 233, 0.0));
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.0));
             opacity: 0.9;
         }
 
@@ -1614,10 +1996,10 @@
             color: rgba(255, 255, 255, 0.78);
         }
         .home-scan-step.is-done .home-scan-step-icon {
-            border-color: rgba(252, 128, 233, 0.45);
-            color: #f5d5ea;
-            background: rgba(252, 128, 233, 0.10);
-            box-shadow: 0 0 16px rgba(252, 128, 233, 0.18);
+            border-color: rgba(255, 255, 255, 0.45);
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.10);
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.18);
         }
         .home-scan-step.is-pending {
             opacity: 0.55;
@@ -1630,8 +2012,8 @@
         }
         .home-scan-btn {
             width: min(320px, 100%);
-            border: 1px solid rgba(252, 128, 233, 0.34);
-            background: rgba(252, 128, 233, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.14);
             color: #fff;
             font-family: 'Montserrat', sans-serif;
             font-size: 0.92rem;
@@ -1641,13 +2023,13 @@
             border-radius: 12px;
             cursor: pointer;
             transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
-            box-shadow: 0 0 0 rgba(252, 128, 233, 0.0);
+            box-shadow: 0 0 0 rgba(255, 255, 255, 0.0);
         }
         .home-scan-btn:hover {
             transform: translateY(-1px);
-            background: rgba(252, 128, 233, 0.22);
-            border-color: rgba(252, 128, 233, 0.55);
-            box-shadow: 0 0 28px rgba(252, 128, 233, 0.18);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.55);
+            box-shadow: 0 0 28px rgba(255, 255, 255, 0.18);
         }
         .home-scan-btn:disabled {
             opacity: 0.42;
@@ -1661,9 +2043,9 @@
         }
         .home-scan-result-inner {
             border-radius: 14px;
-            border: 1px solid rgba(252, 128, 233, 0.34);
-            background: rgba(252, 128, 233, 0.08);
-            box-shadow: 0 0 44px rgba(252, 128, 233, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 44px rgba(255, 255, 255, 0.12);
             padding: 16px 16px;
             display: flex;
             align-items: center;
@@ -1676,9 +2058,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(252, 128, 233, 0.14);
-            border: 1px solid rgba(252, 128, 233, 0.45);
-            color: #f5d5ea;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: #ffffff;
             flex-shrink: 0;
         }
         .home-scan-result-title {
@@ -2154,7 +2536,7 @@
                 </ul>
 
                 <!-- Button -->
-                <button onclick="window.open('https://discord.gg/yVUxWkrPT9','_blank')" style="
+                <button type="button" onclick="openPurchaseModal('lifetime')" style="
                     width:100%;
                     padding:14px;
                     background:#1a1a1a;
@@ -2215,7 +2597,7 @@
                     </li>
                 </ul>
 
-                <button onclick="window.open('https://discord.gg/yVUxWkrPT9','_blank')" style="
+                <button type="button" onclick="openPurchaseModal('sixmonths')" style="
                     width:100%;
                     padding:14px;
                     background:#1a1a1a;
@@ -2233,6 +2615,65 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Purchase checkout modal -->
+    <div id="purchase-modal" class="purchase-overlay" aria-hidden="true" role="presentation">
+        <div class="purchase-panel" role="dialog" aria-modal="true" aria-labelledby="purchase-title">
+            <button type="button" class="purchase-close" onclick="closePurchaseModal()" aria-label="Close checkout"><i class="fa-solid fa-xmark"></i></button>
+            <span class="purchase-eyebrow">Secure checkout</span>
+            <h2 class="purchase-title" id="purchase-title">Lifetime Access</h2>
+            <p class="purchase-subtitle" id="purchase-subtitle">120€ · lifetime</p>
+
+            <div class="purchase-method">
+                <i class="fa-brands fa-paypal" aria-hidden="true"></i>
+                <div>
+                    <span class="purchase-method-label">Payment method</span>
+                    <span class="purchase-method-value">PayPal · Friends &amp; Family</span>
+                </div>
+            </div>
+
+            <p class="purchase-section-head"><i class="fa-solid fa-chevron-right"></i> Add to your payment note</p>
+            <ul class="purchase-note-list">
+                <li class="purchase-note-item">
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span>Your <strong>Discord username</strong> (e.g. user#1234)</span>
+                </li>
+                <li class="purchase-note-item">
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span>The <strong>email</strong> linked to your account</span>
+                </li>
+                <li class="purchase-note-item" id="purchase-note-plan">
+                    <i class="fa-solid fa-chevron-right"></i>
+                    <span>Plan: <strong>Lifetime Access</strong></span>
+                </li>
+            </ul>
+
+            <div class="purchase-warn">
+                <div class="purchase-warn-head">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    Before you pay
+                </div>
+                <ol>
+                    <li>Send as <em>Friends &amp; Family</em> only — goods &amp; services payments may be delayed or declined.</li>
+                    <li>Include all note details above or activation can take up to <em>24 hours</em>.</li>
+                    <li>License delivery is manual — you'll receive access after payment is verified.</li>
+                    <li>All sales are <em>final</em>. No refunds for bans, downtime, or compatibility issues.</li>
+                    <li>Need help? Open a ticket on Discord before paying if anything is unclear.</li>
+                </ol>
+            </div>
+
+            <div class="purchase-actions">
+                <button type="button" class="purchase-btn-cancel" onclick="closePurchaseModal()">Cancel</button>
+                <a class="purchase-btn-pay" id="purchase-pay-btn" href="https://paypal.me/moikanjr/120" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-brands fa-paypal"></i> PayPal
+                </a>
+            </div>
+            <a class="purchase-help" href="https://discord.gg/yVUxWkrPT9" target="_blank" rel="noopener noreferrer">
+                <i class="fa-brands fa-discord"></i>
+                Questions? Join our Discord
+            </a>
         </div>
     </div>
 
@@ -2440,7 +2881,7 @@
     </script>
 
     <!-- -- Dock Navbar -- -->
-    <nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;justify-content:flex-end;gap:2rem;padding:18px 60px;background:linear-gradient(135deg, rgba(30, 5, 35, 0.95) 0%, rgba(90, 15, 95, 0.95) 100%);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(252,128,233,0.18);">
+    <nav id="main-nav" style="position:fixed;top:0;left:0;right:0;z-index:9998;display:flex;align-items:center;justify-content:flex-end;gap:2rem;padding:18px 60px;">
         <a href="#" class="nav-item active" data-page="home" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-house"></i><span class="label" data-i18n="nav_home">Home</span></a>
         <a href="#" class="nav-item" data-page="store" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-cart-shopping"></i><span class="label" data-i18n="nav_pricing">Pricing</span></a>
         <a href="#" class="nav-item" data-page="status" style="color:rgba(255,255,255,0.7);text-decoration:none;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;transition:color 0.2s;"><i class="fa-solid fa-signal"></i><span class="label" data-i18n="nav_status">Status</span></a>
@@ -2451,6 +2892,57 @@
     <iframe id="yt-player" src="" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
 
     <script>
+        var PURCHASE_PLANS = {
+            lifetime: {
+                name: 'Lifetime Access',
+                price: '120',
+                period: 'lifetime',
+                paypal: 'https://paypal.me/moikanjr/120'
+            },
+            sixmonths: {
+                name: '6 Months Access',
+                price: '80',
+                period: '6 months',
+                paypal: 'https://paypal.me/moikanjr/80'
+            }
+        };
+        var _activePurchasePlan = null;
+
+        function openPurchaseModal(planId) {
+            var plan = PURCHASE_PLANS[planId];
+            if (!plan) return;
+            _activePurchasePlan = planId;
+            document.getElementById('purchase-title').textContent = plan.name;
+            document.getElementById('purchase-subtitle').textContent = plan.price + '€ · ' + plan.period;
+            document.getElementById('purchase-note-plan').innerHTML =
+                '<i class="fa-solid fa-chevron-right"></i><span>Plan: <strong>' + plan.name + '</strong></span>';
+            var payBtn = document.getElementById('purchase-pay-btn');
+            if (payBtn) payBtn.href = plan.paypal;
+            var overlay = document.getElementById('purchase-modal');
+            overlay.classList.add('is-open');
+            overlay.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePurchaseModal() {
+            var overlay = document.getElementById('purchase-modal');
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            _activePurchasePlan = null;
+        }
+
+        document.querySelector('.purchase-panel').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+        document.getElementById('purchase-modal').addEventListener('click', function(e) {
+            if (e.target === this) closePurchaseModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('purchase-modal').classList.contains('is-open')) {
+                closePurchaseModal();
+            }
+        });
 
         function startBackgroundMusic() {
             var ytFrame = document.getElementById('yt-player');
@@ -2681,7 +3173,7 @@
             });
 
             // crosshairs
-            ctx.strokeStyle='rgba(252,128,233,0.09)';
+            ctx.strokeStyle='rgba(252,128,233,0.02)';
             ctx.beginPath();ctx.moveTo(cx,cy-R);ctx.lineTo(cx,cy+R);ctx.stroke();
             ctx.beginPath();ctx.moveTo(cx-R,cy);ctx.lineTo(cx+R,cy);ctx.stroke();
 
@@ -2702,7 +3194,7 @@
             ctx.beginPath();
             ctx.moveTo(cx,cy);
             ctx.lineTo(cx+Math.cos(angle)*R, cy+Math.sin(angle)*R);
-            ctx.strokeStyle='rgba(252,128,233,0.60)';
+            ctx.strokeStyle='rgba(252,128,233,0.20)';
             ctx.lineWidth=1.5;
             ctx.stroke();
 
@@ -2990,44 +3482,62 @@
 </script>
 
 <!-- Footer -->
-<footer style="
-    width: 100%;
-    position: relative;
-    z-index: 1;
-    border-top: 1px solid rgba(252,128,233,0.15);
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 1.4rem 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-">
-    <!-- Brand -->
-    <span style="font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-0.02em;">
-        <span style="color:#fd99da;">fuse</span><span style="color:rgba(255, 255, 255, 0.65);">bypass</span>
-    </span>
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-top">
+            <div class="footer-brand-block">
+                <div class="footer-logo">
+                    <span class="footer-logo-fuse">fuse</span><span class="footer-logo-bypass">bypass</span>
+                </div>
+                <p class="footer-tagline">Advanced hiding utility for Windows. Community support and updates on Discord.</p>
+            </div>
+            <div class="footer-actions">
+                <nav class="footer-nav" aria-label="Footer">
+                    <a href="#" onclick="navigateTo('store');return false;">Pricing</a>
+                    <a href="#" onclick="navigateTo('status');return false;">Status</a>
+                    <a href="#" onclick="navigateTo('tos');return false;">Terms</a>
+                </nav>
+                <a class="footer-discord-btn" href="https://discord.gg/fuse" target="_blank" rel="noopener noreferrer" aria-label="Join Fuse Discord server">
+                    <i class="fab fa-discord" aria-hidden="true"></i>
+                    <span class="footer-discord-copy">
+                        <span class="footer-discord-label">Community</span>
+                        <span class="footer-discord-members" id="footer-discord-members">Loading members…</span>
+                    </span>
+                </a>
+            </div>
+        </div>
+        <hr class="footer-rule" />
+        <div class="footer-bottom">
 
-    <!-- Links -->
-    <nav style="display:flex;align-items:center;gap:2rem;">
-        <a onclick="navigateTo('store');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255, 255, 255, 0.65);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#f5d5ea'" onmouseout="this.style.color='rgba(17,11,20,0.65)'">Pricing</a>
-        <a onclick="navigateTo('tos');return false;" href="#" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(253, 253, 253, 0.65);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#f5d5ea'" onmouseout="this.style.color='rgba(17,11,20,0.65)'">Terms</a>
-        <a href="https://discord.gg/yVUxWkrPT9" target="_blank" style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:rgba(255, 255, 255, 0.65);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#f5d5ea'" onmouseout="this.style.color='rgba(17,11,20,0.65)'">Discord</a>
-    </nav>
-
-    <!-- Copyright -->
-    <span style="font-family:'Montserrat',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.25);">
-        &copy; 2026 Fusebypass. All rights reserved.
-    </span>
+            <p class="footer-copyright">&copy; 2026 Fusebypass. All rights reserved.</p>
+        </div>
+    </div>
 </footer>
+<script>
+(function () {
+    var el = document.getElementById('footer-discord-members');
+    if (!el) return;
+    fetch('https://discord.com/api/v10/invites/fuse?with_counts=true')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (data) {
+            var n = data.approximate_member_count;
+            if (typeof n === 'number') {
+                el.textContent = n.toLocaleString() + ' members';
+            } else {
+                el.textContent = 'Join on Discord';
+            }
+        })
+        .catch(function () {
+            el.textContent = 'Join on Discord';
+        });
+})();
+</script>
 
 </body>
 
+</html>
 
-</html>
-</html>
+
 
 
 
