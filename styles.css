@@ -49,8 +49,8 @@
 
 /* ── Glow pulse on active nav item ── */
 @keyframes navGlow {
-  0%, 100% { text-shadow: 0 0 8px rgba(87,223,135,0.3); }
-  50%       { text-shadow: 0 0 22px rgba(87,223,135,0.7), 0 0 40px rgba(87,223,135,0.2); }
+  0%, 100% { text-shadow: 0 0 8px rgba(252,128,233,0.3); }
+  50%       { text-shadow: 0 0 22px rgba(252,128,233,0.7), 0 0 40px rgba(252,128,233,0.2); }
 }
 #main-nav .nav-item.active {
   animation: navGlow 3s ease-in-out infinite;
@@ -84,8 +84,8 @@
   background: linear-gradient(
     135deg,
     #ffffff 0%,
-    #57df87 60%,
-    #57df87 100%
+    #fc80e9 60%,
+    #fc80e9 100%
   ) !important;
   background-size: 300% 300% !important;
   -webkit-background-clip: text !important;
