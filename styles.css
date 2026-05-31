@@ -1,4 +1,4 @@
-﻿.lamp {
+.lamp {
   height: 46vmin;
   min-height: 300px;
   max-height: 420px;
@@ -47,14 +47,7 @@
   animation: shimmer 2.8s linear infinite;
 }
 
-/* ── Glow pulse on active nav item ── */
-@keyframes navGlow {
-  0%, 100% { text-shadow: 0 0 8px rgba(252,128,233,0.3); }
-  50%       { text-shadow: 0 0 22px rgba(252,128,233,0.7), 0 0 40px rgba(252,128,233,0.2); }
-}
-#main-nav .nav-item.active {
-  animation: navGlow 3s ease-in-out infinite;
-}
+/* ── Minimal nav — indicator handled in index.html ── */
 
 /* ── Floating badge entrance animation ── */
 @keyframes badgeEntrance {
@@ -84,8 +77,8 @@
   background: linear-gradient(
     135deg,
     #ffffff 0%,
-    #e6e5e5 60%,
-    #ffffff 100%
+    #703f44 60%,
+    #d30000 100%
   ) !important;
   background-size: 300% 300% !important;
   -webkit-background-clip: text !important;
