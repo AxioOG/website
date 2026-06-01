@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -255,6 +255,10 @@
         }
         const DISCORD_REDIRECT = getDiscordRedirect();
         const GUILD_ID = '1305642236880617482';
+        // Server role IDs (update these to match your Discord server)
+        const ROLE_ADMIN1 = '1471974431579574538';
+        const ROLE_ADMIN2 = '1482165881315524688';
+        const ROLE_CUSTOMER = '1489330191498084413';
         const TOKEN_KEY = 'fuse_token';
         const PENDING_KEY = 'fuse_pending_token';
 
@@ -271,22 +275,52 @@
         }
 
         function getRoleLabel(roles) {
-            if (!roles) return 'visitor';
-            if (roles.indexOf('1471974431579574538') > -1 || roles.indexOf('1482165881315524688') > -1) return 'admin';
-            if (roles.indexOf('1489330191498084413') > -1) return 'customer';
-            return 'member';
+            if (!roles || !Array.isArray(roles) || roles.length === 0) return 'Nothing';
+            // If any admin role is present -> web admin
+            if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+            // Customer role
+            if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
+            // Default mapped web role when user has other roles
+            return 'Nothing';
         }
 
         function showLoggedIn(user, roles) {
             const name = user.global_name || user.username || 'Discord user';
             const tag = user.username ? '@' + user.username : 'No Discord tag available';
+            const webRole = getRoleLabel(roles);
+
+            // Persist web role and token-related flags
+            localStorage.setItem('fuse_user', JSON.stringify(user));
+            localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
+            localStorage.setItem('fuse_web_role', webRole);
+            localStorage.setItem('fuse_is_admin', webRole === 'admin' ? '1' : '0');
+
             userNameEl.textContent = `Welcome, ${name}`;
             userTagEl.textContent = tag;
-            userStatusEl.textContent = `Discord authorized · Role: ${getRoleLabel(roles)}`;
+            userStatusEl.textContent = `Discord authorized · Web role: ${webRole}`;
             copyEl.textContent = 'You are authorized and ready to use the dashboard.';
             infoEl.classList.remove('hidden');
             connectBtn.textContent = 'Refresh connection';
             setStatus('Connected successfully.');
+
+            // Show admin affordance when applicable
+            const existingBadge = document.getElementById('admin-badge');
+            if (webRole === 'admin') {
+                if (!existingBadge) {
+                    const b = document.createElement('div');
+                    b.id = 'admin-badge';
+                    b.style.marginTop = '16px';
+                    b.style.padding = '12px 14px';
+                    b.style.background = 'linear-gradient(90deg,#2b2b2b,#1f1f1f)';
+                    b.style.border = '1px solid rgba(255,255,255,0.06)';
+                    b.style.borderRadius = '12px';
+                    b.style.color = '#dfe7ff';
+                    b.innerHTML = '<strong>Admin</strong> · You have administrative access on this site.';
+                    infoEl.parentNode.insertBefore(b, infoEl.nextSibling);
+                }
+            } else {
+                if (existingBadge) existingBadge.remove();
+            }
         }
 
         function showLoggedOut() {
