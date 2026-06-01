@@ -211,6 +211,56 @@
             font-size: 0.85rem;
         }
 
+        .admin-panel {
+            margin-top: 18px;
+            padding: 14px;
+            background: linear-gradient(180deg, rgba(88,101,242,0.06), rgba(0,0,0,0.02));
+            border: 1px solid rgba(88,101,242,0.08);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .signout-button {
+            margin-top: 12px;
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .debug-panel {
+            margin-top: 18px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.72);
+        }
+
+        .dashboard-main {
+            display: none;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        .dashboard-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        .dashboard-welcome {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+        }
+
         .info-card h2 {
             margin: 0 0 8px;
             font-size: 1rem;
@@ -251,6 +301,20 @@
             <h1 class="panel-title">Fuse Dashboard</h1>
             <p class="panel-copy" id="dashboard-copy">Connect your Discord account to access the dashboard and manage your settings.</p>
             <button class="btn-discord" id="dashboard-connect-btn"><span>Connect with Discord</span></button>
+            <button class="signout-button" id="dashboard-signout-btn" style="display:none">Sign Out</button>
+
+            <div class="admin-panel" id="admin-panel">
+                <strong>Admin Panel</strong>
+                <p style="margin:8px 0 0;color:rgba(255,255,255,0.75)">Admin-only controls go here.</p>
+                <div style="margin-top:10px">
+                    <button class="nav-button" id="admin-users-btn">Manage Users</button>
+                </div>
+            </div>
+
+            <div class="debug-panel" id="debug-panel">
+                <button class="nav-button" id="debug-load-btn">Load stored user</button>
+                <pre id="debug-output" style="margin-top:8px;display:none;background:rgba(0,0,0,0.3);padding:8px;border-radius:6px;overflow:auto;max-height:140px;"></pre>
+            </div>
 
             <div class="dashboard-info hidden" id="dashboard-info">
                 <div class="info-card">
@@ -271,6 +335,35 @@
             </div>
 
             <p class="status-line" id="dashboard-status">Not connected yet.</p>
+        </section>
+        
+        <!-- Full dashboard content shown after login -->
+        <section id="dashboard-main" class="dashboard-main">
+            <div class="dashboard-card">
+                <div style="display:flex;align-items:center;gap:14px;">
+                    <img id="main-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" style="width:84px;height:84px;border-radius:12px;border:1px solid rgba(255,255,255,0.06)">
+                    <div>
+                        <div id="main-name" class="dashboard-welcome">Welcome</div>
+                        <div id="main-tag" style="color:rgba(255,255,255,0.72)"></div>
+                        <div id="main-role" class="user-role" style="margin-top:8px;display:inline-block"></div>
+                    </div>
+                </div>
+                <div style="margin-top:12px">
+                    <button class="signout-button" id="main-signout">Sign Out</button>
+                </div>
+                <div id="main-roles-list" style="margin-top:12px;color:rgba(255,255,255,0.72);display:none"></div>
+            </div>
+
+            <div>
+                <div class="dashboard-card" id="main-content">
+                    <h2 style="margin-top:0">Dashboard</h2>
+                    <p style="color:rgba(255,255,255,0.72)">Here are your dashboard controls and information.</p>
+                    <div id="admin-area" style="margin-top:16px;display:none">
+                        <h3>Admin Controls</h3>
+                        <p style="color:rgba(255,255,255,0.72)">Admin-only functionality appears here.</p>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -371,8 +464,42 @@
                     b.innerHTML = '<strong>Admin</strong> · You have administrative access on this site.';
                     infoEl.parentNode.insertBefore(b, infoEl.nextSibling);
                 }
+                // Show admin panel and main dashboard
+                const adminPanel = document.getElementById('admin-panel');
+                if (adminPanel) adminPanel.style.display = 'block';
+                const dashboardPanel = document.querySelector('.dashboard-panel');
+                if (dashboardPanel) dashboardPanel.style.display = 'none';
+                const dashboardMain = document.getElementById('dashboard-main');
+                if (dashboardMain) dashboardMain.style.display = 'grid';
+                // populate main area
+                const mainAvatar = document.getElementById('main-avatar');
+                const mainName = document.getElementById('main-name');
+                const mainTag = document.getElementById('main-tag');
+                const mainRole = document.getElementById('main-role');
+                const mainRolesList = document.getElementById('main-roles-list');
+                if (mainAvatar) mainAvatar.src = getAvatarUrl(user);
+                if (mainName) mainName.textContent = name;
+                if (mainTag) mainTag.textContent = tag;
+                if (mainRole) mainRole.textContent = webRole;
+                if (mainRolesList) { mainRolesList.style.display = (roles && roles.length) ? 'block' : 'none'; mainRolesList.textContent = 'Server roles: ' + (roles && roles.length ? roles.join(', ') : 'none'); }
+                // show admin-only content
+                const adminArea = document.getElementById('admin-area');
+                if (adminArea) adminArea.style.display = 'block';
+                // show signout buttons
+                const signout = document.getElementById('dashboard-signout-btn');
+                if (signout) signout.style.display = 'inline-block';
+                const mainSignout = document.getElementById('main-signout');
+                if (mainSignout) mainSignout.style.display = 'inline-block';
             } else {
                 if (existingBadge) existingBadge.remove();
+                const adminPanel = document.getElementById('admin-panel');
+                if (adminPanel) adminPanel.style.display = 'none';
+                const dashboardPanel = document.querySelector('.dashboard-panel');
+                if (dashboardPanel) dashboardPanel.style.display = '';
+                const dashboardMain = document.getElementById('dashboard-main');
+                if (dashboardMain) dashboardMain.style.display = 'none';
+                const signout = document.getElementById('dashboard-signout-btn');
+                if (signout) signout.style.display = 'inline-block';
             }
         }
 
@@ -389,6 +516,16 @@
             if (rolesListEl) rolesListEl.style.display = 'none';
             const existingBadge = document.getElementById('admin-badge');
             if (existingBadge) existingBadge.remove();
+            const adminPanel = document.getElementById('admin-panel');
+            if (adminPanel) adminPanel.style.display = 'none';
+            const signout = document.getElementById('dashboard-signout-btn');
+            if (signout) signout.style.display = 'none';
+            const dashboardPanel = document.querySelector('.dashboard-panel');
+            if (dashboardPanel) dashboardPanel.style.display = '';
+            const dashboardMain = document.getElementById('dashboard-main');
+            if (dashboardMain) dashboardMain.style.display = 'none';
+            const debugOutput = document.getElementById('debug-output');
+            if (debugOutput) { debugOutput.style.display = 'none'; debugOutput.textContent = ''; }
         }
 
         function parseHashToken() {
@@ -444,7 +581,36 @@
             }
         }
 
+        function signOut() {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(PENDING_KEY);
+            localStorage.removeItem('fuse_user');
+            localStorage.removeItem('fuse_roles');
+            localStorage.removeItem('fuse_web_role');
+            localStorage.removeItem('fuse_is_admin');
+            showLoggedOut();
+        }
+
+        function loadStoredUser() {
+            const out = document.getElementById('debug-output');
+            const u = localStorage.getItem('fuse_user');
+            const r = localStorage.getItem('fuse_roles');
+            const wr = localStorage.getItem('fuse_web_role');
+            const isAdmin = localStorage.getItem('fuse_is_admin');
+            const token = localStorage.getItem(TOKEN_KEY);
+            const lines = [];
+            lines.push('token: ' + (token ? 'present' : 'none'));
+            lines.push('fuse_user: ' + (u || 'null'));
+            lines.push('fuse_roles: ' + (r || 'null'));
+            lines.push('fuse_web_role: ' + (wr || 'null'));
+            lines.push('fuse_is_admin: ' + (isAdmin || '0'));
+            if (out) { out.style.display = 'block'; out.textContent = lines.join('\n\n'); }
+        }
+
         connectBtn.addEventListener('click', loginWithDiscord);
+        document.getElementById('dashboard-signout-btn')?.addEventListener('click', signOut);
+        document.getElementById('debug-load-btn')?.addEventListener('click', loadStoredUser);
+        document.getElementById('admin-users-btn')?.addEventListener('click', function(){ alert('Manage users (placeholder)'); });
 
         (function init() {
             const tokenFromHash = parseHashToken();
