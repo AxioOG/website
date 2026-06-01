@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fuse Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #000000;
+            --surface: rgba(255, 255, 255, 0.06);
+            --surface-strong: rgba(255, 255, 255, 0.12);
+            --border: rgba(255, 255, 255, 0.14);
+            --text: #ffffff;
+            --muted: rgba(255, 255, 255, 0.72);
+            --accent: #4a76fd;
+            --accent-strong: #5865F2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+            background: radial-gradient(circle at 12% 18%, rgba(74, 118, 253, 0.16), transparent 16%),
+                        linear-gradient(180deg, #050505 0%, #080808 42%, #09090a 100%);
+            color: var(--text);
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.06), transparent 18%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.84);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 10;
+        }
+
+        .nav-brand {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .nav-brand-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-transform: lowercase;
+            color: var(--text);
+        }
+
+        .nav-brand-fuse {
+            color: var(--accent);
+        }
+
+        .nav-brand-bypass {
+            color: #ffffff;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-button {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: background 0.2s, transform 0.18s;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 24px 36px;
+        }
+
+        .dashboard-panel {
+            width: min(560px, 100%);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 36px 90px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(24px);
+        }
+
+        .panel-title {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 3vw, 2.6rem);
+            line-height: 1.05;
+            font-weight: 800;
+        }
+
+        .panel-copy {
+            margin: 0 0 28px;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .btn-discord {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 18px;
+            background: var(--accent-strong);
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: transform 0.18s, background 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-discord:hover {
+            background: #4752c4;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 30px rgba(71, 82, 196, 0.28);
+        }
+
+        .status-line {
+            margin-top: 22px;
+            font-size: 0.94rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        .dashboard-info {
+            margin-top: 30px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .info-card h2 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .info-card p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.72);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-panel {
+                padding: 28px 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="main-nav">
+        <a href="/" class="nav-brand" aria-label="Fuse home">
+            <span class="nav-brand-text"><span class="nav-brand-fuse">fuse</span><span class="nav-brand-bypass">bypass</span></span>
+        </a>
+        <div class="nav-actions">
+            <button class="nav-button" onclick="window.location.href='/'">Home</button>
+        </div>
+    </header>
+
+    <main class="page-wrap">
+        <section class="dashboard-panel">
+            <h1 class="panel-title">Fuse Dashboard</h1>
+            <p class="panel-copy" id="dashboard-copy">Connect your Discord account to access the dashboard and manage your settings.</p>
+            <button class="btn-discord" id="dashboard-connect-btn"><span>Connect with Discord</span></button>
+
+            <div class="dashboard-info hidden" id="dashboard-info">
+                <div class="info-card">
+                    <h2 id="user-name">Welcome back!</h2>
+                    <p id="user-tag">Your Discord tag will appear here after login.</p>
+                </div>
+                <div class="info-card">
+                    <h2>Connection status</h2>
+                    <p id="user-status">Authorized successfully. Use the dashboard features below.</p>
+                </div>
+            </div>
+
+            <p class="status-line" id="dashboard-status">Not connected yet.</p>
+        </section>
+    </main>
+
+    <script>
+        const DISCORD_CLIENT_ID = '1460340695578575041';
+        function getDiscordRedirect() {
+            const path = window.location.pathname;
+            if (path.indexOf('/web/') === 0) {
+                return window.location.origin + path.replace(/\/[^\/]*$/, '/dashboard.html');
+            }
+            if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+                return window.location.origin + '/dashboard.html';
+            }
+            return window.location.origin + '/dashboard';
+        }
+        const DISCORD_REDIRECT = getDiscordRedirect();
+        const GUILD_ID = '1305642236880617482';
+        const TOKEN_KEY = 'fuse_token';
+        const PENDING_KEY = 'fuse_pending_token';
+
+        const statusEl = document.getElementById('dashboard-status');
+        const copyEl = document.getElementById('dashboard-copy');
+        const connectBtn = document.getElementById('dashboard-connect-btn');
+        const infoEl = document.getElementById('dashboard-info');
+        const userNameEl = document.getElementById('user-name');
+        const userTagEl = document.getElementById('user-tag');
+        const userStatusEl = document.getElementById('user-status');
+
+        function setStatus(message) {
+            statusEl.textContent = message;
+        }
+
+        function getRoleLabel(roles) {
+            if (!roles) return 'visitor';
+            if (roles.indexOf('1471974431579574538') > -1 || roles.indexOf('1482165881315524688') > -1) return 'admin';
+            if (roles.indexOf('1489330191498084413') > -1) return 'customer';
+            return 'member';
+        }
+
+        function showLoggedIn(user, roles) {
+            const name = user.global_name || user.username || 'Discord user';
+            const tag = user.username ? '@' + user.username : 'No Discord tag available';
+            userNameEl.textContent = `Welcome, ${name}`;
+            userTagEl.textContent = tag;
+            userStatusEl.textContent = `Discord authorized · Role: ${getRoleLabel(roles)}`;
+            copyEl.textContent = 'You are authorized and ready to use the dashboard.';
+            infoEl.classList.remove('hidden');
+            connectBtn.textContent = 'Refresh connection';
+            setStatus('Connected successfully.');
+        }
+
+        function showLoggedOut() {
+            infoEl.classList.add('hidden');
+            connectBtn.textContent = 'Connect with Discord';
+            copyEl.textContent = 'Connect your Discord account to access the dashboard and manage your settings.';
+            setStatus('Not connected yet.');
+        }
+
+        function parseHashToken() {
+            const hash = window.location.hash.substring(1);
+            if (!hash) return null;
+            const params = new URLSearchParams(hash);
+            const token = params.get('access_token');
+            if (token) {
+                localStorage.setItem(PENDING_KEY, token);
+                history.replaceState(null, '', window.location.pathname);
+                return token;
+            }
+            return null;
+        }
+
+        function getStoredToken() {
+            return localStorage.getItem(TOKEN_KEY) || localStorage.getItem(PENDING_KEY);
+        }
+
+        function loginWithDiscord() {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(PENDING_KEY);
+            const params = new URLSearchParams({
+                client_id: DISCORD_CLIENT_ID,
+                redirect_uri: DISCORD_REDIRECT,
+                response_type: 'token',
+                scope: 'identify guilds.members.read'
+            });
+            window.location.href = 'https://discord.com/oauth2/authorize?' + params.toString();
+        }
+
+        async function fetchDiscordUser(token) {
+            setStatus('Loading Discord profile…');
+            try {
+                const userRes = await fetch('https://corsproxy.io/?https://discord.com/api/v10/users/@me', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const user = await userRes.json();
+                if (!user || !user.id) throw new Error('Discord user fetch failed');
+
+                const memberRes = await fetch('https://corsproxy.io/?https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const member = memberRes.ok ? await memberRes.json() : {};
+                localStorage.setItem(TOKEN_KEY, token);
+                localStorage.removeItem(PENDING_KEY);
+                showLoggedIn(user, member.roles || []);
+            } catch (error) {
+                console.error('Discord dashboard error:', error);
+                localStorage.removeItem(PENDING_KEY);
+                setStatus('Discord login failed. Please try again.');
+                showLoggedOut();
+            }
+        }
+
+        connectBtn.addEventListener('click', loginWithDiscord);
+
+        (function init() {
+            const tokenFromHash = parseHashToken();
+            const storedToken = getStoredToken();
+            if (tokenFromHash || storedToken) {
+                const token = tokenFromHash || storedToken;
+                fetchDiscordUser(token);
+                return;
+            }
+            showLoggedOut();
+        })();
+    </script>
+</body>
+</html>
