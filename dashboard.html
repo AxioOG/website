@@ -185,6 +185,32 @@
             padding: 20px;
         }
 
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar img {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .user-role {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 6px 10px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 999px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
         .info-card h2 {
             margin: 0 0 8px;
             font-size: 1rem;
@@ -228,8 +254,15 @@
 
             <div class="dashboard-info hidden" id="dashboard-info">
                 <div class="info-card">
-                    <h2 id="user-name">Welcome back!</h2>
-                    <p id="user-tag">Your Discord tag will appear here after login.</p>
+                    <div class="user-avatar">
+                        <img id="user-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="avatar">
+                        <div>
+                            <h2 id="user-name">Welcome back!</h2>
+                            <p id="user-tag">Your Discord tag will appear here after login.</p>
+                            <div id="user-role" class="user-role" style="display:none">Nothing</div>
+                        </div>
+                    </div>
+                    <p id="user-roles-list" style="color:rgba(255,255,255,0.68);font-size:0.9rem;margin-top:8px;display:none"></p>
                 </div>
                 <div class="info-card">
                     <h2>Connection status</h2>
@@ -284,6 +317,12 @@
             return 'Nothing';
         }
 
+        function getAvatarUrl(user) {
+            if (!user) return 'https://cdn.discordapp.com/embed/avatars/0.png';
+            if (user.avatar) return 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png?size=128';
+            return 'https://cdn.discordapp.com/embed/avatars/0.png';
+        }
+
         function showLoggedIn(user, roles) {
             const name = user.global_name || user.username || 'Discord user';
             const tag = user.username ? '@' + user.username : 'No Discord tag available';
@@ -294,6 +333,20 @@
             localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
             localStorage.setItem('fuse_web_role', webRole);
             localStorage.setItem('fuse_is_admin', webRole === 'admin' ? '1' : '0');
+
+            // Set avatar and role UI
+            const avatarEl = document.getElementById('user-avatar');
+            const roleEl = document.getElementById('user-role');
+            const rolesListEl = document.getElementById('user-roles-list');
+            if (avatarEl) avatarEl.src = getAvatarUrl(user);
+            if (roleEl) {
+                roleEl.textContent = webRole;
+                roleEl.style.display = 'inline-block';
+            }
+            if (rolesListEl) {
+                rolesListEl.textContent = 'Server roles: ' + (roles && roles.length ? roles.join(', ') : 'none');
+                rolesListEl.style.display = 'block';
+            }
 
             userNameEl.textContent = `Welcome, ${name}`;
             userTagEl.textContent = tag;
@@ -328,6 +381,14 @@
             connectBtn.textContent = 'Connect with Discord';
             copyEl.textContent = 'Connect your Discord account to access the dashboard and manage your settings.';
             setStatus('Not connected yet.');
+            const avatarEl = document.getElementById('user-avatar');
+            const roleEl = document.getElementById('user-role');
+            const rolesListEl = document.getElementById('user-roles-list');
+            if (avatarEl) avatarEl.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+            if (roleEl) roleEl.style.display = 'none';
+            if (rolesListEl) rolesListEl.style.display = 'none';
+            const existingBadge = document.getElementById('admin-badge');
+            if (existingBadge) existingBadge.remove();
         }
 
         function parseHashToken() {
