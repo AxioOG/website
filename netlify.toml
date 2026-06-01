@@ -19,16 +19,6 @@
   status = 200
 
 [[redirects]]
-  from = "/adminpanel"
-  to = "/adminpanel.html"
-  status = 200
-
-[[redirects]]
-  from = "/dashboard"
-  to = "/dashboard.html"
-  status = 200
-
-[[redirects]]
   from = "/tickets"
   to = "/tickets.html"
   status = 200
@@ -49,6 +39,21 @@
   status = 200
 
 [[redirects]]
+  from = "/policy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
+  from = "/dashboard/"
+  to = "/dashboard.html"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
@@ -59,18 +64,9 @@
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type"
+    Cache-Control = "no-cache, no-store, must-revalidate"
 
 [[headers]]
   for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=2592000"
-
-[[headers]]
-  for = "/*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
-
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
