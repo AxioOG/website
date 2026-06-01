@@ -417,10 +417,7 @@
                 </div>
             </section>
 
-            <div class="debug-panel">
-                <button class="nav-button" id="debug-load-btn">Load stored user</button>
-                <pre id="debug-output" style="display:none"></pre>
-            </div>
+            <!-- debug panel removed -->
 
             <p class="status-line" id="dashboard-status">Not connected yet.</p>
         </main>
@@ -482,7 +479,17 @@
 
         function showLoggedIn(user, roles) {
             const name = user.global_name || user.username || 'Discord user';
-            const tag = user.username ? '@' + user.username : 'No Discord tag available';
+            // Prefer a rich tag when discriminator is available: username#1234
+            let tag;
+            if (user.global_name && user.username && user.discriminator) {
+                tag = `${user.global_name} · ${user.username}#${user.discriminator}`;
+            } else if (user.username && user.discriminator) {
+                tag = `${user.username}#${user.discriminator}`;
+            } else if (user.username) {
+                tag = '@' + user.username;
+            } else {
+                tag = 'Discord user';
+            }
             const webRole = getRoleLabel(roles);
             const roleNames = (roles && roles.length) ? roles.map(r => ROLE_NAMES[r] || r) : [];
 
@@ -599,27 +606,13 @@
             showLoggedOut();
         }
 
-        function loadStoredUser() {
-            const out = document.getElementById('debug-output');
-            const u = localStorage.getItem('fuse_user');
-            const r = localStorage.getItem('fuse_roles');
-            const wr = localStorage.getItem('fuse_web_role');
-            const isAdmin = localStorage.getItem('fuse_is_admin');
-            const token = localStorage.getItem(TOKEN_KEY);
-            const lines = [];
-            lines.push('token: ' + (token ? 'present' : 'none'));
-            lines.push('fuse_user: ' + (u || 'null'));
-            lines.push('fuse_roles: ' + (r || 'null'));
-            lines.push('fuse_web_role: ' + (wr || 'null'));
-            lines.push('fuse_is_admin: ' + (isAdmin || '0'));
-            if (out) { out.style.display = 'block'; out.textContent = lines.join('\n\n'); }
-        }
+        // debug helper removed in production
 
         connectBtn.addEventListener('click', loginWithDiscord);
         document.getElementById('dashboard-signout-btn')?.addEventListener('click', signOut);
         document.getElementById('main-signout')?.addEventListener('click', signOut);
         document.getElementById('browse-store')?.addEventListener('click', function(){ window.location.href = '/'; });
-        document.getElementById('debug-load-btn')?.addEventListener('click', loadStoredUser);
+        // debug listener removed
         document.getElementById('admin-users-btn')?.addEventListener('click', function(){ window.location.href = '/admin.html'; });
 
         (function init() {
