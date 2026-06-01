@@ -96,6 +96,7 @@
             pointer-events: auto !important;
             display: flex !important;
         }
+
         #page-account {
             display: none !important;
         }
@@ -1782,22 +1783,6 @@
     <!-- -- PAGE: Account (Login) -- -->
     <div class="page" id="page-account">
         <div class="scene">
-            <svg class="lamp" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                </defs>
-                <g class="lamp-light" filter="url(#glow)">
-                    <ellipse cx="100" cy="60" rx="45" ry="35" fill="rgba(255,255,200,0.4)"/>
-                    <circle cx="100" cy="60" r="50" fill="none" stroke="rgba(255,255,150,0.2)" stroke-width="2"/>
-                </g>
-                <path id="js-cord" class="lamp-cord" d="M100,95 Q95,150 90,250" stroke="#666" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <rect class="fill-opening" x="75" y="95" width="50" height="15" rx="3"/>
-                <rect class="fill-base-top" x="70" y="110" width="60" height="20" rx="2"/>
-                <rect class="fill-base-side" x="65" y="130" width="70" height="80" rx="3"/>
-                <rect class="fill-post" x="95" y="210" width="10" height="100" rx="2"/>
-                <rect class="fill-shade" x="60" y="310" width="80" height="60" rx="4"/>
-                <path id="js-hit" class="lamp-hit" d="M100,95 Q95,150 90,250" stroke="transparent" stroke-width="20" fill="none"/>
-            </svg>
             <div class="card" id="js-card">
                 <div class="brand">
                     <div class="brand-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="currentColor"/></svg></div>
@@ -2834,148 +2819,6 @@
         </div>
     </div>
 
-    <script>
-        /* --------------------------------------------------------------
-           CORD PHYSICS
-           Physics-based cord drag. On sufficient pull ? toggleLight().
-           Cord is rendered as a cubic bezier from anchor to tassel tip.
-        -------------------------------------------------------------- */
-        const ROOT = document.documentElement;
-        const BODY = document.body;
-        const card = document.getElementById('js-card');
-        const cord = document.getElementById('js-cord');
-        const hit = document.getElementById('js-hit');
-        const lampEl = document.querySelector('.lamp');
-
-        // SVG anchor (top of cord) and tassel rest position
-        const AX = 124, AY = 190;
-        const REST_X = 124, REST_Y = 348;
-        const TRIGGER_DIST = 55;
-
-        let dragging = false;
-        let animating = false;
-        let lightOn = false;
-        let curX = REST_X, curY = REST_Y;
-
-        // Convert screen coords ? SVG coords
-        function toSVG(sx, sy) {
-            const pt = lampEl.createSVGPoint();
-            pt.x = sx; pt.y = sy;
-            return pt.matrixTransform(lampEl.getScreenCTM().inverse());
-        }
-
-        // Build a natural bezier path for the cord
-        function buildCord(tx, ty) {
-            const dx = tx - AX, dy = ty - AY;
-            const sag = Math.max(4, 30 - Math.hypot(dx, dy) * 0.06);
-            const c1x = AX + dx * 0.15 + sag, c1y = AY + dy * 0.30 + sag;
-            const c2x = AX + dx * 0.70 - sag * 0.3, c2y = AY + dy * 0.72 - sag * 0.2;
-            return `M${AX},${AY} C${c1x},${c1y} ${c2x},${c2y} ${tx},${ty}`;
-        }
-
-        function updateCord(tx, ty) {
-            curX = tx; curY = ty;
-            cord.setAttribute('d', buildCord(tx, ty));
-            const tension = Math.min(Math.hypot(tx - REST_X, ty - REST_Y) / 120, 1);
-            cord.style.stroke = `hsl(0, 0%, ${Math.round(38 + tension * 52)}%)`;
-        }
-
-        function springBack(fromX, fromY, triggered) {
-            if (animating) return;
-            animating = true;
-            const dur = triggered ? 380 : 500;
-            const t0 = performance.now();
-
-            function tick(now) {
-                const t = Math.min((now - t0) / dur, 1);
-                const fn = triggered ? easeElastic(t) : easeOutBounce(t);
-                updateCord(fromX + (REST_X - fromX) * fn, fromY + (REST_Y - fromY) * fn);
-                if (t < 1) { requestAnimationFrame(tick); return; }
-                updateCord(REST_X, REST_Y);
-                cord.style.stroke = '';
-                animating = false;
-            }
-            requestAnimationFrame(tick);
-        }
-
-        // Easing functions
-        function easeElastic(t) {
-            if (!t || t === 1) return t;
-            return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI / 3)) + 1;
-        }
-        function easeOutBounce(t) {
-            if (t < 1 / 2.75) return 7.5625 * t * t;
-            if (t < 2 / 2.75) { t -= 1.5 / 2.75; return 7.5625 * t * t + 0.750; }
-            if (t < 2.5 / 2.75) { t -= 2.25 / 2.75; return 7.5625 * t * t + 0.9375; }
-            t -= 2.625 / 2.75; return 7.5625 * t * t + 0.984375;
-        }
-
-        // Pointer helpers
-        function client(e) {
-            return e.touches
-                ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-                : { x: e.clientX, y: e.clientY };
-        }
-
-        function onDown(e) {
-            if (animating) return;
-            e.preventDefault();
-            dragging = true;
-        }
-        function onMove(e) {
-            if (!dragging) return;
-            e.preventDefault();
-            const { x, y } = client(e);
-            const sv = toSVG(x, y);
-            updateCord(sv.x, Math.max(AY + 20, sv.y));
-        }
-        function onUp() {
-            if (!dragging) return;
-            dragging = false;
-            const dist = Math.hypot(curX - REST_X, curY - REST_Y);
-            if (dist > TRIGGER_DIST) toggleLight();
-            springBack(curX, curY, dist > TRIGGER_DIST);
-        }
-
-        // Attach events to both hit zone and cord line
-        [hit, cord].forEach(el => {
-            el.addEventListener('mousedown', onDown);
-            el.addEventListener('touchstart', onDown, { passive: false });
-        });
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('mouseup', onUp);
-        window.addEventListener('touchmove', onMove, { passive: false });
-        window.addEventListener('touchend', onUp);
-
-        /* --------------------------------------------------------------
-           LIGHT TOGGLE
-        -------------------------------------------------------------- */
-        const AUDIO = {
-            CLICK: new Audio("https://fezacademy.com/click-sound.mp3"),
-        };
-        function toggleLight() {
-            AUDIO.CLICK.play();
-            lightOn = !lightOn;
-            ROOT.style.setProperty('--on', lightOn ? '1' : '0');
-
-            const isLoggedIn = !!localStorage.getItem('fuse_user');
-            if (isLoggedIn) {
-                // Show profile popup instead of login card
-                card.classList.remove('is-active');
-                const popup = document.getElementById('discord-profile-popup');
-                if (lightOn) {
-                    popup.classList.add('is-active');
-                } else {
-                    popup.classList.remove('is-active');
-                }
-            } else {
-                document.getElementById('discord-profile-popup').classList.remove('is-active');
-                card.classList.toggle('is-active', lightOn);
-            }
-        }
-
-    </script>
-
     <!-- -- Ocean-style Site Nav -- -->
     <header id="main-nav" aria-label="Main navigation">
         <div class="nav-inner">
@@ -3005,8 +2848,8 @@
                 <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
                     <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
-                <button type="button" class="nav-login" id="nav-login-btn">Login</button>
-                <button type="button" class="nav-signup" id="nav-signup-btn">Sign Up</button>
+                
+                <button type="button" class="nav-signup" id="nav-signup-btn">Sign In</button>
             </div>
         </div>
     </header>
@@ -3129,7 +2972,7 @@
 
         document.getElementById('nav-signup-btn')?.addEventListener('click', function() {
             closeNavMenu();
-            navigateTo('store');
+            loginWithDiscord();
         });
 
         document.getElementById('nav-menu-btn')?.addEventListener('click', function() {
@@ -3177,6 +3020,11 @@
                 var p = new URLSearchParams(h);
                 var t = p.get('access_token');
                 if (t) {
+                    if (window.opener && window.opener !== window) {
+                        window.opener.postMessage({ type: 'discord_oauth_token', token: t }, window.location.origin);
+                        window.close();
+                        return;
+                    }
                     localStorage.setItem('fuse_pending_token', t);
                     // Clear hash without redirecting to dashboard
                     history.replaceState(null, '', window.location.pathname);
@@ -3191,8 +3039,26 @@
             }
         })();
 
+        window.addEventListener('message', function(event) {
+            if (event.origin !== window.location.origin) return;
+            if (event.data && event.data.type === 'discord_oauth_token') {
+                localStorage.setItem('fuse_pending_token', event.data.token);
+                console.log('Discord token received from popup.');
+            }
+        });
+
         var DISCORD_CLIENT_ID = '1460340695578575041';
-        var DISCORD_REDIRECT  = window.location.origin + '/home';
+        function getDiscordRedirect() {
+            var path = window.location.pathname;
+            if (path.indexOf('/web/') === 0) {
+                return window.location.origin + path.replace(/\/[^\/]*$/, '/dashboard.html');
+            }
+            if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+                return window.location.origin + '/dashboard.html';
+            }
+            return window.location.origin + '/dashboard';
+        }
+        var DISCORD_REDIRECT  = getDiscordRedirect();
         var GUILD_ID          = '1305642236880617482';
         var ROLE_ADMIN1       = '1471974431579574538';
         var ROLE_ADMIN2       = '1482165881315524688';
@@ -3264,7 +3130,6 @@
         })();
 
         function loginWithDiscord() {
-            // Clear any existing token to allow fresh authorization
             localStorage.removeItem('fuse_token');
             localStorage.removeItem('fuse_pending_token');
             var p = new URLSearchParams({
@@ -3278,8 +3143,6 @@
 
         document.getElementById('popup-logout-btn').addEventListener('click', function() {
             clearUI();
-            lightOn = false;
-            ROOT.style.setProperty('--on', '0');
             document.getElementById('discord-profile-popup').classList.remove('is-active');
         });
     </script>
