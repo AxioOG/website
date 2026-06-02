@@ -539,7 +539,7 @@
         .nav-brand:hover { opacity: 0.72; }
 
         .nav-brand-text {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: 1.12rem;
             font-weight: 500;
             letter-spacing: -0.03em;
@@ -2250,64 +2250,12 @@
             line-height: 1.7;
         }
         .faq-item.open .faq-answer {
-            max-height: 300px;
+            max-height: 500px;
             padding: 0 1.5rem 1.2rem;
         }
     </style>
 
-    <div class="faq-section" id="faq-home" style="position:relative;z-index:20;">
-        <h2 class="faq-title">Frequently Asked Questions</h2>
-        <p class="faq-sub">Still have questions? Ask them now</p>
 
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                How does Fuse perform?
-                <i class="fa fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">The development team knew their objective clearly: to make our software as stealthy as possible, prioritizing customer trust and safety � and they delivered. Fuse is loaded with various mechanisms to counteract those who try to limit us.</div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                Sounds interesting, can I get a free test license?
-                <i class="fa fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">No.</div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                How much does the Fuse FiveM executor cost?
-                <i class="fa fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">Check our pricing page for the latest plans and pricing. All plans include full software access, bypass utility, and instant delivery with no hidden fees.</div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                How do I download and install Fuse?
-                <i class="fa fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">If you are not a customer , fuck off</div>
-        </div>
-
-        <div class="faq-item">
-            <button class="faq-question" onclick="toggleFaq(this)">
-                Can I use Fuse while streaming on Twitch or YouTube?
-                <i class="fa fa-chevron-down"></i>
-            </button>
-            <div class="faq-answer">Yes. Fuse includes a built-in stream-proof mode that hides the executor from all capture software including OBS, Streamlabs, and Discord screen share. You can stream safely.</div>
-        </div>
-    </div>
-
-    <script>
-        function toggleFaq(btn) {
-            var item = btn.closest('.faq-item');
-            var isOpen = item.classList.contains('open');
-            document.querySelectorAll('.faq-item.open').forEach(function(el) { el.classList.remove('open'); });
-            if (!isOpen) item.classList.add('open');
-        }
-    </script>
 
     </div><!-- end page-home -->
 
@@ -2819,6 +2767,54 @@
         </div>
     </div>
 
+    <!-- FAQ Page -->
+    <div class="page" id="page-faq">
+        <div class="faq-section" style="position:relative;z-index:20;">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            <p class="faq-sub">Still have questions? Ask them now</p>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    How does Fuse perform?
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">Fuse delivers ultra-fast, undetected performance across all major platforms. Our optimized bypass technology ensures minimal latency and maximum reliability, making it the industry's fastest software.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Sounds interesting, can I get a free test license?
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">No.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    How much does the Fuse FiveM Bypass Cost?
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">Click Pricing And Check.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    How do I download and install Fuse?
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">If you are not a client , fuck off.</div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    Can I use Fuse while streaming on Twitch or YouTube?
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">Yes you can stream while using Fuse but if you miss something on streamproof its not our fault. Use at your own risk!</div>
+            </div>
+        </div>
+    </div>
+
     <!-- -- Ocean-style Site Nav -- -->
     <header id="main-nav" aria-label="Main navigation">
         <div class="nav-inner">
@@ -2835,6 +2831,9 @@
                 </a>
                 <a href="#" class="nav-item" data-page="status">
                     <span class="label" data-i18n="nav_status">Status</span>
+                </a>
+                <a href="#" class="nav-item" data-page="faq">
+                    <span class="label" data-i18n="nav_faq">FAQ</span>
                 </a>
                 <a href="#" class="nav-item" data-page="tos">
                     <span class="label" data-i18n="nav_policy">Policy</span>
@@ -2857,6 +2856,13 @@
     <iframe id="yt-player" src="" allow="autoplay" style="display:none;" width="0" height="0" frameborder="0"></iframe>
 
     <script>
+        function toggleFaq(btn) {
+            var item = btn.closest('.faq-item');
+            var isOpen = item.classList.contains('open');
+            document.querySelectorAll('.faq-item.open').forEach(function(el) { el.classList.remove('open'); });
+            if (!isOpen) item.classList.add('open');
+        }
+
         var PURCHASE_PLANS = {
             lifetime: {
                 name: 'Lifetime Access',
