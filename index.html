@@ -86,23 +86,9 @@
         }
 
         /* Pages fill the full viewport */
-        /* -- Smooth page transitions -- */
+        /* -- Single-page navigation -- */
         .page {
-            transition: none;
-        }
-        /* Force all pages visible � scroll-based layout */
-        .page, .page:not(.active) {
-            opacity: 1 !important;
-            pointer-events: auto !important;
-            display: flex !important;
-        }
-
-        #page-account {
-            display: none !important;
-        }
-
-        /* Pages fill the full viewport */
-        .page {
+            display: none;
             width: 100%;
             min-height: 100vh;
             position: relative;
@@ -111,10 +97,20 @@
             justify-content: center;
         }
 
+        .page.active {
+            display: flex;
+        }
+
+        #page-account {
+            display: none !important;
+        }
+
         #page-home,
         #page-tos,
         #page-store,
-        #page-status {
+        #page-status,
+        #page-faq,
+        #page-branding {
             align-items: flex-start;
             overflow-y: visible;
         }
@@ -1661,7 +1657,7 @@
             height: 100%;
             width: 0;
             background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.9));
-            animation: logoIntroProgress 1.65s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: logoIntroProgress 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         @keyframes logoIntroProgress { to { width: 100%; } }
         #logo-intro.fade-out {
@@ -1686,7 +1682,7 @@
             var msgTimer = setInterval(function () {
                 msgIdx = (msgIdx + 1) % messages.length;
                 if (statusEl) statusEl.textContent = messages[msgIdx] + '…';
-            }, 520);
+            }, 1000);
 
             function dismiss() {
                 clearInterval(msgTimer);
@@ -1695,7 +1691,7 @@
                 setTimeout(function () { intro.remove(); }, 720);
             }
 
-            var minMs = 1650;
+            var minMs = 3000;
             var start = Date.now();
             function scheduleDismiss() {
                 var wait = Math.max(0, minMs - (Date.now() - start));
@@ -1706,7 +1702,7 @@
                 scheduleDismiss();
             } else {
                 window.addEventListener('load', scheduleDismiss);
-                setTimeout(scheduleDismiss, minMs + 800);
+                setTimeout(scheduleDismiss, minMs + 500);
             }
         })();
     </script>
@@ -2810,6 +2806,158 @@
         </div>
     </div>
 
+    <!-- -- PAGE: Branding -- -->
+    <div class="page" id="page-branding">
+        <div style="width:100%; max-width:1100px; padding:6rem 2rem 5rem; margin:0 auto; color:#fff; font-family:'DM Sans',sans-serif;">
+
+            <!-- Header -->
+            <div style="text-align:center; margin-bottom:4rem;">
+                <p style="font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:1.2rem;">Brand Identity</p>
+                <h1 style="font-family:'Montserrat',sans-serif; font-size:clamp(2.4rem,5vw,3.8rem); font-weight:800; letter-spacing:-0.04em; line-height:1.05; margin-bottom:1rem; background:linear-gradient(135deg,#fff 40%,rgba(255,255,255,0.45) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Fuse Brand Kit</h1>
+                <p style="color:rgba(255,255,255,0.4); font-size:1rem; max-width:520px; margin:0 auto; line-height:1.7;">Official assets, colors, and guidelines for the fusebypass brand. Use these resources consistently to represent Fuse correctly.</p>
+            </div>
+
+            <!-- Logo Showcase -->
+            <div style="margin-bottom:4rem;">
+                <h2 style="font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:1.5rem; display:flex; align-items:center; gap:10px;">
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                    Logo
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                </h2>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem;">
+                    <!-- Logo on dark -->
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:2.5rem 2rem; display:flex; flex-direction:column; align-items:center; gap:1.5rem; transition:border-color 0.2s;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="./images/fusegg.png" alt="Fuse logo" style="width:52px; height:52px; object-fit:contain;">
+                            <span style="font-family:'Montserrat',sans-serif; font-size:1.5rem; font-weight:800; letter-spacing:-0.04em;"><span style="color:#4197fa;">fuse</span><span style="color:#fff;">bypass</span></span>
+                        </div>
+                        <span style="font-size:0.72rem; color:rgba(255,255,255,0.3); font-family:'DM Sans',sans-serif; letter-spacing:0.1em; text-transform:uppercase;">Dark Background</span>
+                    </div>
+                    <!-- Logo mark only -->
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:2.5rem 2rem; display:flex; flex-direction:column; align-items:center; gap:1.5rem;">
+                        <img src="./images/fusegg.png" alt="Fuse icon" style="width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 0 24px rgba(255,255,255,0.12));">
+                        <span style="font-size:0.72rem; color:rgba(255,255,255,0.3); font-family:'DM Sans',sans-serif; letter-spacing:0.1em; text-transform:uppercase;">Icon Mark</span>
+                    </div>
+                    <!-- Wordmark only -->
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:2.5rem 2rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem;">
+                        <span style="font-family:'Montserrat',sans-serif; font-size:2rem; font-weight:800; letter-spacing:-0.05em; line-height:1;"><span style="color:#4197fa;">fuse</span><span style="color:rgba(255,255,255,0.55);">bypass</span></span>
+                        <span style="font-size:0.72rem; color:rgba(255,255,255,0.3); font-family:'DM Sans',sans-serif; letter-spacing:0.1em; text-transform:uppercase;">Wordmark</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colors -->
+            <div style="margin-bottom:4rem;">
+                <h2 style="font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:1.5rem; display:flex; align-items:center; gap:10px;">
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                    Brand Colors
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                </h2>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem;">
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
+                        <div style="height:90px; background:#4197fa;"></div>
+                        <div style="padding:1rem 1.2rem;">
+                            <div style="font-family:'Montserrat',sans-serif; font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:0.25rem;">Fuse Blue</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35);">#4197FA</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:0.15rem;">rgb(65, 151, 250)</div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
+                        <div style="height:90px; background:#ffffff;"></div>
+                        <div style="padding:1rem 1.2rem;">
+                            <div style="font-family:'Montserrat',sans-serif; font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:0.25rem;">Pure White</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35);">#FFFFFF</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:0.15rem;">rgb(255, 255, 255)</div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
+                        <div style="height:90px; background:#000000; border-bottom:1px solid rgba(255,255,255,0.08);"></div>
+                        <div style="padding:1rem 1.2rem;">
+                            <div style="font-family:'Montserrat',sans-serif; font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:0.25rem;">Void Black</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35);">#000000</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:0.15rem;">rgb(0, 0, 0)</div>
+                        </div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
+                        <div style="height:90px; background:rgba(255,255,255,0.07);"></div>
+                        <div style="padding:1rem 1.2rem;">
+                            <div style="font-family:'Montserrat',sans-serif; font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:0.25rem;">Glass Surface</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35);">rgba(255,255,255,7%)</div>
+                            <div style="font-family:'DM Sans',sans-serif; font-size:0.72rem; color:rgba(255,255,255,0.25); margin-top:0.15rem;">UI card background</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typography -->
+            <div style="margin-bottom:4rem;">
+                <h2 style="font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:1.5rem; display:flex; align-items:center; gap:10px;">
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                    Typography
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                </h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.75rem;">
+                        <div style="font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.75rem; font-family:'DM Sans',sans-serif;">Display / Headings</div>
+                        <div style="font-family:'Montserrat',sans-serif; font-size:2rem; font-weight:800; color:#fff; letter-spacing:-0.03em; line-height:1.1;">Montserrat</div>
+                        <div style="font-family:'Montserrat',sans-serif; font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.35); margin-top:0.5rem; letter-spacing:0.06em;">700 · 800</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.75rem;">
+                        <div style="font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.75rem; font-family:'DM Sans',sans-serif;">Body / UI</div>
+                        <div style="font-family:'DM Sans',sans-serif; font-size:2rem; font-weight:400; color:#fff; line-height:1.1;">DM Sans</div>
+                        <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35); margin-top:0.5rem; letter-spacing:0.06em;">300 · 400 · 500</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Rules -->
+            <div style="margin-bottom:2rem;">
+                <h2 style="font-family:'Montserrat',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.35); margin-bottom:1.5rem; display:flex; align-items:center; gap:10px;">
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                    Usage Guidelines
+                    <span style="display:block; width:28px; height:1px; background:rgba(255,255,255,0.15);"></span>
+                </h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div style="background:rgba(0,200,80,0.04); border:1px solid rgba(0,180,60,0.18); border-radius:16px; padding:1.5rem;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:1rem;">
+                            <div style="width:22px; height:22px; background:rgba(0,180,60,0.15); border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa fa-check" style="font-size:0.65rem; color:#3dd68c;"></i></div>
+                            <span style="font-family:'Montserrat',sans-serif; font-size:0.8rem; font-weight:700; color:#3dd68c; letter-spacing:0.06em; text-transform:uppercase;">Do</span>
+                        </div>
+                        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.55rem;">
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Use the logo on dark backgrounds only</li>
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Keep "fuse" and "bypass" together as one unit</li>
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Maintain clear space around the logo equal to the icon height</li>
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Use lowercase for the wordmark always</li>
+                        </ul>
+                    </div>
+                    <div style="background:rgba(255,50,50,0.04); border:1px solid rgba(255,60,60,0.15); border-radius:16px; padding:1.5rem;">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:1rem;">
+                            <div style="width:22px; height:22px; background:rgba(255,60,60,0.12); border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fa fa-times" style="font-size:0.65rem; color:#ff5555;"></i></div>
+                            <span style="font-family:'Montserrat',sans-serif; font-size:0.8rem; font-weight:700; color:#ff5555; letter-spacing:0.06em; text-transform:uppercase;">Don't</span>
+                        </div>
+                        <ul style="list-style:none; display:flex; flex-direction:column; gap:0.55rem;">
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Stretch, rotate, or distort the logo</li>
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Change the brand colors or apply filters</li>
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Use the logo on light or busy backgrounds</li>
+                            <li style="font-size:0.85rem; color:rgba(255,255,255,0.55); display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><i class="fa fa-circle" style="font-size:0.3rem; margin-top:0.55rem; color:rgba(255,255,255,0.2); flex-shrink:0;"></i>Represent Fuse without written permission</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download CTA -->
+            <div style="text-align:center; padding:3rem 2rem; background:rgba(65,151,250,0.05); border:1px solid rgba(65,151,250,0.18); border-radius:20px; margin-top:1rem;">
+                <img src="./images/fusegg.png" alt="Fuse" style="width:48px; height:48px; object-fit:contain; margin-bottom:1.25rem; opacity:0.85;">
+                <h3 style="font-family:'Montserrat',sans-serif; font-size:1.5rem; font-weight:800; color:#fff; letter-spacing:-0.03em; margin-bottom:0.6rem;">Need the assets?</h3>
+                <p style="font-family:'DM Sans',sans-serif; color:rgba(255,255,255,0.4); font-size:0.9rem; margin-bottom:1.5rem; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.6;">Contact us on Discord for the official press kit — high-res logos, source files, and media assets.</p>
+                <a href="https://discord.gg/yVUxWkrPT9" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:9px; padding:0.7rem 1.4rem; background:#5865F2; border-radius:10px; color:#fff; font-family:'Montserrat',sans-serif; font-size:0.85rem; font-weight:700; text-decoration:none; transition:background 0.2s, transform 0.15s;" onmouseover="this.style.background='#4752C4'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#5865F2'; this.style.transform='translateY(0)'">
+                    <i class="fab fa-discord"></i> Contact on Discord
+                </a>
+            </div>
+
+        </div>
+    </div>
+
     <!-- -- Ocean-style Site Nav -- -->
     <header id="main-nav" aria-label="Main navigation">
         <div class="nav-inner">
@@ -2829,6 +2977,9 @@
                 </a>
                 <a href="#" class="nav-item" data-page="faq">
                     <span class="label" data-i18n="nav_faq">FAQ</span>
+                </a>
+                <a href="#" class="nav-item" data-page="branding">
+                    <span class="label" data-i18n="nav_branding">Branding</span>
                 </a>
                 <a href="#" class="nav-item" data-page="tos">
                     <span class="label" data-i18n="nav_policy">Policy</span>
@@ -2925,7 +3076,9 @@
             home:    '/home',
             store:   '/pricing',
             status:  '/status',
+            faq:    '/faq',
             tos:     '/policy',
+            branding: '/branding',
             panel:   '/panel',
             
         };
@@ -2944,10 +3097,9 @@
             document.querySelectorAll('#main-nav .nav-links [data-page="' + target + '"]').forEach(i => i.classList.add('active'));
             closeNavMenu();
             const el = document.getElementById('page-' + target);
-            if (el) {
-                const top = el.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT;
-                window.scrollTo({ top: top, behavior: 'smooth' });
-            }
+            document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+            if (el) { el.classList.add('active'); }
+            window.scrollTo(0, 0);
             const slug = PAGE_SLUGS[target] || '/home';
             history.pushState({ page: target }, '', slug);
         }
@@ -3539,7 +3691,6 @@
 </body>
 
 </html>
-
 
 
 
