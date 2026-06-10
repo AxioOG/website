@@ -16,7 +16,7 @@
         :root {
             --on: 0;
 
-            /* Lamp colours � all driven by --on (0 = off, 1 = on) */
+            /* Lamp colours ? all driven by --on (0 = off, 1 = on) */
             --opening: hsl(0, 0%, calc((18 + var(--on) * 68) * 1%));
             --base-top: hsl(0, 0%, calc((30 + var(--on) * 38) * 1%));
             --base-side: hsl(0, 0%, calc((15 + var(--on) * 35) * 1%));
@@ -71,7 +71,7 @@
             min-height: 100vh;
         }
 
-        /* NOTE: Side �shadow bars� were caused by body::before/::after.
+        /* NOTE: Side ?shadow bars? were caused by body::before/::after.
            We keep all shading inside the canvas instead for a cleaner look. */
         body::before,
         body::after { display: none; }
@@ -120,7 +120,7 @@
             align-items: center;
         }
 
-        /* Ambient room glow � only visible on account page */
+        /* Ambient room glow ? only visible on account page */
         #page-account::after {
             content: '';
             position: fixed;
@@ -163,7 +163,7 @@
             opacity: var(--on);
         }
 
-        /* SVG fill helpers � resolved from CSS variables */
+        /* SVG fill helpers ? resolved from CSS variables */
         .fill-opening {
             fill: var(--opening);
         }
@@ -901,9 +901,9 @@
         .widget-dd-item.red { color: rgba(255,80,80,0.8); }
         .widget-dd-item.red:hover { background: rgba(255,50,50,0.1); color: #ff5555; }
 
-        /* ═══════════════════════════════════════════
+        /* -------------------------------------------
            FANCY ENHANCEMENTS
-        ═══════════════════════════════════════════ */
+        ------------------------------------------- */
 
         /* Hero title */
         .hero-title {
@@ -1017,7 +1017,7 @@
             background: rgba(255,255,255,0.07) !important;
         }
 
-        /* Store pricing cards — enhanced */
+        /* Store pricing cards ? enhanced */
         #page-store > div > div {
             transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
         }
@@ -1033,7 +1033,7 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
 
-        /* ── Games Ticker ── */
+        /* -- Games Ticker -- */
         .games-ticker-wrap {
             width: 100%;
             padding: 0 0 4rem;
@@ -1454,7 +1454,7 @@
                 boxes.push({
                     xN: r1[1], // normalized 0..1
                     yN: r2[1],
-                    // Larger, more �UI panel� like shapes
+                    // Larger, more ?UI panel? like shapes
                     wN: 0.16 + r3[1] * 0.28,
                     hN: 0.10 + r4[1] * 0.22,
                     sp: 0.10 + r5[1] * 0.40,
@@ -1559,7 +1559,7 @@
 
 
 
-    <!-- ══ Logo Intro ══ -->
+    <!-- -- Logo Intro -- -->
     <div id="logo-intro" class="logo-intro" role="status" aria-live="polite" aria-label="Loading site">
         <div class="logo-intro-vignette" aria-hidden="true"></div>
         <div class="logo-intro-inner">
@@ -1681,7 +1681,7 @@
             var msgIdx = 0;
             var msgTimer = setInterval(function () {
                 msgIdx = (msgIdx + 1) % messages.length;
-                if (statusEl) statusEl.textContent = messages[msgIdx] + '…';
+                if (statusEl) statusEl.textContent = messages[msgIdx] + '';
             }, 1000);
 
             function dismiss() {
@@ -1707,75 +1707,6 @@
         })();
     </script>
 
-    <!-- Team Dropdown (bottom-left) -->
-    <div style="position:fixed;bottom:44px;left:20px;z-index:9999;">
-        <button onclick="document.getElementById('team-dropdown').classList.toggle('open')" style="display:flex;align-items:center;gap:8px;background:#000000;border:1px solid rgba(255,255,255,0.16);border-radius:999px;padding:8px 16px 8px 10px;cursor:pointer;color:#ffffff;font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;transition:background 0.2s;">
-            <i class="fa fa-users" style="font-size:0.85rem;color:#ffffff;"></i> <span data-i18n="team_btn">Team</span>
-            <i class="fa fa-chevron-up" style="font-size:0.6rem;color:#ffffff;transition:transform 0.2s;" id="team-chevron"></i>
-        </button>
-        <div id="team-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;background:#000000;border:1px solid rgba(255,255,255,0.16);border-radius:14px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.35);">
-            <div id="team-grid"></div>
-        </div>
-    </div>
-    <style>
-        #team-dropdown.open { display:block !important; }
-        #team-dropdown.open ~ button #team-chevron { transform:rotate(180deg); }
-        .team-card {
-            background: transparent;
-            border: none;
-            border-radius: 10px;
-            padding: 0.7rem 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            transition: background 0.15s ease;
-            text-decoration: none;
-            position: relative;
-        }
-        .team-card:hover { background: rgba(252,128,233,0.10); }
-        .team-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-        .team-avatar-wrap { position: relative; flex-shrink: 0; }
-        .team-discord-badge {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 14px;
-            height: 14px;
-            background: #5865F2;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #0c0c0c;
-        }
-        .team-discord-badge svg { width: 8px; height: 8px; }
-        .team-name {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1.2;
-        }
-        .team-role {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.4);
-            margin-top: 1px;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .team-arrow { display:none; }
-    </style>
-
-
-
-
-
     <!-- -- PAGE: Account (Login) -- -->
     <div class="page" id="page-account">
         <div class="scene">
@@ -1790,7 +1721,7 @@
                 <button class="btn-discord" onclick="loginWithDiscord()"><i class="fab fa-discord"></i> <span data-i18n="login_btn_discord">Sign in with Discord</span></button>
                 <div class="divider-or"><div class="divider-line"></div><span class="divider-text" data-i18n="login_or">or</span><div class="divider-line"></div></div>
                 <div class="field"><label data-i18n="login_email_label">Email</label><div class="field-wrap"><i class="field-icon fas fa-envelope"></i><input type="email" data-i18n-ph="login_email_ph" placeholder="your@email.com"></div></div>
-                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="••••••••"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
+                <div class="field"><label data-i18n="login_pass_label">Password</label><div class="field-wrap"><i class="field-icon fas fa-lock"></i><input type="password" placeholder="????????"><button class="field-toggle"><i class="fas fa-eye"></i></button></div></div>
                 <div class="forgot"><a href="#" data-i18n="login_forgot">Forgot password?</a></div>
                 <button class="btn-submit" data-i18n="login_btn_submit">Sign</button>
                 <div class="signup"><span data-i18n="login_no_account">Don't have an account?</span> <a href="#" data-i18n="login_create">Create one</a></div>
@@ -1891,7 +1822,7 @@
                     <div class="home-scan-result-inner">
                         <div class="home-scan-result-check"><i class="fa-solid fa-check"></i></div>
                         <div class="home-scan-result-text">
-                            <div class="home-scan-result-title">SCAN COMPLETE � NOTHING FOUND</div>
+                            <div class="home-scan-result-title">SCAN COMPLETE ? NOTHING FOUND</div>
                             <div id="home-scan-result-sub" class="home-scan-result-sub">System checks finished successfully.</div>
                         </div>
                     </div>
@@ -2260,7 +2191,7 @@
             #team-grid { grid-template-columns: 1fr; }
         }
 
-        /* ── Floating Badges ── */
+        /* -- Floating Badges -- */
         .float-badge {
             position: absolute;
             display: flex;
@@ -2328,60 +2259,6 @@
         }
     </style>
 
-    <script>
-        // Hardcoded team data — no API dependency, always loads instantly
-        const TEAM_MEMBERS = [
-            {
-                id: '838411101645045821',
-                role: 'Owner',
-                name: 'Axio',
-                avatar: 'https://cdn.discordapp.com/avatars/838411101645045821/2f54dbea2a3cbaae2b9c65ddc4d84310.webp?size=1024'
-            },
-            {
-                id: '704440841317384206',
-                role: 'Owner',
-                name: 'Moikan',
-                avatar: 'https://cdn.discordapp.com/avatars/704440841317384206/93c41dfb0d15d96630a751f9762a0219.png?size=128'
-            },
-            {
-                id: '258741640678604800', 
-                role: 'Administrator',
-                name: 'George Face',
-                avatar: 'https://cdn.discordapp.com/avatars/258741640678604800/a553d52900f647a197facaea7e768266.webp?size=1024'
-            },
-            {
-                id: '612997946606092289',
-                role: 'Support Team',
-                name: 'K0staKYS',
-                avatar: 'https://cdn.discordapp.com/avatars/612997946606092289/792baaf89e37c05b9b9f42c1377b11bc.png?size=128'
-            },
-            
-        ];
-
-        function renderTeam() {
-            const grid = document.getElementById('team-grid');
-            if (!grid) return;
-            grid.innerHTML = TEAM_MEMBERS.map(m => `
-                <a class="team-card" href="https://discord.com/users/${m.id}" target="_blank" rel="noopener">
-                    <div class="team-avatar-wrap">
-                        <img class="team-avatar" src="${m.avatar}" alt="${m.name}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
-                        <div class="team-discord-badge">
-                            <svg viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="team-name">${m.name}</div>
-                        <div class="team-role">${m.role}</div>
-                    </div>
-                    <span class="team-arrow">↗</span>
-                </a>
-            `).join('');
-        }
-
-        document.addEventListener('DOMContentLoaded', renderTeam);
-    </script>
 
     <!-- -- PAGE: Status -- -->
     <div class="page" id="page-status">
@@ -2449,7 +2326,7 @@
             <!-- Scanner list + Radar side by side -->
             <div style="display:flex; gap:2rem; align-items:flex-start;">
 
-                <!-- Scanner list — original full width style -->
+                <!-- Scanner list ? original full width style -->
                 <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;">
                     <div class="scanner-row">
                         <div style="display:flex; align-items:center; gap:1rem;">
@@ -2527,7 +2404,7 @@
                 <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
 
                 <!-- Price -->
-                <div style="font-family:'Roboto',monospace; font-size:2rem; color:#fff; margin-bottom:1.5rem; line-height:1.3;">120€ <span style="font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:400; color:rgba(255,255,255,0.35);">/ Lifetime</span></div>
+                <div style="font-family:'Roboto',monospace; font-size:2rem; color:#fff; margin-bottom:1.5rem; line-height:1.3;">120? <span style="font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:400; color:rgba(255,255,255,0.35);">/ Lifetime</span></div>
 
                 <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
 
@@ -2590,7 +2467,7 @@
 
                 <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
 
-                <div style="font-family:'Roboto',monospace; font-size:2rem; color:#fff; margin-bottom:1.5rem; line-height:1.3;">80€ <span style="font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:400; color:rgba(255,255,255,0.35);">/ 6 Months</span></div>
+                <div style="font-family:'Roboto',monospace; font-size:2rem; color:#fff; margin-bottom:1.5rem; line-height:1.3;">80? <span style="font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:400; color:rgba(255,255,255,0.35);">/ 6 Months</span></div>
 
                 <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin-bottom:1.5rem;">
 
@@ -2644,13 +2521,13 @@
             <button type="button" class="purchase-close" onclick="closePurchaseModal()" aria-label="Close checkout"><i class="fa-solid fa-xmark"></i></button>
             <span class="purchase-eyebrow">Secure checkout</span>
             <h2 class="purchase-title" id="purchase-title">Lifetime Access</h2>
-            <p class="purchase-subtitle" id="purchase-subtitle">120€ · lifetime</p>
+            <p class="purchase-subtitle" id="purchase-subtitle">120? ? lifetime</p>
 
             <div class="purchase-method">
                 <i class="fa-brands fa-paypal" aria-hidden="true"></i>
                 <div>
                     <span class="purchase-method-label">Payment method</span>
-                    <span class="purchase-method-value">PayPal · Friends &amp; Family</span>
+                    <span class="purchase-method-value">PayPal ? Friends &amp; Family</span>
                 </div>
             </div>
 
@@ -2676,9 +2553,9 @@
                     Before you pay
                 </div>
                 <ol>
-                    <li>Send as <em>Friends &amp; Family</em> only — goods &amp; services payments may be delayed or declined.</li>
+                    <li>Send as <em>Friends &amp; Family</em> only ? goods &amp; services payments may be delayed or declined.</li>
                     <li>Include all note details above or activation can take up to <em>24 hours</em>.</li>
-                    <li>License delivery is manual — you'll receive access after payment is verified.</li>
+                    <li>License delivery is manual ? you'll receive access after payment is verified.</li>
                     <li>All sales are <em>final</em>. No refunds for bans, downtime, or compatibility issues.</li>
                     <li>Need help? Open a ticket on Discord before paying if anything is unclear.</li>
                 </ol>
@@ -2900,12 +2777,12 @@
                     <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.75rem;">
                         <div style="font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.75rem; font-family:'DM Sans',sans-serif;">Display / Headings</div>
                         <div style="font-family:'Montserrat',sans-serif; font-size:2rem; font-weight:800; color:#fff; letter-spacing:-0.03em; line-height:1.1;">Montserrat</div>
-                        <div style="font-family:'Montserrat',sans-serif; font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.35); margin-top:0.5rem; letter-spacing:0.06em;">700 · 800</div>
+                        <div style="font-family:'Montserrat',sans-serif; font-size:0.78rem; font-weight:700; color:rgba(255,255,255,0.35); margin-top:0.5rem; letter-spacing:0.06em;">700 ? 800</div>
                     </div>
                     <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1.75rem;">
                         <div style="font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.75rem; font-family:'DM Sans',sans-serif;">Body / UI</div>
                         <div style="font-family:'DM Sans',sans-serif; font-size:2rem; font-weight:400; color:#fff; line-height:1.1;">DM Sans</div>
-                        <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35); margin-top:0.5rem; letter-spacing:0.06em;">300 · 400 · 500</div>
+                        <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.35); margin-top:0.5rem; letter-spacing:0.06em;">300 ? 400 ? 500</div>
                     </div>
                 </div>
             </div>
@@ -2949,7 +2826,7 @@
             <div style="text-align:center; padding:3rem 2rem; background:rgba(65,151,250,0.05); border:1px solid rgba(65,151,250,0.18); border-radius:20px; margin-top:1rem;">
                 <img src="./images/fusegg.png" alt="Fuse" style="width:48px; height:48px; object-fit:contain; margin-bottom:1.25rem; opacity:0.85;">
                 <h3 style="font-family:'Montserrat',sans-serif; font-size:1.5rem; font-weight:800; color:#fff; letter-spacing:-0.03em; margin-bottom:0.6rem;">Need the assets?</h3>
-                <p style="font-family:'DM Sans',sans-serif; color:rgba(255,255,255,0.4); font-size:0.9rem; margin-bottom:1.5rem; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.6;">Contact us on Discord for the official press kit — high-res logos, source files, and media assets.</p>
+                <p style="font-family:'DM Sans',sans-serif; color:rgba(255,255,255,0.4); font-size:0.9rem; margin-bottom:1.5rem; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.6;">Contact us on Discord for the official press kit ? high-res logos, source files, and media assets.</p>
                 <a href="https://discord.gg/yVUxWkrPT9" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:9px; padding:0.7rem 1.4rem; background:#5865F2; border-radius:10px; color:#fff; font-family:'Montserrat',sans-serif; font-size:0.85rem; font-weight:700; text-decoration:none; transition:background 0.2s, transform 0.15s;" onmouseover="this.style.background='#4752C4'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#5865F2'; this.style.transform='translateY(0)'">
                     <i class="fab fa-discord"></i> Contact on Discord
                 </a>
@@ -2990,11 +2867,11 @@
             </nav>
 
             <div class="nav-actions">
+                
+                <button type="button" id="nav-signup-btn" class="nav-signup">Log In</button>
                 <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
                     <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
-                
-                
             </div>
         </div>
     </header>
@@ -3030,7 +2907,7 @@
             if (!plan) return;
             _activePurchasePlan = planId;
             document.getElementById('purchase-title').textContent = plan.name;
-            document.getElementById('purchase-subtitle').textContent = plan.price + '€ · ' + plan.period;
+            document.getElementById('purchase-subtitle').textContent = plan.price + '? ? ' + plan.period;
             document.getElementById('purchase-note-plan').innerHTML =
                 '<i class="fa-solid fa-chevron-right"></i><span>Plan: <strong>' + plan.name + '</strong></span>';
             var payBtn = document.getElementById('purchase-pay-btn');
@@ -3070,7 +2947,7 @@
         document.addEventListener('touchstart', startBackgroundMusic, { once: true });
     </script>
     <script>
-        // Page name → URL slug mapping
+        // Page name ? URL slug mapping
         const PAGE_SLUGS = {
             
             home:    '/home',
@@ -3147,7 +3024,7 @@
 
         // On load, read the URL and activate the right page
         (function () {
-            // Check for redirect from 404.html — restore path and hash
+            // Check for redirect from 404.html ? restore path and hash
             const params = new URLSearchParams(window.location.search);
             const redirectedPath = params.get('p');
             const redirectedHash = params.get('h');
@@ -3652,11 +3529,11 @@
                     <a href="#" onclick="navigateTo('status');return false;">Status</a>
                     <a href="#" onclick="navigateTo('tos');return false;">Terms</a>
                 </nav>
-                <a class="footer-discord-btn" href="https://discord.gg/fuse" target="_blank" rel="noopener noreferrer" aria-label="Join Fuse Discord server">
+                <a class="footer-discord-btn" href="https://discord.gg/fusebypass" target="_blank" rel="noopener noreferrer" aria-label="Join Fuse Discord server">
                     <i class="fab fa-discord" aria-hidden="true"></i>
                     <span class="footer-discord-copy">
                         <span class="footer-discord-label">Community</span>
-                        <span class="footer-discord-members" id="footer-discord-members">Loading members…</span>
+                        <span class="footer-discord-members" id="footer-discord-members">Loading members</span>
                     </span>
                 </a>
             </div>
@@ -3688,7 +3565,153 @@
 })();
 </script>
 
-</body>
+<script src="./enhancements.js"></script>
+<script>
+/* -- FuseBypass Enhancements: inline fallback guarantee -- */
+(function(){
+  /* STEP 1 ? CSS injection */
+  if (!document.getElementById('fuse-enhancements-css')) {
+    var style = document.createElement('style');
+    style.id = 'fuse-enhancements-css';
+    style.textContent = [
+      '#fuse-cursor-glow{position:fixed;pointer-events:none;z-index:9990;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(65,151,250,0.09) 0%,rgba(65,151,250,0.03) 40%,transparent 70%);transform:translate(-50%,-50%);left:-9999px;top:-9999px;will-change:left,top;}',
+      '#fuse-overlay-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;}',
+      '.nav-item{position:relative;}',
+      '.nav-item::after{content:"";position:absolute;bottom:-6px;left:0;right:0;height:2px;background:#4197fa;border-radius:2px;transform:scaleX(0);transition:transform 0.22s cubic-bezier(0.22,1,0.36,1);transform-origin:center;}',
+      '.nav-item.active::after{transform:scaleX(1);}',
+      '#main-nav.scrolled{background:rgba(0,0,0,0.95)!important;border-bottom:1px solid rgba(255,255,255,0.07)!important;box-shadow:0 2px 40px rgba(0,0,0,0.7)!important;}',
+      '@keyframes fusePageIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}',
+      '.page.active{animation:fusePageIn 0.32s cubic-bezier(0.22,1,0.36,1) both!important;}',
+      '.fuse-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.22);transform:scale(0);animation:fuseRippleAnim 0.55s ease-out forwards;pointer-events:none;}',
+      '@keyframes fuseRippleAnim{to{transform:scale(4);opacity:0;}}',
+      '.scanner-row{position:relative;}',
+      '.scanner-row::before{content:"";position:absolute;left:0;top:15%;bottom:15%;width:2px;background:linear-gradient(180deg,transparent,#4197fa,transparent);border-radius:2px;opacity:0;transition:opacity 0.2s;}',
+      '.scanner-row:hover::before{opacity:1;}',
+      '.scanner-row:hover{box-shadow:inset 3px 0 0 rgba(65,151,250,0.3)!important;}',
+      '.faq-item.open{border-color:rgba(65,151,250,0.35)!important;box-shadow:0 0 0 1px rgba(65,151,250,0.12),0 8px 32px rgba(0,0,0,0.3)!important;}',
+      '.tos-item,.faq-item{position:relative;overflow:hidden;}',
+      '.tos-item::after,.faq-item::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.035) 50%,transparent 60%);background-size:200% 100%;background-position:200% 0;transition:background-position 0.55s ease;pointer-events:none;}',
+      '.tos-item:hover::after,.faq-item:hover::after{background-position:-200% 0;}',
+      '.logo-intro-bar-fill{background:linear-gradient(90deg,rgba(65,151,250,0.6),#4197fa,#ffffff)!important;}',
+      '.badge-undetected{box-shadow:0 0 16px rgba(0,180,60,0.3)!important;}',
+      '.fuse-reveal{opacity:0;transform:translateY(20px);transition:opacity 0.55s cubic-bezier(0.22,1,0.36,1),transform 0.55s cubic-bezier(0.22,1,0.36,1);}',
+      '.fuse-reveal.fuse-visible{opacity:1;transform:translateY(0);}',
+      '.fuse-reveal-d1{transition-delay:0.08s;}.fuse-reveal-d2{transition-delay:0.16s;}.fuse-reveal-d3{transition-delay:0.24s;}.fuse-reveal-d4{transition-delay:0.32s;}',
+      '.float-badge{box-shadow:0 4px 24px rgba(0,0,0,0.65),0 0 0 1px rgba(255,255,255,0.07),inset 0 1px 0 rgba(255,255,255,0.09)!important;}',
+      '.hero-sub{filter:drop-shadow(0 0 40px rgba(65,151,250,0.12));}',
+      '.fuse-tilt-card{transform-style:preserve-3d;will-change:transform;}',
+      '#page-store .fuse-tilt-card:hover{border-color:rgba(255,255,255,0.2)!important;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 60px rgba(65,151,250,0.07)!important;}',
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  /* STEP 2 ? JS effects */
+  function fuseInit() {
+    /* Cursor glow */
+    if (!document.getElementById('fuse-cursor-glow')) {
+      var glow = document.createElement('div');
+      glow.id = 'fuse-cursor-glow';
+      document.body.appendChild(glow);
+      var tx = -9999, ty = -9999, gx = -9999, gy = -9999;
+      document.addEventListener('mousemove', function(e){ tx=e.clientX; ty=e.clientY; });
+      (function lg(){ gx+=(tx-gx)*0.1; gy+=(ty-gy)*0.1; glow.style.left=gx+'px'; glow.style.top=gy+'px'; requestAnimationFrame(lg); })();
+    }
+
+    /* Nav scroll */
+    var nav = document.getElementById('main-nav');
+    if (nav) {
+      window.addEventListener('scroll', function(){ nav.classList.toggle('scrolled', window.scrollY>12); }, {passive:true});
+    }
+
+    /* Button ripple */
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest('.btn-primary,.btn-ghost,.btn-submit,.btn-discord,.nav-signup');
+      if (!btn) return;
+      var rect = btn.getBoundingClientRect();
+      var sz = Math.max(rect.width,rect.height)*1.6;
+      var r = document.createElement('span');
+      r.className='fuse-ripple';
+      r.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-rect.left-sz/2)+'px;top:'+(e.clientY-rect.top-sz/2)+'px;';
+      btn.appendChild(r);
+      setTimeout(function(){r.remove();},600);
+    });
+
+    /* 3D card tilt */
+    function applyTilt(sel){
+      document.querySelectorAll(sel).forEach(function(c){
+        if(c.dataset.ft) return; c.dataset.ft='1'; c.classList.add('fuse-tilt-card');
+        c.addEventListener('mousemove',function(e){
+          var r=c.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+          c.style.transition='transform 0.08s ease,box-shadow 0.25s,border-color 0.25s';
+          c.style.transform='perspective(800px) rotateX('+(-y*7)+'deg) rotateY('+(x*7)+'deg) translateY(-6px) scale(1.02)';
+        });
+        c.addEventListener('mouseleave',function(){
+          c.style.transition='transform 0.45s cubic-bezier(0.22,1,0.36,1),box-shadow 0.25s,border-color 0.25s';
+          c.style.transform='';
+        });
+      });
+    }
+    applyTilt('#page-store > div > div');
+
+    /* Scroll reveal */
+    var io = window.IntersectionObserver ? new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){e.target.classList.add('fuse-visible');io.unobserve(e.target);} });
+    },{threshold:0.1,rootMargin:'0px 0px -30px 0px'}) : null;
+
+    function attachReveal(){
+      ['.tos-item','.faq-item','.scanner-row','.game-card','#page-store > div > div'].forEach(function(s){
+        document.querySelectorAll(s).forEach(function(el,i){
+          if(el.dataset.fr) return; el.dataset.fr='1';
+          el.classList.add('fuse-reveal','fuse-reveal-d'+((i%4)+1));
+          if(io) io.observe(el);
+        });
+      });
+    }
+    attachReveal();
+
+    /* Particle canvas */
+    if (!document.getElementById('fuse-overlay-canvas')) {
+      var ov = document.createElement('canvas');
+      ov.id='fuse-overlay-canvas'; document.body.appendChild(ov);
+      var oc=ov.getContext('2d'), pts=[], N=50;
+      function rsz(){ ov.width=window.innerWidth; ov.height=window.innerHeight; }
+      rsz(); window.addEventListener('resize',rsz,{passive:true});
+      for(var i=0;i<N;i++) pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,r:.6+Math.random()*1.4,a:.12+Math.random()*.28,blue:Math.random()>.6,ph:Math.random()*Math.PI*2});
+      var ot=0;
+      (function draw(){
+        var W=ov.width,H=ov.height; oc.clearRect(0,0,W,H);
+        var ly=H*.5+Math.sin(ot*.00025)*H*.07,lg=oc.createLinearGradient(0,0,W,0);
+        lg.addColorStop(0,'transparent');lg.addColorStop(.25,'rgba(65,151,250,0.03)');lg.addColorStop(.5,'rgba(65,151,250,0.055)');lg.addColorStop(.75,'rgba(65,151,250,0.03)');lg.addColorStop(1,'transparent');
+        oc.fillStyle=lg; oc.fillRect(0,ly-90,W,180);
+        for(var i=0;i<N;i++){
+          var p=pts[i]; p.x+=p.vx; p.y+=p.vy;
+          if(p.x<-8)p.x=W+8; if(p.x>W+8)p.x=-8; if(p.y<-8)p.y=H+8; if(p.y>H+8)p.y=-8;
+          var pa=p.a*(.55+.45*Math.sin(ot*.0007+p.ph));
+          oc.beginPath(); oc.arc(p.x,p.y,p.r,0,Math.PI*2);
+          oc.fillStyle=p.blue?'rgba(65,151,250,'+pa.toFixed(3)+')':'rgba(255,255,255,'+(pa*.45).toFixed(3)+')'; oc.fill();
+          for(var j=i+1;j<N;j++){
+            var q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+            if(d<115){var la=(1-d/115)*.045; oc.strokeStyle=p.blue?'rgba(65,151,250,'+la.toFixed(4)+')':'rgba(255,255,255,'+(la*.4).toFixed(4)+')'; oc.lineWidth=.5; oc.beginPath(); oc.moveTo(p.x,p.y); oc.lineTo(q.x,q.y); oc.stroke();}
+          }
+        }
+        ot+=16; requestAnimationFrame(draw);
+      })();
+    }
+
+    /* Patch navigateTo */
+    function patchNav(){
+      if(typeof window.navigateTo!=='function'){setTimeout(patchNav,80);return;}
+      if(window.navigateTo._fp) return;
+      var orig=window.navigateTo;
+      window.navigateTo=function(t){orig(t);setTimeout(function(){applyTilt('#page-store > div > div');attachReveal();},60);};
+      window.navigateTo._fp=true;
+    }
+    patchNav();
+  }
+
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',fuseInit);}else{fuseInit();}
+})();
+</script>
 
 </html>
 
