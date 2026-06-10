@@ -63,7 +63,7 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Discord-Access-Token"
     Cache-Control = "no-cache, no-store, must-revalidate"
 
 [[headers]]
