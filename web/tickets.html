@@ -1,0 +1,857 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tickets — Fuse</title>
+    <link rel="icon" type="image/png" href="./images/fuseggbw.png" sizes="64x64">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFwYUyllePp3mg0DHl4XHPhmFoGGhjJ68",
+            authDomain: "fuse-tickets.firebaseapp.com",
+            projectId: "fuse-tickets",
+            storageBucket: "fuse-tickets.firebasestorage.app",
+            messagingSenderId: "1095180652042",
+            appId: "1:1095180652042:web:4c510969bcc818f470d9f3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db  = getFirestore(app);
+
+        window._db         = db;
+        window._fbCol      = (name) => collection(db, name);
+        window._fbAddDoc   = addDoc;
+        window._fbGetDocs  = getDocs;
+        window._fbDoc      = (col, id) => doc(db, col, id);
+        window._fbUpdate   = updateDoc;
+        window._fbQuery    = query;
+        window._fbOrderBy  = orderBy;
+        window._fbSnapshot = onSnapshot;
+        window._fbServerTs = serverTimestamp;
+        window._fbReady    = true;
+
+        // Signal that Firebase is ready — use setTimeout to ensure the regular script listener is registered first
+        setTimeout(() => document.dispatchEvent(new Event('firebase-ready')), 0);
+    </script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #000000;
+            background-image: linear-gradient(rgba(252,128,233,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(252,128,233,0.07) 1px, transparent 1px);
+            background-size: 60px 60px;
+            min-height: 100vh;
+            color: #fff;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 45%, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.04) 45%, transparent 72%),
+                radial-gradient(ellipse 50% 30% at 20% 100%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 30% at 80% 100%, rgba(255,255,255,0.04) 0%, transparent 60%);
+            animation: glowPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.72; }
+        }
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background: rgba(8,8,8,0.92); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px; z-index: 100;
+        }
+        .topbar-logo { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; color: #fff; text-decoration: none; }
+        .topbar-logo span { color: rgba(255,255,255,0.4); }
+        .wrap { padding: 88px 32px 60px; max-width: 1100px; margin: 0 auto; }
+        /* Page header */
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+        .page-header-left { display: flex; align-items: center; gap: 14px; }
+        .back-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.9rem; transition: background 0.2s, color 0.2s; flex-shrink: 0; cursor: pointer; }
+        .back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .page-title-block h1 { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; }
+        .page-title-block p { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-top: 4px; }
+        .btn-create { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #fc80e9; color: #000; font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 800; border-radius: 10px; border: none; cursor: pointer; transition: background 0.2s, transform 0.15s; white-space: nowrap; }
+        .btn-create:hover { background: #fc80e9; transform: translateY(-1px); }
+        /* Table */
+        .table-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        thead th { padding: 14px 18px; text-align: left; font-family: 'Montserrat', sans-serif; font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,255,255,0.05); }
+        tbody td { padding: 14px 18px; color: rgba(255,255,255,0.8); vertical-align: middle; }
+        .td-subject { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.85rem; color: #fff; max-width: 260px; }
+        .td-subject small { display: block; font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+        .td-category { color: rgba(255,255,255,0.55); font-size: 0.82rem; }
+        .td-messages { color: rgba(255,255,255,0.55); font-size: 0.82rem; text-align: center; }
+        .td-last { color: rgba(255,255,255,0.4); font-size: 0.78rem; white-space: nowrap; }
+        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+        .badge::before { content: '●'; font-size: 0.55rem; }
+        .badge-open        { background: rgba(252,128,233,0.12);   color: #fc80e9; }
+        .badge-in_progress { background: rgba(240,165,0,0.12);  color: #f0a500; }
+        .badge-waiting     { background: rgba(74,144,226,0.12); color: #4a90e2; }
+        .badge-resolved    { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+        .badge-closed      { background: rgba(107,114,128,0.12);color: #6b7280; }
+        .empty-state { padding: 64px 32px; text-align: center; }
+        .empty-state i { font-size: 2.5rem; color: rgba(255,255,255,0.1); margin-bottom: 16px; display: block; }
+        .empty-state h3 { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+        .empty-state p { font-size: 0.82rem; color: rgba(255,255,255,0.25); }
+        .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.78rem; color: rgba(255,255,255,0.35); flex-wrap: wrap; gap: 10px; }
+        .pagination { display: flex; gap: 6px; }
+        .page-btn { padding: 5px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; color: rgba(255,255,255,0.6); font-size: 0.78rem; font-family: 'Montserrat', sans-serif; font-weight: 700; cursor: pointer; transition: background 0.15s, color 0.15s; }
+        .page-btn:hover:not(:disabled) { background: rgba(255,255,255,0.12); color: #fff; }
+        .page-btn:disabled { opacity: 0.35; cursor: default; }
+        .page-btn.active { background: rgba(0,200,168,0.15); border-color: rgba(0,200,168,0.4); color: #fc80e9; }
+        /* ── Detail View ── */
+        #view-detail { display: none; }
+        .detail-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+        .detail-title-block { flex: 1; min-width: 0; }
+        .detail-title-block h2 { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .detail-title-block small { font-size: 0.72rem; color: rgba(255,255,255,0.3); font-family: 'Montserrat', sans-serif; letter-spacing: 0.06em; }
+        .detail-layout { display: flex; gap: 20px; align-items: flex-start; }
+        .conversation-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .messages-area { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px 12px 0 0; padding: 20px; min-height: 420px; max-height: 520px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+        .messages-area::-webkit-scrollbar { width: 5px; }
+        .messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+        .msg-row { display: flex; gap: 12px; align-items: flex-start; }
+        .msg-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,200,168,0.2); border: 1px solid rgba(0,200,168,0.3); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 800; color: #fc80e9; flex-shrink: 0; overflow: hidden; }
+        .msg-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .msg-avatar.staff-av { background: rgba(240,165,0,0.15); border-color: rgba(240,165,0,0.3); color: #f0a500; }
+        .msg-body { flex: 1; min-width: 0; }
+        .msg-meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+        .msg-author { font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 700; color: #fff; }
+        .msg-author.staff-name { color: #f0a500; }
+        .msg-time { font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+        .staff-tag { font-size: 0.62rem; font-family: 'Montserrat', sans-serif; font-weight: 700; background: rgba(240,165,0,0.15); color: #f0a500; padding: 1px 6px; border-radius: 4px; letter-spacing: 0.05em; }
+        .msg-bubble { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 4px 12px 12px 12px; padding: 10px 14px; font-size: 0.85rem; line-height: 1.6; color: rgba(255,255,255,0.85); word-break: break-word; }
+        .msg-bubble.staff-bubble { background: rgba(240,165,0,0.06); border-color: rgba(240,165,0,0.12); }
+        .no-messages { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(255,255,255,0.2); gap: 10px; padding: 40px 0; text-align: center; }
+        .no-messages i { font-size: 2rem; }
+        .no-messages p { font-size: 0.82rem; }
+        /* Input bar */
+        .msg-input-bar { display: flex; align-items: flex-end; gap: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-top: none; border-radius: 0 0 12px 12px; padding: 10px 12px; }
+        .msg-input-bar textarea { flex: 1; background: none; border: none; outline: none; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; resize: none; min-height: 38px; max-height: 120px; line-height: 1.5; padding: 6px 8px; }
+        .msg-input-bar textarea::placeholder { color: rgba(255,255,255,0.25); }
+        .input-action-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background 0.15s, color 0.15s; flex-shrink: 0; }
+        .input-action-btn:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); }
+        .send-btn { background: rgba(0,200,168,0.15); color: #fc80e9; }
+        .send-btn:hover { background: rgba(0,200,168,0.28); color: #fc80e9; }
+        /* Sidebar */
+        .sidebar-col { width: 280px; flex-shrink: 0; }
+        .sidebar-panel { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; }
+        .sidebar-section { padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar-label { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.25); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+        .sidebar-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.82rem; }
+        .sidebar-row:last-child { margin-bottom: 0; }
+        .sidebar-row-label { color: rgba(255,255,255,0.4); }
+        .sidebar-row-val { color: rgba(255,255,255,0.8); font-weight: 500; }
+        .member-row { display: flex; align-items: center; gap: 10px; }
+        .member-av { width: 30px; height: 30px; border-radius: 50%; background: rgba(0,200,168,0.15); border: 1px solid rgba(0,200,168,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 0.72rem; font-weight: 800; color: #fc80e9; overflow: hidden; flex-shrink: 0; }
+        .member-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .member-name { font-family: 'Montserrat', sans-serif; font-size: 0.78rem; font-weight: 700; color: #fff; }
+        .member-role { font-size: 0.68rem; color: rgba(255,255,255,0.3); }
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal { background: #111118; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; transform: translateY(12px) scale(0.98); transition: transform 0.2s; }
+        .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+        .modal::-webkit-scrollbar { width: 5px; }
+        .modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+        .modal-header h3 { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 800; }
+        .modal-close { width: 30px; height: 30px; border-radius: 7px; border: none; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background 0.15s, color 0.15s; }
+        .modal-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+        .form-label { font-family: 'Montserrat', sans-serif; font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; text-transform: uppercase; }
+        .form-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 9px; padding: 10px 14px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.15s; width: 100%; }
+        .form-input:focus { border-color: rgba(0,200,168,0.5); }
+        .form-input::placeholder { color: rgba(255,255,255,0.2); }
+        textarea.form-input { resize: vertical; min-height: 90px; line-height: 1.5; }
+        .category-list { display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; padding-right: 4px; }
+        .category-list::-webkit-scrollbar { width: 4px; }
+        .category-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .cat-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 13px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.03); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+        .cat-item:hover { background: rgba(255,255,255,0.07); }
+        .cat-item.selected { background: rgba(0,200,168,0.1); border-color: rgba(0,200,168,0.35); }
+        .cat-emoji { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+        .cat-name { font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 700; color: #fff; }
+        .cat-desc { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+        .modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 16px 24px 20px; border-top: 1px solid rgba(255,255,255,0.07); }
+        .btn-cancel { padding: 9px 18px; background: rgba(180,30,30,0.15); border: 1px solid rgba(180,30,30,0.3); border-radius: 9px; color: #e05555; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+        .btn-cancel:hover { background: rgba(180,30,30,0.28); }
+        .btn-submit { padding: 9px 18px; background: rgba(0,200,168,0.12); border: 1px solid rgba(0,200,168,0.4); border-radius: 9px; color: #fc80e9; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+        .btn-submit:hover { background: rgba(0,200,168,0.22); }
+        /* Toast */
+        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(20,20,28,0.97); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 20px; font-size: 0.82rem; color: rgba(255,255,255,0.8); z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: rgba(252,128,233,0.3); color: #fc80e9; }
+        .toast.error { border-color: rgba(255,80,80,0.3); color: #ff5555; }
+        /* No access */
+        #no-access { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 2rem; }
+        #no-access h2 { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+        #no-access p { color: rgba(255,255,255,0.4); font-size: 0.9rem; margin-bottom: 24px; }
+        .btn-discord { display: inline-flex; align-items: center; gap: 9px; padding: 12px 26px; background: #5865F2; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.88rem; border-radius: 10px; text-decoration: none; border: none; cursor: pointer; transition: background 0.2s; }
+        .btn-discord:hover { background: #4752C4; }
+        @media (max-width: 700px) { .wrap { padding: 80px 16px 40px; } .detail-layout { flex-direction: column; } .sidebar-col { width: 100%; } .topbar { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+<header class="topbar">
+    <a class="topbar-logo" href="https://fusebypass.fun">fusebypass<span>.fun</span></a>
+</header>
+<div class="toast" id="toast"></div>
+
+<!-- No access screen -->
+<div id="no-access">
+    <h2>Sign in required</h2>
+    <p>You need to sign in with Discord to view your tickets.</p>
+    <a class="btn-discord" href="/dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Go to Dashboard
+    </a>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Create Support Ticket</h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label" for="modal-subject">Subject</label>
+                <input class="form-input" type="text" id="modal-subject" placeholder="Brief description of your issue" maxlength="120" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <div class="category-list" id="category-list">
+                    <div class="cat-item selected" data-value="purchase" onclick="selectCat(this)">
+                        <span class="cat-emoji">💸</span>
+                        <div><div class="cat-name">Purchase</div><div class="cat-desc">Purchase Inquiries</div></div>
+                    </div>
+                    <div class="cat-item" data-value="support" onclick="selectCat(this)">
+                        <span class="cat-emoji">📞</span>
+                        <div><div class="cat-name">Support</div><div class="cat-desc">Ask For Assistance</div></div>
+                    </div>
+                    
+                    
+                    <div class="cat-item" data-value="media" onclick="selectCat(this)">
+                        <span class="cat-emoji">🎥</span>
+                        <div><div class="cat-name">Media</div><div class="cat-desc">Apply For Media Creator</div></div>
+                    </div>
+                    <div class="cat-item" data-value="investor" onclick="selectCat(this)">
+                        <span class="cat-emoji">💼</span>
+                        <div><div class="cat-name">Investor</div><div class="cat-desc">Work With Us , Start Gain Cash</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="modal-message">Message <span style="color:rgba(255,255,255,0.25);font-size:0.7rem;text-transform:none;letter-spacing:0">(optional)</span></label>
+                <textarea class="form-input" id="modal-message" placeholder="Describe your issue in detail..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-submit" onclick="submitTicket()">Create Ticket</button>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW 1: Ticket List -->
+<div class="wrap" id="view-list" style="display:none;">
+    <div class="page-header">
+        <div class="page-header-left">
+            <a class="back-btn" href="/dashboard"><i class="fa fa-arrow-left"></i></a>
+            <div class="page-title-block">
+                <h1>Need Help?</h1>
+                <p>Search for a handbook or create a support ticket.</p>
+            </div>
+        </div>
+        <button class="btn-create" onclick="openModal()"><i class="fa fa-plus"></i> Create Ticket</button>
+    </div>
+    <div class="table-card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Participants</th>
+                        <th>Category</th>
+                        <th style="text-align:center">Messages</th>
+                        <th>Last Message</th>
+                    </tr>
+                </thead>
+                <tbody id="tickets-tbody"></tbody>
+            </table>
+        </div>
+        <div id="empty-state" class="empty-state" style="display:none;">
+            <i class="fa fa-ticket"></i>
+            <h3>No tickets yet</h3>
+            <p>Create a support ticket and we'll get back to you shortly.</p>
+        </div>
+        <div class="table-footer">
+            <span id="entries-info">Showing 0 entries</span>
+            <div class="pagination">
+                <button class="page-btn" id="btn-prev" onclick="changePage(-1)" disabled>Previous</button>
+                <button class="page-btn active" id="page-num">1</button>
+                <button class="page-btn" id="btn-next" onclick="changePage(1)" disabled>Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VIEW 2: Ticket Detail -->
+<div class="wrap" id="view-detail" style="display:none;">
+    <div class="detail-header">
+        <button class="back-btn" onclick="showList()"><i class="fa fa-arrow-left"></i></button>
+        <div class="detail-title-block">
+            <h2 id="detail-subject">—</h2>
+            <small id="detail-id">—</small>
+        </div>
+        <span id="detail-badge" class="badge badge-open">Open</span>
+        <button id="btn-close-ticket" onclick="closeTicket()" style="display:none;margin-left:auto;padding:8px 16px;background:rgba(180,30,30,0.15);border:1px solid rgba(180,30,30,0.35);border-radius:9px;color:#e05555;font-family:'Montserrat',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:background 0.15s;">
+            <i class="fa fa-lock"></i> Close Ticket
+        </button>
+    </div>
+    <div class="detail-layout">
+        <div class="conversation-col">
+            <div class="messages-area" id="messages-area"></div>
+            <div class="msg-input-bar" id="msg-input-bar">
+                <textarea id="msg-textarea" placeholder="Type a message..." rows="1" onkeydown="handleMsgKey(event)"></textarea>
+                <button class="input-action-btn send-btn" onclick="sendMessage()" title="Send"><i class="fa fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <div class="sidebar-col">
+            <div class="sidebar-panel">
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Ticket Info</div>
+                    <div class="sidebar-row"><span class="sidebar-row-label">Status</span><span id="sb-status" class="badge badge-open">Open</span></div>
+                    <div class="sidebar-row"><span class="sidebar-row-label">Category</span><span class="sidebar-row-val" id="sb-category">—</span></div>
+                    <div class="sidebar-row"><span class="sidebar-row-label">Created</span><span class="sidebar-row-val" id="sb-created">—</span></div>
+                    <div class="sidebar-row"><span class="sidebar-row-label">Last Reply</span><span class="sidebar-row-val" id="sb-last">—</span></div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Members (<span id="sb-member-count">1</span>)</div>
+                    <div id="sb-members"></div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="sidebar-label">Attachments (0)</div>
+                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.25);">No attachments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Constants ──
+    var ROLE_OWNER = '1507374058247815218';
+    var ROLE_ADMIN = '1510902432681689128';
+
+    // ── State ──
+    var currentUser   = null;
+    var userRoles     = [];
+    var isAdmin       = false;
+    var allTickets    = [];
+    var currentTicket = null;
+    var selectedCat   = 'general';
+    var currentPage   = 1;
+    var perPage       = 10;
+    var unsubscribe   = null;
+
+    // ── Immediate boot — show UI right away ──
+    (function immediateInit() {
+        var userData  = localStorage.getItem('fuse_user');
+        var rolesData = localStorage.getItem('fuse_roles');
+        var token     = localStorage.getItem('fuse_token');
+
+        if (!userData || !token) {
+            document.getElementById('no-access').style.display = 'flex';
+            return;
+        }
+        try { currentUser = JSON.parse(userData); } catch(e) {
+            document.getElementById('no-access').style.display = 'flex'; return;
+        }
+        try { userRoles = JSON.parse(rolesData || '[]'); } catch(e) { userRoles = []; }
+
+        isAdmin = userRoles.indexOf(ROLE_OWNER) > -1 || userRoles.indexOf(ROLE_ADMIN) > -1;
+
+        fetch('/api/users?action=check-ban&id=' + encodeURIComponent(currentUser.id))
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.banned) showNoAccess();
+            }).catch(function() {});
+
+        // Show list immediately — Firebase will populate it when ready
+        document.getElementById('no-access').style.display   = 'none';
+        document.getElementById('view-list').style.display   = 'block';
+        document.getElementById('view-detail').style.display = 'none';
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('entries-info').textContent  = 'Loading tickets...';
+    })();
+
+    // ── Firebase boot (fires when module is ready) ──
+    function bootApp() {
+        if (!currentUser) return; // not logged in, already handled above
+        startRealtimeListener();
+    }
+
+    // Wait for Firebase — poll every 100ms as fallback
+    var _booted = false;
+    document.addEventListener('firebase-ready', function() { if (!_booted) { _booted = true; bootApp(); } });
+    var _fbPoll = setInterval(function() {
+        if (window._fbReady && !_booted) { _booted = true; clearInterval(_fbPoll); bootApp(); }
+    }, 100);
+
+    function showNoAccess() {
+        document.getElementById('no-access').style.display = 'flex';
+        document.getElementById('view-list').style.display = 'none';
+        document.getElementById('view-detail').style.display = 'none';
+    }
+
+    // ── Firestore realtime listener ──
+    function startRealtimeListener() {
+        var col = window._fbCol('tickets');
+        var q   = window._fbQuery(col, window._fbOrderBy('createdAt', 'desc'));
+
+        if (unsubscribe) unsubscribe();
+
+        unsubscribe = window._fbSnapshot(q, function(snapshot) {
+            allTickets = [];
+            snapshot.forEach(function(docSnap) {
+                var data = docSnap.data();
+                data._docId = docSnap.id;
+                allTickets.push(data);
+            });
+
+            // If viewing detail, refresh it live
+            if (currentTicket) {
+                var updated = allTickets.find(function(t) { return t.id === currentTicket.id; });
+                if (updated) {
+                    currentTicket = updated;
+                    renderMessages();
+                    updateDetailSidebar(updated);
+                }
+            } else {
+                renderTable();
+            }
+        }, function(err) {
+            console.error('Firestore error:', err);
+            showToast('Failed to load tickets.', 'error');
+        });
+    }
+
+    // ── Visibility filter ──
+    // Users see only their own tickets; admins see ALL
+    // Closed tickets are hidden from regular users
+    function getVisibleTickets() {
+        if (isAdmin) return allTickets.slice();
+        return allTickets.filter(function(t) {
+            return t.userId === currentUser.id && t.status !== 'closed';
+        });
+    }
+
+    // ── Views ──
+    function showList() {
+        document.getElementById('no-access').style.display   = 'none';
+        document.getElementById('view-list').style.display   = 'block';
+        document.getElementById('view-detail').style.display = 'none';
+        currentTicket = null;
+        renderTable();
+    }
+
+    function showDetail(ticketId) {
+        var ticket = allTickets.find(function(t) { return t.id === ticketId; });
+        if (!ticket) return;
+
+        // Access control: non-admins can only open their own tickets
+        if (!isAdmin && ticket.userId !== currentUser.id) {
+            showToast('Access denied.', 'error');
+            return;
+        }
+
+        // Closed tickets are invisible to regular users
+        if (!isAdmin && ticket.status === 'closed') {
+            showToast('This ticket is no longer available.', 'error');
+            return;
+        }
+
+        currentTicket = ticket;
+        document.getElementById('view-list').style.display   = 'none';
+        document.getElementById('view-detail').style.display = 'block';
+
+        // Header
+        document.getElementById('detail-subject').textContent = ticket.subject;
+        document.getElementById('detail-id').textContent      = ticket.id;
+        var badgeEl = document.getElementById('detail-badge');
+        badgeEl.className   = 'badge badge-' + ticket.status;
+        badgeEl.textContent = statusLabel(ticket.status);
+
+        // Show close button only if ticket is not closed, and only for admins or ticket owner
+        var closeBtn = document.getElementById('btn-close-ticket');
+        if (ticket.status !== 'closed' && (isAdmin || ticket.userId === currentUser.id)) {
+            closeBtn.style.display = 'inline-flex';
+        } else {
+            closeBtn.style.display = 'none';
+        }
+
+        updateDetailSidebar(ticket);
+
+        // Input bar: hide if ticket is closed
+        document.getElementById('msg-input-bar').style.display = ticket.status === 'closed' ? 'none' : 'flex';
+
+        renderMessages();
+    }
+
+    function updateDetailSidebar(ticket) {
+        var sbStatus = document.getElementById('sb-status');
+        sbStatus.className   = 'badge badge-' + ticket.status;
+        sbStatus.textContent = statusLabel(ticket.status);
+        document.getElementById('sb-category').textContent = catLabel(ticket.category);
+        document.getElementById('sb-created').textContent  = timeAgo(ticket.createdAt && ticket.createdAt.toDate ? ticket.createdAt.toDate().toISOString() : ticket.createdAt);
+        document.getElementById('sb-last').textContent     = timeAgo(ticket.lastReplyAt && ticket.lastReplyAt.toDate ? ticket.lastReplyAt.toDate().toISOString() : (ticket.lastReplyAt || ticket.createdAt));
+
+        var members = ticket.members || [{ id: ticket.userId, name: ticket.userName || 'User', isStaff: false }];
+        document.getElementById('sb-member-count').textContent = members.length;
+        document.getElementById('sb-members').innerHTML = members.map(function(m) {
+            var initials = (m.name || 'U').charAt(0).toUpperCase();
+            var avatarHtml = m.avatar ? '<img src="' + m.avatar + '" alt="">' : initials;
+            return '<div class="member-row" style="margin-bottom:8px;">' +
+                '<div class="member-av">' + avatarHtml + '</div>' +
+                '<div><div class="member-name">' + escHtml(m.name) + '</div>' +
+                '<div class="member-role">' + (m.isStaff ? 'Staff' : 'Member') + '</div></div>' +
+                '</div>';
+        }).join('');
+    }
+
+    // ── Table rendering ──
+    function renderTable() {
+        var visible = getVisibleTickets();
+        visible.sort(function(a,b){
+            var ta = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+            var tb = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+            return tb - ta;
+        });
+
+        // Disable create button if user already has an open ticket
+        if (!isAdmin) {
+            var activeStatuses = ['open', 'in_progress', 'waiting'];
+            var hasOpen = allTickets.some(function(t) {
+                return t.userId === currentUser.id && activeStatuses.indexOf(t.status) > -1;
+            });
+            var createBtn = document.querySelector('.btn-create');
+            if (createBtn) {
+                createBtn.disabled = hasOpen;
+                createBtn.title    = hasOpen ? 'You already have an open ticket' : '';
+                createBtn.style.opacity = hasOpen ? '0.4' : '1';
+                createBtn.style.cursor  = hasOpen ? 'not-allowed' : 'pointer';
+            }
+        }
+
+        var total      = visible.length;
+        var totalPages = Math.max(1, Math.ceil(total / perPage));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        var start = (currentPage - 1) * perPage;
+        var page  = visible.slice(start, start + perPage);
+
+        var tbody = document.getElementById('tickets-tbody');
+        var empty = document.getElementById('empty-state');
+
+        if (total === 0) {
+            tbody.innerHTML = '';
+            empty.style.display = 'block';
+            document.getElementById('entries-info').textContent = 'Showing 0 entries';
+        } else {
+            empty.style.display = 'none';
+            tbody.innerHTML = page.map(function(t) {
+                var initials = (t.userName || 'U').charAt(0).toUpperCase();
+                var msgCount = (t.replies || []).length;
+                var lastTs   = t.lastReplyAt && t.lastReplyAt.toDate ? t.lastReplyAt.toDate().toISOString() : (t.lastReplyAt || t.createdAt);
+                return '<tr onclick="showDetail(\'' + t.id + '\')">' +
+                    '<td class="td-subject">' + escHtml(t.subject) + '<small>' + t.id + '</small></td>' +
+                    '<td><span class="badge badge-' + t.status + '">' + statusLabel(t.status) + '</span></td>' +
+                    '<td><div style="display:flex;align-items:center;gap:6px;"><div class="member-av" style="width:26px;height:26px;font-size:0.68rem;">' + initials + '</div></div></td>' +
+                    '<td class="td-category">' + catLabel(t.category) + '</td>' +
+                    '<td class="td-messages">' + msgCount + '</td>' +
+                    '<td class="td-last">' + timeAgo(lastTs) + '</td>' +
+                    '</tr>';
+            }).join('');
+            document.getElementById('entries-info').textContent =
+                'Showing ' + (start+1) + ' to ' + Math.min(start+perPage, total) + ' of ' + total + ' entries';
+        }
+
+        document.getElementById('btn-prev').disabled = currentPage <= 1;
+        document.getElementById('btn-next').disabled = currentPage >= totalPages;
+        document.getElementById('page-num').textContent = currentPage;
+    }
+
+    function changePage(dir) {
+        currentPage += dir;
+        renderTable();
+    }
+
+    // ── Messages rendering ──
+    function renderMessages() {
+        if (!currentTicket) return;
+        var area    = document.getElementById('messages-area');
+        var replies = currentTicket.replies || [];
+
+        if (replies.length === 0) {
+            area.innerHTML = '<div class="no-messages"><i class="fa fa-comments"></i><p>No messages yet. Start the conversation!</p></div>';
+            return;
+        }
+
+        area.innerHTML = replies.map(function(r) {
+            var isStaff   = r.isStaff || false;
+            var initials  = (r.authorName || 'U').charAt(0).toUpperCase();
+            var avatarHtml = r.authorAvatar ? '<img src="' + r.authorAvatar + '" alt="">' : initials;
+            var ts = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toISOString() : r.createdAt;
+            return '<div class="msg-row">' +
+                '<div class="msg-avatar ' + (isStaff ? 'staff-av' : '') + '">' + avatarHtml + '</div>' +
+                '<div class="msg-body">' +
+                    '<div class="msg-meta">' +
+                        '<span class="msg-author ' + (isStaff ? 'staff-name' : '') + '">' + escHtml(r.authorName) + '</span>' +
+                        (isStaff ? '<span class="staff-tag">STAFF</span>' : '') +
+                        '<span class="msg-time">' + formatDate(ts) + '</span>' +
+                    '</div>' +
+                    '<div class="msg-bubble ' + (isStaff ? 'staff-bubble' : '') + '">' + escHtml(r.message) + '</div>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        area.scrollTop = area.scrollHeight;
+    }
+
+    // ── Send message ──
+    function sendMessage() {
+        if (!currentTicket) return;
+        var textarea = document.getElementById('msg-textarea');
+        var text = textarea.value.trim();
+        if (!text) return;
+
+        var now = new Date().toISOString();
+        var reply = {
+            id:           'R-' + Date.now(),
+            ticketId:     currentTicket.id,
+            authorId:     currentUser.id,
+            authorName:   currentUser.global_name || currentUser.username,
+            authorAvatar: currentUser.avatar
+                ? 'https://cdn.discordapp.com/avatars/' + currentUser.id + '/' + currentUser.avatar + '.png?size=64'
+                : null,
+            message:      text,
+            createdAt:    now,
+            isStaff:      isAdmin
+        };
+
+        var newStatus = currentTicket.status;
+        if (isAdmin && currentTicket.status === 'open') newStatus = 'in_progress';
+        if (!isAdmin && currentTicket.status === 'waiting') newStatus = 'open';
+
+        var updatedReplies = (currentTicket.replies || []).concat([reply]);
+
+        // Update Firestore
+        var docRef = window._fbDoc('tickets', currentTicket._docId);
+        window._fbUpdate(docRef, {
+            replies:     updatedReplies,
+            lastReplyAt: now,
+            updatedAt:   now,
+            status:      newStatus
+        }).then(function() {
+            textarea.value = '';
+            textarea.style.height = 'auto';
+            showToast('Message sent!', 'success');
+        }).catch(function(err) {
+            console.error(err);
+            showToast('Failed to send message.', 'error');
+        });
+    }
+
+    function handleMsgKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+        // Auto-resize textarea
+        var ta = document.getElementById('msg-textarea');
+        ta.style.height = 'auto';
+        ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+    }
+
+    // ── Modal ──
+    function openModal() {
+        document.getElementById('modal-subject').value  = '';
+        document.getElementById('modal-message').value = '';
+        selectedCat = 'general';
+        document.querySelectorAll('.cat-item').forEach(function(el) {
+            el.classList.toggle('selected', el.dataset.value === 'general');
+        });
+        document.getElementById('modal-overlay').classList.add('open');
+        setTimeout(function(){ document.getElementById('modal-subject').focus(); }, 200);
+    }
+
+    function closeModal() {
+        document.getElementById('modal-overlay').classList.remove('open');
+    }
+
+    function selectCat(el) {
+        document.querySelectorAll('.cat-item').forEach(function(c){ c.classList.remove('selected'); });
+        el.classList.add('selected');
+        selectedCat = el.dataset.value;
+    }
+
+    function submitTicket() {
+        var subject = document.getElementById('modal-subject').value.trim();
+        var message = document.getElementById('modal-message').value.trim();
+
+        if (!subject) { showToast('Please enter a subject.', 'error'); return; }
+        if (subject.length < 3) { showToast('Subject must be at least 3 characters.', 'error'); return; }
+
+        // Check if user already has an open ticket
+        var activeStatuses = ['open', 'in_progress', 'waiting'];
+        var hasOpenTicket = allTickets.some(function(t) {
+            return t.userId === currentUser.id && activeStatuses.indexOf(t.status) > -1;
+        });
+        if (hasOpenTicket) {
+            showToast('You already have an open ticket. Please wait for it to be resolved.', 'error');
+            closeModal();
+            return;
+        }
+
+        var userName   = currentUser.global_name || currentUser.username;
+        var userAvatar = currentUser.avatar
+            ? 'https://cdn.discordapp.com/avatars/' + currentUser.id + '/' + currentUser.avatar + '.png?size=64'
+            : null;
+
+        var now      = new Date().toISOString();
+        var ticketId = 'TKT-' + Date.now().toString(36).toUpperCase();
+
+        var firstReply = message ? [{
+            id:           'R-' + Date.now(),
+            ticketId:     ticketId,
+            authorId:     currentUser.id,
+            authorName:   userName,
+            authorAvatar: userAvatar,
+            message:      message,
+            createdAt:    now,
+            isStaff:      false
+        }] : [];
+
+        var ticket = {
+            id:          ticketId,
+            userId:      currentUser.id,
+            userName:    userName,
+            userAvatar:  userAvatar,
+            subject:     subject,
+            category:    selectedCat,
+            status:      'open',
+            createdAt:   now,
+            updatedAt:   now,
+            lastReplyAt: now,
+            replies:     firstReply,
+            members:     [{ id: currentUser.id, name: userName, avatar: userAvatar, isStaff: false }]
+        };
+
+        // Save to Firestore
+        window._fbAddDoc(window._fbCol('tickets'), ticket)
+            .then(function() {
+                closeModal();
+                showToast('Ticket created: ' + ticketId, 'success');
+            })
+            .catch(function(err) {
+                console.error(err);
+                showToast('Failed to create ticket.', 'error');
+            });
+    }
+
+    // ── Close Ticket ──
+    function closeTicket() {
+        if (!currentTicket) return;
+        if (!confirm('Are you sure you want to close this ticket? This cannot be undone.')) return;
+
+        var docRef = window._fbDoc('tickets', currentTicket._docId);
+        window._fbUpdate(docRef, {
+            status:    'closed',
+            updatedAt: new Date().toISOString()
+        }).then(function() {
+            showToast('Ticket closed.', 'success');
+            document.getElementById('btn-close-ticket').style.display = 'none';
+            document.getElementById('msg-input-bar').style.display    = 'none';
+        }).catch(function(err) {
+            console.error(err);
+            showToast('Failed to close ticket.', 'error');
+        });
+    }
+
+    // ── Helpers ──
+    function statusLabel(s) {
+        return { open:'Open', in_progress:'In Progress', waiting:'Waiting', resolved:'Resolved', closed:'Closed' }[s] || s;
+    }
+
+    function catLabel(c) {
+        return { purchase:'Purchase', ban_appeal:'Ban Appeal', partnership:'Partnership', technical_support:'Technical Support' }[c] || c;
+    }
+
+    function timeAgo(iso) {
+        if (!iso) return '—';
+        var diff = Date.now() - new Date(iso).getTime();
+        var mins = Math.floor(diff / 60000);
+        if (mins < 1)  return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 24)  return hrs + 'h ago';
+        var days = Math.floor(hrs / 24);
+        if (days < 7)  return days + 'd ago';
+        return new Date(iso).toLocaleDateString();
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '';
+        var d = new Date(iso);
+        return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' at ' +
+               d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+    }
+
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function showToast(msg, type) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + (type || '');
+        t.classList.add('show');
+        setTimeout(function(){ t.classList.remove('show'); }, 3000);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
+</body>
+</html>
+
+

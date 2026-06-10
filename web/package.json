@@ -1,0 +1,6 @@
+function toogleLight() {
+  AUDIO.CLICK.play();
+  lightON = !lightOn;
+  ROOT.style.setProperty("--on", lightOn ? "1" : "0");
+  card.classList.toggle("is-active", lightOn);
+}

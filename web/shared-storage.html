@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Fuse Shared Storage</title>
+</head>
+<body>
+<script>
+// This iframe acts as a shared storage hub
+// All tabs communicate through this single iframe
+
+console.log('[SharedStorage] Initializing...');
+
+let users = [];
+let banned = [];
+
+// Load from localStorage
+try {
+    users = JSON.parse(localStorage.getItem('fuse_all_users') || '[]');
+    banned = JSON.parse(localStorage.getItem('fuse_banned_users') || '[]');
+    console.log('[SharedStorage] Loaded from localStorage:', users.length, 'users,', banned.length, 'banned');
+} catch(e) {
+    console.error('[SharedStorage] Error loading from localStorage:', e);
+    users = [];
+    banned = [];
+}
+
+// Listen for messages from parent windows
+window.addEventListener('message', function(event) {
+    // Security: only accept messages from same origin
+    if (event.origin !== window.location.origin) {
+        console.warn('[SharedStorage] Ignored message from different origin:', event.origin);
+        return;
+    }
+
+    const { action, data } = event.data;
+    console.log('[SharedStorage] Received action:', action, data);
+
+    switch(action) {
+        case 'GET_USERS':
+            console.log('[SharedStorage] Sending users data:', users.length, 'users');
+            event.source.postMessage({
+                action: 'USERS_DATA',
+                users: users,
+                banned: banned
+            }, event.origin);
+            break;
+
+        case 'REGISTER_USER':
+            console.log('[SharedStorage] Registering user:', data.username);
+            // Update or add user
+            const idx = users.findIndex(u => u.id === data.id);
+            if (idx > -1) {
+                console.log('[SharedStorage] Updating existing user at index', idx);
+                users[idx] = data;
+            } else {
+                console.log('[SharedStorage] Adding new user');
+                users.push(data);
+            }
+            localStorage.setItem('fuse_all_users', JSON.stringify(users));
+            console.log('[SharedStorage] Total users now:', users.length);
+            
+            // Notify all listening windows
+            broadcastUpdate();
+            event.source.postMessage({ action: 'REGISTER_SUCCESS' }, event.origin);
+            break;
+
+        case 'BAN_USER':
+            console.log('[SharedStorage] Banning user:', data.username);
+            if (!banned.find(u => u.id === data.id)) {
+                banned.push(data);
+                localStorage.setItem('fuse_banned_users', JSON.stringify(banned));
+                broadcastUpdate();
+            }
+            event.source.postMessage({ action: 'BAN_SUCCESS' }, event.origin);
+            break;
+
+        case 'UNBAN_USER':
+            console.log('[SharedStorage] Unbanning user:', data.id);
+            banned = banned.filter(u => u.id !== data.id);
+            localStorage.setItem('fuse_banned_users', JSON.stringify(banned));
+            broadcastUpdate();
+            event.source.postMessage({ action: 'UNBAN_SUCCESS' }, event.origin);
+            break;
+
+        case 'CHECK_BAN':
+            const isBanned = banned.some(u => u.id === data.id);
+            console.log('[SharedStorage] Check ban for', data.id, ':', isBanned);
+            event.source.postMessage({ 
+                action: 'BAN_STATUS', 
+                userId: data.id,
+                banned: isBanned 
+            }, event.origin);
+            break;
+    }
+});
+
+function broadcastUpdate() {
+    // This will trigger storage event in other tabs
+    localStorage.setItem('fuse_update_trigger', Date.now().toString());
+    console.log('[SharedStorage] Broadcast update to other tabs');
+}
+
+// Send ready signal
+console.log('[SharedStorage] Sending STORAGE_READY signal');
+window.parent.postMessage({ action: 'STORAGE_READY' }, '*');
+</script>
+</body>
+</html>

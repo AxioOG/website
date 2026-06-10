@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+    var path = window.location.pathname;
+    var hash = window.location.hash;
+
+    if (path === '/dashboard' || path === '/dashboard/') {
+        // Preserve the hash so dashboard.html can read the token directly
+        window.location.replace('/dashboard.html' + hash);
+    } else {
+        window.location.replace('/?p=' + encodeURIComponent(path));
+    }
+</script>
+</head>
+</html>
