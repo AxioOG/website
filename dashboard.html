@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="fuse-api-base" content="" />
     <title>Dashboard — Fuse</title>
     <link rel="icon" type="image/png" href="./images/fuseggbw.png" sizes="64x64">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -355,7 +356,7 @@
 <!-- Loading -->
 <div id="loading-screen">
     <div class="spinner"></div>
-    <div class="loading-label">Signing you in…</div>
+    <div class="loading-label" id="loading-label">Connecting to API…</div>
 </div>
 
 <!-- Banned -->
@@ -718,6 +719,7 @@
 <!-- Toast -->
 <div id="toast"></div>
 
+<script src="/api-config.js"></script>
 <script>
 (function() {
     // ── Config ──
@@ -777,36 +779,31 @@
             return Promise.reject(new Error('No Discord session — sign out, then sign in with Discord again.'));
         }
 
-        return fetch('/api/members?action=list', {
+        return fuseApiJson('/api/members?action=list', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ access_token: token })
-        }).then(function(r) {
-            return r.text().then(function(text) {
-                var data = {};
-                try { data = text ? JSON.parse(text) : {}; } catch (e) {
-                    throw new Error('Members API returned invalid data — redeploy the web folder to Netlify.');
-                }
-                if (!r.ok) {
-                    throw new Error(data.error || ('Members request failed (' + r.status + ')'));
-                }
-                if (!Array.isArray(data.members)) {
-                    throw new Error(data.error || 'Members API returned an unexpected response.');
-                }
-                return data;
-            });
+        }).then(function(result) {
+            if (!result.response.ok) {
+                throw new Error(result.data && result.data.error
+                    ? result.data.error
+                    : ('Members request failed (' + result.response.status + ')'));
+            }
+            if (!Array.isArray(result.data.members)) {
+                throw new Error((result.data && result.data.error) || 'Members API returned an unexpected response.');
+            }
+            return result.data;
         }).catch(function(err) {
             if (err && err.message === 'Failed to fetch') {
-                throw new Error('Cannot reach /api/members — redeploy the full web folder to Netlify (serverless functions required).');
+                throw new Error('Cannot reach Fuse API — deploy the web folder to Netlify and set fuse-api-base if the site is hosted elsewhere.');
             }
             throw err;
         });
     }
 
     function fetchBannedList() {
-        return fetch('/api/users?action=banned')
-            .then(function(r) { return r.json(); })
-            .then(function(data) { return Array.isArray(data) ? data : []; })
+        return fuseApiJson('/api/users?action=banned')
+            .then(function(result) { return Array.isArray(result.data) ? result.data : []; })
             .catch(function() { return []; });
     }
 
@@ -816,9 +813,8 @@
     }
 
     function checkBan(userId) {
-        return fetch('/api/users?action=check-ban&id=' + encodeURIComponent(userId))
-            .then(function(r) { return r.json(); })
-            .then(function(res) { return !!res.banned; })
+        return fuseApiJson('/api/users?action=check-ban&id=' + encodeURIComponent(userId))
+            .then(function(result) { return !!(result.data && result.data.banned); })
             .catch(function() { return false; });
     }
 
@@ -938,7 +934,7 @@
     window.loadRecentActivity = function() {
         var el = document.getElementById('recent-activity');
         if (!el) return;
-        fetch('/api/users?action=users')
+        fuseApiFetch('/api/users?action=users')
             .then(function(r) { return r.json(); })
             .then(function(users) {
                 var sorted = (users || []).slice().sort(function(a, b) {
@@ -969,7 +965,7 @@
         if (!isAdmin) return;
         var tbody = document.getElementById('activity-tbody');
         tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Loading activity…</td></tr>';
-        fetch('/api/users?action=users')
+        fuseApiFetch('/api/users?action=users')
             .then(function(r) { return r.json(); })
             .then(function(users) {
                 allActivity = (users || []).slice().sort(function(a, b) {
@@ -1185,7 +1181,7 @@
     // ── Register user on backend ──
     function registerUser(user, roles) {
         var label = getRoleLabel(roles);
-        fetch('/api/users?action=register', {
+        fuseApiFetch('/api/users?action=register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1221,7 +1217,7 @@
             }).catch(function() {
                 document.getElementById('stat-users').textContent = '—';
             });
-        fetch('/api/users?action=banned')
+        fuseApiFetch('/api/users?action=banned')
             .then(function(r) { return r.json(); })
             .then(function(banned) {
                 document.getElementById('stat-banned').textContent = (banned || []).length;
@@ -1229,7 +1225,7 @@
     }
 
     function loadStatsBasic() {
-        fetch('/api/users?action=users')
+        fuseApiFetch('/api/users?action=users')
             .then(function(r) { return r.json(); })
             .then(function(users) {
                 var customers = (users || []).filter(function(u) {
@@ -1397,7 +1393,7 @@
     // ── Ban / Unban ──
     window.banUser = function(id, name) {
         if (!confirm('Ban ' + name + '?')) return;
-        fetch('/api/users?action=ban', {
+        fuseApiFetch('/api/users?action=ban', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id, username: name, reason: 'Banned by admin' })
@@ -1412,7 +1408,7 @@
     window.banMember = function(user) {
         var name = user.global_name || user.username || user.id;
         if (!confirm('Ban ' + name + '?')) return;
-        fetch('/api/users?action=ban', {
+        fuseApiFetch('/api/users?action=ban', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1435,7 +1431,7 @@
 
     window.unbanUser = function(id, name) {
         if (!confirm('Unban ' + name + '?')) return;
-        fetch('/api/users?action=unban&id=' + id, { method: 'DELETE' })
+        fuseApiFetch('/api/users?action=unban&id=' + id, { method: 'DELETE' })
         .then(function(r) { return r.json(); })
         .then(function(res) {
             if (res.success) { showToast(name + ' unbanned', 'green'); loadBanned(); loadUsers(); loadStats(); }
@@ -1453,6 +1449,18 @@
     });
 
     // ── MAIN AUTH FLOW ──
+    var loadingLabel = document.getElementById('loading-label');
+
+    fuseApiReady().then(function(apiBase) {
+        if (loadingLabel) loadingLabel.textContent = 'Signing you in…';
+        startAuthFlow();
+    }).catch(function(err) {
+        if (loadingLabel) {
+            loadingLabel.textContent = (err && err.message) ? err.message : 'Could not connect to Fuse API.';
+        }
+    });
+
+    function startAuthFlow() {
     if (sessionStorage.getItem('fuse_banned')) {
         sessionStorage.removeItem('fuse_banned');
         showBanned();
@@ -1524,6 +1532,7 @@
         } else {
             showLogin();
         }
+    }
     }
 })();
 </script>
