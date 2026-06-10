@@ -1,0 +1,7 @@
+{
+  "apiBase": "",
+  "fallbacks": [
+    "https://api.fusebypass.fun"
+  ],
+  "mode": "auto"
+}
