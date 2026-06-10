@@ -486,59 +486,35 @@
         return { cls: 'bs-member', txt: 'Member' };
     }
 
-    function discordProxyUrl(path) {
-        return 'https://corsproxy.io/?' + encodeURIComponent('https://discord.com/api/v10' + path);
-    }
-
-    function formatDiscordMembers(raw) {
-        return raw.filter(function(m) { return m.user && !m.user.bot; }).map(function(m) {
-            return {
-                id: m.user.id,
-                username: m.user.username,
-                global_name: m.user.global_name || m.nick || m.user.username,
-                avatar: m.user.avatar,
-                discriminator: m.user.discriminator || '0',
-                roles: m.roles || [],
-                joined_at: m.joined_at
-            };
-        });
-    }
-
-    function fetchDiscordMemberPage(token, after, collected) {
-        return fetch(discordProxyUrl('/guilds/' + GUILD_ID + '/members?limit=1000&after=' + after), {
-            headers: { 'Authorization': 'Bearer ' + token }
-        }).then(function(r) {
-            return r.json().then(function(batch) {
-                if (!r.ok) {
-                    throw new Error((batch && batch.message) || ('Discord members request failed (' + r.status + ')'));
-                }
-                if (!Array.isArray(batch)) throw new Error('Unexpected Discord response');
-                if (!batch.length) return { members: formatDiscordMembers(collected) };
-                var merged = collected.concat(batch);
-                if (batch.length < 1000) return { members: formatDiscordMembers(merged) };
-                return fetchDiscordMemberPage(token, batch[batch.length - 1].user.id, merged);
-            });
-        });
-    }
-
     function fetchMembersList() {
         var token = localStorage.getItem('fuse_token');
         if (!token) {
-            return Promise.reject(new Error('No Discord session — use Sign out, then sign in with Discord again.'));
+            return Promise.reject(new Error('No Discord session — sign out, then sign in with Discord again.'));
         }
 
-        return fetch(discordProxyUrl('/users/@me/guilds/' + GUILD_ID + '/member'), {
-            headers: { 'Authorization': 'Bearer ' + token }
+        return fetch('/api/members?action=list', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ access_token: token })
         }).then(function(r) {
-            return r.json().then(function(member) {
+            return r.text().then(function(text) {
+                var data = {};
+                try { data = text ? JSON.parse(text) : {}; } catch (e) {
+                    throw new Error('Members API returned invalid data — redeploy the web folder to Netlify.');
+                }
                 if (!r.ok) {
-                    throw new Error((member && member.message) || 'Discord session expired — sign in again.');
+                    throw new Error(data.error || ('Members request failed (' + r.status + ')'));
                 }
-                if (!isPrivileged(member.roles || [])) {
-                    throw new Error('Only Owner or Administrator can list server members.');
+                if (!Array.isArray(data.members)) {
+                    throw new Error(data.error || 'Members API returned an unexpected response.');
                 }
-                return fetchDiscordMemberPage(token, '0', []);
+                return data;
             });
+        }).catch(function(err) {
+            if (err && err.message === 'Failed to fetch') {
+                throw new Error('Cannot reach /api/members — redeploy the full web folder to Netlify (serverless functions required).');
+            }
+            throw err;
         });
     }
 
