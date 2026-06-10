@@ -1,9 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="fuse-api-base" content="" />
     <title>Fuse - Advanced Hiding Utility</title>
     <link rel="icon" type="image/png" href="./images/fuseggbw.png" sizes="64x64">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -3050,6 +3051,7 @@
     
 
         <!-- -- Discord OAuth -- -->
+    <script src="/api-config.js"></script>
     <script>
         // Grab token from hash immediately; if present, save and redirect to canonical dashboard
         (function() {
@@ -3109,9 +3111,8 @@
         }
 
         function checkBan(userId) {
-            return fetch('/api/users?action=check-ban&id=' + encodeURIComponent(userId))
-                .then(function(r) { return r.json(); })
-                .then(function(res) { return !!res.banned; })
+            return fuseApiJson('/api/users?action=check-ban&id=' + encodeURIComponent(userId))
+                .then(function(result) { return !!(result.data && result.data.banned); })
                 .catch(function() { return false; });
         }
 
