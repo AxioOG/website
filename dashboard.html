@@ -129,6 +129,7 @@
             border-radius: 999px; font-family: 'Montserrat', sans-serif; font-size: 0.68rem;
             font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
         }
+        .pill-owner    { background: rgba(255,193,7,0.12);  color: #ffc107; border: 1px solid rgba(255,193,7,0.25); }
         .pill-admin    { background: rgba(252,128,233,0.12); color: #fc80e9; border: 1px solid rgba(252,128,233,0.25); }
         .pill-customer { background: rgba(65,151,250,0.12);  color: #4197fa; border: 1px solid rgba(65,151,250,0.25); }
         .pill-member   { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.1); }
@@ -186,6 +187,7 @@
             display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px;
             font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
         }
+        .bs-owner    { background: rgba(255,193,7,0.12);  color: #ffc107; }
         .bs-admin    { background: rgba(252,128,233,0.12); color: #fc80e9; }
         .bs-customer { background: rgba(65,151,250,0.12);  color: #4197fa; }
         .bs-member   { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
@@ -243,6 +245,13 @@
 <div id="loading-screen">
     <div class="spinner"></div>
     <div class="loading-label">Signing you in…</div>
+</div>
+
+<!-- Banned -->
+<div id="screen-banned" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;gap:1rem;padding:2rem;">
+    <h2 style="font-family:'Montserrat',sans-serif;font-size:1.6rem;font-weight:800;">Access denied</h2>
+    <p style="color:rgba(255,255,255,0.38);font-size:0.9rem;max-width:420px;">Your account has been banned from Fuse services. You cannot access the dashboard or site features.</p>
+    <button class="btn-discord" style="background:rgba(255,255,255,0.08);cursor:default;" disabled>Banned</button>
 </div>
 
 <!-- Not logged in -->
@@ -375,17 +384,17 @@
         <!-- Users page (admin only) -->
         <div class="page" id="page-users">
             <div class="page-title">User List</div>
-            <div class="page-sub">All users who have signed in to Fuse.</div>
+            <div class="page-sub">All members from your Discord server.</div>
             <div class="panel-card">
                 <div class="panel-header">
-                    <div class="panel-header-title">Registered Users</div>
+                    <div class="panel-header-title">Discord Members</div>
                     <input class="search-input" id="user-search" type="text" placeholder="Search by name…" oninput="filterUsers()">
                 </div>
                 <table>
                     <thead><tr>
                         <th>User</th>
                         <th>Role</th>
-                        <th>Last Seen</th>
+                        <th>Joined</th>
                         <th>Actions</th>
                     </tr></thead>
                     <tbody id="users-tbody">
@@ -434,9 +443,9 @@
     var CLIENT_ID    = '1460340695578575041';
     var REDIRECT_URI = window.location.origin + '/dashboard';
     var GUILD_ID     = '1305642236880617482';
-    var ROLE_ADMIN1  = '1471974431579574538';
-    var ROLE_ADMIN2  = '1482165881315524688';
-    var ROLE_CUSTOMER= '1489330191498084413';
+    var ROLE_OWNER    = '1507374058247815218';
+    var ROLE_ADMIN    = '1510902432681689128';
+    var ROLE_CUSTOMER = '1512219971197862020';
 
     var currentUser  = null;
     var currentRoles = [];
@@ -457,11 +466,35 @@
             : 'https://cdn.discordapp.com/embed/avatars/' + (parseInt(u.discriminator || '0') % 5) + '.png';
     }
 
+    function isPrivileged(roles) {
+        if (!roles || !roles.length) return false;
+        return roles.indexOf(ROLE_OWNER) > -1 || roles.indexOf(ROLE_ADMIN) > -1;
+    }
+
     function getRoleLabel(roles) {
         if (!roles || !roles.length) return 'member';
-        if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+        if (roles.indexOf(ROLE_OWNER) > -1) return 'owner';
+        if (roles.indexOf(ROLE_ADMIN) > -1) return 'admin';
         if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
         return 'member';
+    }
+
+    function roleBadgeInfo(label) {
+        if (label === 'owner') return { cls: 'bs-owner', txt: '👑 Owner' };
+        if (label === 'admin') return { cls: 'bs-admin', txt: '⚡ Admin' };
+        if (label === 'customer') return { cls: 'bs-customer', txt: '✦ Customer' };
+        return { cls: 'bs-member', txt: 'Member' };
+    }
+
+    function membersApiUrl() {
+        return '/api/members?action=list&userid=' + encodeURIComponent(currentUser.id);
+    }
+
+    function checkBan(userId) {
+        return fetch('/api/users?action=check-ban&id=' + encodeURIComponent(userId))
+            .then(function(r) { return r.json(); })
+            .then(function(res) { return !!res.banned; })
+            .catch(function() { return false; });
     }
 
     function showToast(msg, type) {
@@ -516,11 +549,22 @@
         });
     };
 
+    function showBanned() {
+        localStorage.removeItem('fuse_user');
+        localStorage.removeItem('fuse_roles');
+        localStorage.removeItem('fuse_token');
+        localStorage.removeItem('fuse_pending_token');
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('screen-login').style.display = 'none';
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('screen-banned').style.display = 'flex';
+    }
+
     // ── Show dashboard ──
     function boot(user, roles) {
         currentUser  = user;
         currentRoles = roles || [];
-        isAdmin = currentRoles.indexOf(ROLE_ADMIN1) > -1 || currentRoles.indexOf(ROLE_ADMIN2) > -1;
+        isAdmin = isPrivileged(currentRoles);
         var label = getRoleLabel(currentRoles);
         var name  = user.global_name || user.username;
         var av    = avatarUrl(user);
@@ -535,9 +579,10 @@
         document.getElementById('pf-name').textContent = name;
         document.getElementById('pf-handle').textContent = '@' + user.username;
         var badge = document.getElementById('pf-badge');
-        if (label === 'admin')    { badge.textContent = '⚡ Admin';    badge.className = 'role-pill pill-admin'; }
+        if (label === 'owner')       { badge.textContent = '👑 Owner';    badge.className = 'role-pill pill-owner'; }
+        else if (label === 'admin')  { badge.textContent = '⚡ Admin';    badge.className = 'role-pill pill-admin'; }
         else if (label === 'customer') { badge.textContent = '✦ Customer'; badge.className = 'role-pill pill-customer'; }
-        else                      { badge.textContent = 'Member';     badge.className = 'role-pill pill-member'; }
+        else                         { badge.textContent = 'Member';     badge.className = 'role-pill pill-member'; }
 
         // Show admin sections
         if (isAdmin) {
@@ -581,19 +626,23 @@
 
     // ── Stats ──
     function loadStats() {
-        fetch('/api/users?action=users')
+        fetch(membersApiUrl())
             .then(function(r) { return r.json(); })
-            .then(function(users) {
-                allUsers = users || [];
-                var admins = users.filter(function(u) {
-                    return u.roles && (u.roles.indexOf(ROLE_ADMIN1) > -1 || u.roles.indexOf(ROLE_ADMIN2) > -1);
+            .then(function(res) {
+                var members = res.members || [];
+                allUsers = members;
+                var owners = members.filter(function(u) {
+                    return u.roles && u.roles.indexOf(ROLE_OWNER) > -1;
                 });
-                var customers = users.filter(function(u) {
+                var admins = members.filter(function(u) {
+                    return u.roles && u.roles.indexOf(ROLE_ADMIN) > -1;
+                });
+                var customers = members.filter(function(u) {
                     return u.roles && u.roles.indexOf(ROLE_CUSTOMER) > -1;
                 });
-                document.getElementById('stat-users').textContent     = users.length;
-                document.getElementById('stat-customers').textContent = customers.length;
-                document.getElementById('stat-admins').textContent    = admins.length;
+                document.getElementById('stat-users').textContent       = members.length;
+                document.getElementById('stat-customers').textContent   = customers.length;
+                document.getElementById('stat-admins').textContent      = owners.length + admins.length;
             }).catch(function() {
                 document.getElementById('stat-users').textContent = '—';
             });
@@ -616,52 +665,70 @@
             }).catch(function() {});
     }
 
-    // ── Load users table ──
+    // ── Load users table (all Discord server members — owner/admin only) ──
     function loadUsers() {
+        if (!isAdmin) return;
         var tbody = document.getElementById('users-tbody');
-        tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Loading…</td></tr>';
-        fetch('/api/users?action=users')
-            .then(function(r) { return r.json(); })
-            .then(function(users) {
-                allUsers = users || [];
-                if (!users || users.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No users yet</td></tr>';
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Loading Discord members…</td></tr>';
+        Promise.all([
+            fetch(membersApiUrl()).then(function(r) { return r.json(); }),
+            fetch('/api/users?action=banned').then(function(r) { return r.json(); })
+        ])
+            .then(function(results) {
+                var memberRes = results[0] || {};
+                var banned = results[1] || [];
+                var members = memberRes.members || [];
+                allUsers = members;
+                var bannedMap = {};
+                banned.forEach(function(u) { bannedMap[u.id] = true; });
+
+                if (!members.length) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No Discord members found</td></tr>';
                     return;
                 }
                 tbody.innerHTML = '';
-                users.forEach(function(u) {
-                    var label = u.role_label || getRoleLabel(u.roles);
-                    var av = u.avatar
-                        ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=64'
-                        : 'https://cdn.discordapp.com/embed/avatars/0.png';
-                    var lastSeen = u.lastSeen ? new Date(u.lastSeen).toLocaleDateString() : '—';
-                    var badgeCls = label === 'admin' ? 'bs-admin' : label === 'customer' ? 'bs-customer' : 'bs-member';
-                    var badgeTxt = label === 'admin' ? '⚡ Admin' : label === 'customer' ? '✦ Customer' : 'Member';
+                members.forEach(function(u) {
+                    var label = getRoleLabel(u.roles);
+                    var badge = roleBadgeInfo(label);
+                    var isBannedMember = !!bannedMap[u.id];
+                    var joined = u.joined_at ? new Date(u.joined_at).toLocaleDateString() : '—';
+                    var displayName = u.global_name || u.username || u.id;
                     var tr = document.createElement('tr');
                     tr.dataset.uid = u.id;
-                    tr.dataset.name = (u.global_name || u.username || '').toLowerCase();
+                    tr.dataset.name = (displayName + ' ' + (u.username || '') + ' ' + u.id).toLowerCase();
                     tr.innerHTML =
                         '<td><div class="user-cell">' +
-                            '<img class="user-cell-avatar" src="' + av + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
-                            '<div><div class="user-cell-name">' + (u.global_name || u.username) + '</div>' +
+                            '<img class="user-cell-avatar" src="' + memberAvatarUrl(u, 64) + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                            '<div><div class="user-cell-name">' + displayName + '</div>' +
                             '<div class="user-cell-handle">@' + (u.username || u.id) + '</div></div>' +
                         '</div></td>' +
-                        '<td><span class="badge-sm ' + badgeCls + '">' + badgeTxt + '</span></td>' +
-                        '<td>' + lastSeen + '</td>' +
-                        '<td><button class="action-btn btn-ban" onclick="banUser(\'' + u.id + '\',\'' + (u.global_name || u.username) + '\')">Ban</button></td>';
+                        '<td><span class="badge-sm ' + badge.cls + '">' + badge.txt + '</span></td>' +
+                        '<td>' + joined + '</td>' +
+                        '<td></td>';
+                    var actionTd = tr.lastElementChild;
+                    var btn = document.createElement('button');
+                    btn.className = 'action-btn ' + (isBannedMember ? 'btn-unban' : 'btn-ban');
+                    btn.textContent = isBannedMember ? 'Unban' : 'Ban';
+                    btn.addEventListener('click', function() {
+                        if (isBannedMember) unbanUser(u.id, displayName);
+                        else banMember(u);
+                    });
+                    actionTd.appendChild(btn);
                     tbody.appendChild(tr);
                 });
+                filterUsers();
             }).catch(function() {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Failed to load users</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Failed to load Discord members. Check DISCORD_BOT_TOKEN and bot guild permissions.</td></tr>';
             });
     }
 
     // ── Load manage bans table ──
     function loadBanned() {
+        if (!isAdmin) return;
         var tbody = document.getElementById('banned-tbody');
         tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Loading...</td></tr>';
         Promise.all([
-            fetch('/api/members?action=list').then(function(r) { return r.json(); }),
+            fetch(membersApiUrl()).then(function(r) { return r.json(); }),
             fetch('/api/users?action=banned').then(function(r) { return r.json(); })
         ])
             .then(function(results) {
@@ -768,7 +835,7 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(res) {
-            if (res.success) { showToast(name + ' banned', 'red'); loadUsers(); loadStats(); }
+            if (res.success) { showToast(name + ' banned', 'red'); loadUsers(); loadBanned(); loadStats(); }
             else showToast('Failed to ban', 'red');
         }).catch(function() { showToast('Error', 'red'); });
     };
@@ -792,7 +859,7 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(res) {
-            if (res.success) { showToast(name + ' banned', 'red'); loadBanned(); loadStats(); }
+            if (res.success) { showToast(name + ' banned', 'red'); loadBanned(); loadUsers(); loadStats(); }
             else showToast('Failed to ban', 'red');
         }).catch(function() { showToast('Error', 'red'); });
     };
@@ -802,7 +869,7 @@
         fetch('/api/users?action=unban&id=' + id, { method: 'DELETE' })
         .then(function(r) { return r.json(); })
         .then(function(res) {
-            if (res.success) { showToast(name + ' unbanned', 'green'); loadBanned(); loadStats(); }
+            if (res.success) { showToast(name + ' unbanned', 'green'); loadBanned(); loadUsers(); loadStats(); }
             else showToast('Failed to unban', 'red');
         }).catch(function() { showToast('Error', 'red'); });
     };
@@ -817,6 +884,12 @@
     });
 
     // ── MAIN AUTH FLOW ──
+    if (sessionStorage.getItem('fuse_banned')) {
+        sessionStorage.removeItem('fuse_banned');
+        showBanned();
+        return;
+    }
+
     // Step 1: Check URL hash for fresh OAuth token
     var freshToken = null;
     var hash = window.location.hash.substring(1);
@@ -848,14 +921,20 @@
             .then(function(r) { return r.ok ? r.json() : {}; })
             .then(function(m) {
                 var roles = m.roles || [];
-                localStorage.setItem('fuse_user', JSON.stringify(user));
-                localStorage.setItem('fuse_roles', JSON.stringify(roles));
-                boot(user, roles);
+                return checkBan(user.id).then(function(banned) {
+                    if (banned) { showBanned(); return; }
+                    localStorage.setItem('fuse_user', JSON.stringify(user));
+                    localStorage.setItem('fuse_roles', JSON.stringify(roles));
+                    boot(user, roles);
+                });
             })
             .catch(function() {
-                localStorage.setItem('fuse_user', JSON.stringify(user));
-                localStorage.setItem('fuse_roles', '[]');
-                boot(user, []);
+                return checkBan(user.id).then(function(banned) {
+                    if (banned) { showBanned(); return; }
+                    localStorage.setItem('fuse_user', JSON.stringify(user));
+                    localStorage.setItem('fuse_roles', '[]');
+                    boot(user, []);
+                });
             });
         })
         .catch(function() { showLogin(); });
@@ -868,7 +947,10 @@
             try {
                 var u = JSON.parse(savedUser);
                 var r = JSON.parse(localStorage.getItem('fuse_roles') || '[]');
-                boot(u, r);
+                checkBan(u.id).then(function(banned) {
+                    if (banned) { showBanned(); return; }
+                    boot(u, r);
+                });
             } catch(e) { showLogin(); }
         } else {
             showLogin();
