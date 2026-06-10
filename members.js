@@ -87,11 +87,20 @@ async function fetchAllMembers(authorization) {
     return { ok: true, members };
 }
 
+function parseBody(event) {
+    if (!event.body) return {};
+    try {
+        return JSON.parse(event.body);
+    } catch (e) {
+        return {};
+    }
+}
+
 exports.handler = async function(event, context) {
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Discord-Access-Token',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Content-Type': 'application/json'
     };
 
@@ -99,7 +108,8 @@ exports.handler = async function(event, context) {
         return { statusCode: 200, headers, body: '' };
     }
 
-    const action = event.queryStringParameters && event.queryStringParameters.action;
+    const body = parseBody(event);
+    const action = (event.queryStringParameters && event.queryStringParameters.action) || body.action;
 
     try {
         if (action !== 'list') {
@@ -110,6 +120,7 @@ exports.handler = async function(event, context) {
         const customToken = event.headers['x-discord-access-token'] || event.headers['X-Discord-Access-Token'] || '';
         const queryToken = event.queryStringParameters && event.queryStringParameters.access_token;
         const oauthToken =
+            body.access_token ||
             (authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null) ||
             customToken ||
             queryToken ||
