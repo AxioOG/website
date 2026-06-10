@@ -486,8 +486,72 @@
         return { cls: 'bs-member', txt: 'Member' };
     }
 
-    function membersApiUrl() {
-        return '/api/members?action=list&userid=' + encodeURIComponent(currentUser.id);
+    function discordProxyUrl(path) {
+        return 'https://corsproxy.io/?' + encodeURIComponent('https://discord.com/api/v10' + path);
+    }
+
+    function formatDiscordMembers(raw) {
+        return raw.filter(function(m) { return m.user && !m.user.bot; }).map(function(m) {
+            return {
+                id: m.user.id,
+                username: m.user.username,
+                global_name: m.user.global_name || m.nick || m.user.username,
+                avatar: m.user.avatar,
+                discriminator: m.user.discriminator || '0',
+                roles: m.roles || [],
+                joined_at: m.joined_at
+            };
+        });
+    }
+
+    function fetchDiscordMemberPage(token, after, collected) {
+        return fetch(discordProxyUrl('/guilds/' + GUILD_ID + '/members?limit=1000&after=' + after), {
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).then(function(r) {
+            return r.json().then(function(batch) {
+                if (!r.ok) {
+                    throw new Error((batch && batch.message) || ('Discord members request failed (' + r.status + ')'));
+                }
+                if (!Array.isArray(batch)) throw new Error('Unexpected Discord response');
+                if (!batch.length) return { members: formatDiscordMembers(collected) };
+                var merged = collected.concat(batch);
+                if (batch.length < 1000) return { members: formatDiscordMembers(merged) };
+                return fetchDiscordMemberPage(token, batch[batch.length - 1].user.id, merged);
+            });
+        });
+    }
+
+    function fetchMembersList() {
+        var token = localStorage.getItem('fuse_token');
+        if (!token) {
+            return Promise.reject(new Error('No Discord session — use Sign out, then sign in with Discord again.'));
+        }
+
+        return fetch(discordProxyUrl('/users/@me/guilds/' + GUILD_ID + '/member'), {
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).then(function(r) {
+            return r.json().then(function(member) {
+                if (!r.ok) {
+                    throw new Error((member && member.message) || 'Discord session expired — sign in again.');
+                }
+                if (!isPrivileged(member.roles || [])) {
+                    throw new Error('Only Owner or Administrator can list server members.');
+                }
+                return fetchDiscordMemberPage(token, '0', []);
+            });
+        });
+    }
+
+    function fetchBannedList() {
+        return fetch('/api/users?action=banned')
+            .then(function(r) { return r.json(); })
+            .then(function(data) { return Array.isArray(data) ? data : []; })
+            .catch(function() { return []; });
+    }
+
+    function memberLoadErrorHtml(err, colspan) {
+        var msg = (err && err.message) ? err.message : 'Failed to load Discord members.';
+        return '<tr><td colspan="' + (colspan || 5) + '" class="empty-state">' + msg + '</td></tr>';
     }
 
     function checkBan(userId) {
@@ -626,8 +690,7 @@
 
     // ── Stats ──
     function loadStats() {
-        fetch(membersApiUrl())
-            .then(function(r) { return r.json(); })
+        fetchMembersList()
             .then(function(res) {
                 var members = res.members || [];
                 allUsers = members;
@@ -670,10 +733,7 @@
         if (!isAdmin) return;
         var tbody = document.getElementById('users-tbody');
         tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Loading Discord members…</td></tr>';
-        Promise.all([
-            fetch(membersApiUrl()).then(function(r) { return r.json(); }),
-            fetch('/api/users?action=banned').then(function(r) { return r.json(); })
-        ])
+        Promise.all([fetchMembersList(), fetchBannedList()])
             .then(function(results) {
                 var memberRes = results[0] || {};
                 var banned = results[1] || [];
@@ -717,8 +777,8 @@
                     tbody.appendChild(tr);
                 });
                 filterUsers();
-            }).catch(function() {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Failed to load Discord members. Check DISCORD_BOT_TOKEN and bot guild permissions.</td></tr>';
+            }).catch(function(err) {
+                tbody.innerHTML = memberLoadErrorHtml(err, 4);
             });
     }
 
@@ -727,17 +787,14 @@
         if (!isAdmin) return;
         var tbody = document.getElementById('banned-tbody');
         tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Loading...</td></tr>';
-        Promise.all([
-            fetch(membersApiUrl()).then(function(r) { return r.json(); }),
-            fetch('/api/users?action=banned').then(function(r) { return r.json(); })
-        ])
+        Promise.all([fetchMembersList(), fetchBannedList()])
             .then(function(results) {
                 var memberRes = results[0] || {};
                 var banned = results[1] || [];
                 allBanMembers = memberRes.members || [];
                 renderBanMembers(allBanMembers, banned);
-            }).catch(function() {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Failed to load Discord members. Check DISCORD_BOT_TOKEN and bot guild permissions.</td></tr>';
+            }).catch(function(err) {
+                tbody.innerHTML = memberLoadErrorHtml(err);
             });
     }
 
