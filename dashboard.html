@@ -237,6 +237,117 @@
             background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
             color: #fff; font-size: 1rem; cursor: pointer; border: none;
         }
+
+        /* ── New components ── */
+        .greeting-bar {
+            background: linear-gradient(135deg, rgba(65,151,250,0.12) 0%, rgba(88,101,242,0.06) 100%);
+            border: 1px solid rgba(65,151,250,0.18); border-radius: 14px;
+            padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+        }
+        .greeting-text { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 800; }
+        .greeting-sub { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
+        .greeting-time { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem; }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+        .info-item {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px; padding: 1rem 1.15rem;
+        }
+        .info-label { font-size: 0.68rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 6px; }
+        .info-value { font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-weight: 700; word-break: break-all; }
+        .info-value.mono { font-family: monospace; font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+
+        .btn-secondary, .btn-primary, .btn-ghost {
+            display: inline-flex; align-items: center; gap: 6px; padding: 0.45rem 0.9rem;
+            border-radius: 8px; border: none; cursor: pointer;
+            font-family: 'Montserrat', sans-serif; font-size: 0.72rem; font-weight: 700;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .btn-primary { background: rgba(65,151,250,0.2); color: #4197fa; border: 1px solid rgba(65,151,250,0.3); }
+        .btn-primary:hover { background: rgba(65,151,250,0.32); }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-ghost { background: transparent; color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.08); }
+        .btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.18); }
+
+        .filter-select {
+            padding: 0.45rem 0.75rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; outline: none; cursor: pointer;
+        }
+        .filter-select option { background: #1a1a1a; color: #fff; }
+
+        .tab-bar { display: flex; gap: 4px; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 1rem; width: fit-content; }
+        .tab-btn {
+            padding: 0.45rem 1rem; border-radius: 7px; border: none; background: none;
+            color: rgba(255,255,255,0.4); font-family: 'Montserrat', sans-serif; font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; transition: background 0.15s, color 0.15s;
+        }
+        .tab-btn.active { background: rgba(65,151,250,0.18); color: #4197fa; }
+        .tab-btn:hover:not(.active) { color: rgba(255,255,255,0.7); }
+
+        .role-bars { display: flex; flex-direction: column; gap: 0.75rem; }
+        .role-bar-row { display: flex; align-items: center; gap: 0.75rem; }
+        .role-bar-label { font-size: 0.75rem; color: rgba(255,255,255,0.5); width: 72px; flex-shrink: 0; }
+        .role-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 999px; overflow: hidden; }
+        .role-bar-fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
+        .role-bar-count { font-family: 'Montserrat', sans-serif; font-size: 0.75rem; font-weight: 700; width: 28px; text-align: right; color: rgba(255,255,255,0.6); }
+
+        .activity-list { display: flex; flex-direction: column; gap: 0; }
+        .activity-item {
+            display: flex; align-items: center; gap: 10px; padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+        .activity-name { font-size: 0.82rem; font-weight: 500; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .activity-time { font-size: 0.7rem; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+
+        .settings-group { margin-bottom: 1.5rem; }
+        .settings-group-title { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 800; margin-bottom: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.08em; }
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            padding: 0.9rem 1.15rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px; margin-bottom: 0.5rem;
+        }
+        .setting-label { font-size: 0.85rem; }
+        .setting-desc { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+        .toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 999px; cursor: pointer; transition: background 0.2s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+            background: #fff; border-radius: 50%; transition: transform 0.2s;
+        }
+        .toggle input:checked + .toggle-slider { background: rgba(65,151,250,0.5); }
+        .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+        .action-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-copy { padding: 3px 8px; font-size: 0.62rem; }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px;
+            font-size: 0.72rem; font-weight: 600;
+        }
+        .status-active { background: rgba(54,180,60,0.12); color: #36b43c; border: 1px solid rgba(54,180,60,0.25); }
+        .status-banned { background: rgba(255,50,50,0.12); color: #ff6b6b; border: 1px solid rgba(255,50,50,0.25); }
+
+        .customer-card {
+            background: linear-gradient(135deg, rgba(54,180,60,0.1) 0%, rgba(65,151,250,0.06) 100%);
+            border: 1px solid rgba(54,180,60,0.2); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+        }
+        .customer-card h3 { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 800; margin-bottom: 0.35rem; }
+        .customer-card p { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-bottom: 0.85rem; }
+
+        body.compact-tables td { padding: 0.5rem 1rem; }
+        body.compact-tables th { padding: 0.55rem 1rem; }
+        body.compact-tables .user-cell-avatar { width: 26px; height: 26px; }
     </style>
 </head>
 <body>
@@ -283,11 +394,24 @@
             <button class="nav-btn active" data-page="overview" onclick="showPage('overview', this)">
                 <i class="fa fa-home"></i> Overview
             </button>
+            <button class="nav-btn" data-page="account" onclick="showPage('account', this)">
+                <i class="fa fa-user-circle"></i> My Account
+            </button>
+            <button class="nav-btn" data-page="settings" onclick="showPage('settings', this)">
+                <i class="fa fa-gear"></i> Settings
+            </button>
+            <div class="nav-section-label">Links</div>
             <a class="nav-btn" href="/">
                 <i class="fa fa-arrow-left"></i> Back to Site
             </a>
             <a class="nav-btn" href="/tickets">
                 <i class="fa fa-ticket-alt"></i> Support Tickets
+            </a>
+            <a class="nav-btn" href="/#store">
+                <i class="fa fa-shopping-bag"></i> Store
+            </a>
+            <a class="nav-btn" href="https://discord.gg/yVUxWkrPT9" target="_blank" rel="noopener">
+                <i class="fab fa-discord"></i> Discord
             </a>
             <div class="nav-section-label admin-only" style="display:none;">Admin</div>
             <button class="nav-btn admin-only" data-page="users" onclick="showPage('users', this)" style="display:none;">
@@ -295,6 +419,9 @@
             </button>
             <button class="nav-btn admin-only" data-page="banned" onclick="showPage('banned', this)" style="display:none;">
                 <i class="fa fa-ban"></i> Manage Bans
+            </button>
+            <button class="nav-btn admin-only" data-page="activity" onclick="showPage('activity', this)" style="display:none;">
+                <i class="fa fa-clock-rotate-left"></i> Activity Log
             </button>
         </nav>
         <div class="sidebar-footer">
@@ -316,6 +443,20 @@
         <div class="page active" id="page-overview">
             <div class="page-title">Overview</div>
             <div class="page-sub">Welcome back to your Fuse dashboard.</div>
+
+            <div class="greeting-bar">
+                <div>
+                    <div class="greeting-text" id="greeting-text">Welcome back</div>
+                    <div class="greeting-sub" id="greeting-sub">Here's what's happening with your account.</div>
+                </div>
+                <div class="greeting-time" id="greeting-time"></div>
+            </div>
+
+            <div class="customer-card" id="customer-card" style="display:none;">
+                <h3><i class="fa fa-star" style="color:#36b43c;margin-right:6px;"></i>Customer Access Active</h3>
+                <p>You have the Customer role — enjoy full access to Fuse products and support.</p>
+                <a class="btn-primary" href="/#store"><i class="fa fa-shopping-bag"></i> Browse Store</a>
+            </div>
 
             <!-- Profile card -->
             <div class="profile-card">
@@ -351,6 +492,27 @@
                 </div>
             </div>
 
+            <div class="two-col admin-only" id="overview-admin-widgets" style="display:none;">
+                <div class="panel-card" style="padding:1.25rem;">
+                    <div class="panel-header-title" style="margin-bottom:1rem;">Role Distribution</div>
+                    <div class="role-bars" id="role-bars">
+                        <div class="role-bar-row"><span class="role-bar-label">Owners</span><div class="role-bar-track"><div class="role-bar-fill" style="width:0%;background:#ffc107;"></div></div><span class="role-bar-count" id="bar-owners">0</span></div>
+                        <div class="role-bar-row"><span class="role-bar-label">Admins</span><div class="role-bar-track"><div class="role-bar-fill" style="width:0%;background:#fc80e9;"></div></div><span class="role-bar-count" id="bar-admins">0</span></div>
+                        <div class="role-bar-row"><span class="role-bar-label">Customers</span><div class="role-bar-track"><div class="role-bar-fill" style="width:0%;background:#4197fa;"></div></div><span class="role-bar-count" id="bar-customers">0</span></div>
+                        <div class="role-bar-row"><span class="role-bar-label">Members</span><div class="role-bar-track"><div class="role-bar-fill" style="width:0%;background:rgba(255,255,255,0.3);"></div></div><span class="role-bar-count" id="bar-members">0</span></div>
+                    </div>
+                </div>
+                <div class="panel-card" style="padding:1.25rem;">
+                    <div class="panel-header" style="padding:0 0 1rem;border:none;">
+                        <div class="panel-header-title">Recently Active</div>
+                        <button class="btn-ghost" onclick="loadRecentActivity()"><i class="fa fa-rotate-right"></i> Refresh</button>
+                    </div>
+                    <div class="activity-list" id="recent-activity">
+                        <div class="empty-state" style="padding:1.5rem 0;">Loading activity…</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick links -->
             <div class="quick-grid">
                 <a class="quick-card" href="/">
@@ -381,6 +543,102 @@
             </div>
         </div>
 
+        <!-- Account page -->
+        <div class="page" id="page-account">
+            <div class="page-title">My Account</div>
+            <div class="page-sub">Your Discord profile and account details.</div>
+            <div class="profile-card">
+                <img id="acct-avatar" class="profile-avatar-big" src="" alt="">
+                <div style="flex:1;">
+                    <div class="profile-name-big" id="acct-name">—</div>
+                    <div class="profile-handle-big" id="acct-handle">—</div>
+                    <span class="role-pill pill-member" id="acct-badge">Member</span>
+                    <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn-secondary" onclick="copyText(currentUser && currentUser.id, 'Discord ID copied')"><i class="fa fa-copy"></i> Copy ID</button>
+                        <button class="btn-secondary" onclick="openDiscordProfile()"><i class="fab fa-discord"></i> Discord Profile</button>
+                        <button class="btn-secondary" onclick="loginWithDiscord()"><i class="fa fa-rotate-right"></i> Re-login</button>
+                    </div>
+                </div>
+            </div>
+            <div class="info-grid">
+                <div class="info-item"><div class="info-label">Discord ID</div><div class="info-value mono" id="acct-id">—</div></div>
+                <div class="info-item"><div class="info-label">Username</div><div class="info-value" id="acct-username">—</div></div>
+                <div class="info-item"><div class="info-label">Display Name</div><div class="info-value" id="acct-display">—</div></div>
+                <div class="info-item"><div class="info-label">Account Status</div><div class="info-value" id="acct-status"><span class="status-badge status-active"><i class="fa fa-circle" style="font-size:0.5rem;"></i> Active</span></div></div>
+                <div class="info-item"><div class="info-label">Server Role</div><div class="info-value" id="acct-role">—</div></div>
+                <div class="info-item"><div class="info-label">Last Seen</div><div class="info-value" id="acct-lastseen">—</div></div>
+            </div>
+        </div>
+
+        <!-- Settings page -->
+        <div class="page" id="page-settings">
+            <div class="page-title">Settings</div>
+            <div class="page-sub">Customize your dashboard experience.</div>
+            <div class="settings-group">
+                <div class="settings-group-title">Preferences</div>
+                <div class="setting-row">
+                    <div><div class="setting-label">Compact tables</div><div class="setting-desc">Use smaller row spacing in member lists</div></div>
+                    <label class="toggle"><input type="checkbox" id="set-compact" onchange="saveSettings()"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-row">
+                    <div><div class="setting-label">Show avatars</div><div class="setting-desc">Display profile pictures in user tables</div></div>
+                    <label class="toggle"><input type="checkbox" id="set-avatars" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="setting-row">
+                    <div><div class="setting-label">Toast notifications</div><div class="setting-desc">Show pop-up alerts for actions</div></div>
+                    <label class="toggle"><input type="checkbox" id="set-toasts" checked onchange="saveSettings()"><span class="toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <div class="settings-group-title">Session</div>
+                <div class="setting-row">
+                    <div><div class="setting-label">Clear local data</div><div class="setting-desc">Remove saved session and preferences from this browser</div></div>
+                    <button class="btn-secondary" onclick="clearLocalData()"><i class="fa fa-trash"></i> Clear</button>
+                </div>
+                <div class="setting-row">
+                    <div><div class="setting-label">Sign out</div><div class="setting-desc">End your current Discord session</div></div>
+                    <button class="btn-secondary" onclick="document.getElementById('logout-btn').click()"><i class="fa fa-sign-out-alt"></i> Sign Out</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity page (admin) -->
+        <div class="page" id="page-activity">
+            <div class="page-title">Activity Log</div>
+            <div class="page-sub">Users who have signed into the Fuse dashboard.</div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-title">Sign-in History</div>
+                    <div class="panel-tools">
+                        <select class="filter-select" id="activity-role-filter" onchange="filterActivity()">
+                            <option value="all">All roles</option>
+                            <option value="owner">Owners</option>
+                            <option value="admin">Admins</option>
+                            <option value="customer">Customers</option>
+                            <option value="member">Members</option>
+                        </select>
+                        <input class="search-input" id="activity-search" type="text" placeholder="Search users…" oninput="filterActivity()">
+                        <button class="btn-secondary" onclick="loadActivity()"><i class="fa fa-rotate-right"></i> Refresh</button>
+                        <button class="btn-primary" onclick="exportActivityCsv()"><i class="fa fa-download"></i> Export</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Last Seen</th>
+                            <th>Discord ID</th>
+                            <th>Actions</th>
+                        </tr></thead>
+                        <tbody id="activity-tbody">
+                            <tr class="loading-row"><td colspan="5">Loading activity…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Users page (admin only) -->
         <div class="page" id="page-users">
             <div class="page-title">User List</div>
@@ -388,8 +646,25 @@
             <div class="panel-card">
                 <div class="panel-header">
                     <div class="panel-header-title">Discord Members</div>
-                    <input class="search-input" id="user-search" type="text" placeholder="Search by name…" oninput="filterUsers()">
+                    <div class="panel-tools">
+                        <select class="filter-select" id="user-role-filter" onchange="filterUsers()">
+                            <option value="all">All roles</option>
+                            <option value="owner">Owners</option>
+                            <option value="admin">Admins</option>
+                            <option value="customer">Customers</option>
+                            <option value="member">Members</option>
+                        </select>
+                        <select class="filter-select" id="user-status-filter" onchange="filterUsers()">
+                            <option value="all">All status</option>
+                            <option value="active">Active</option>
+                            <option value="banned">Banned</option>
+                        </select>
+                        <input class="search-input" id="user-search" type="text" placeholder="Search by name…" oninput="filterUsers()">
+                        <button class="btn-secondary" onclick="loadUsers()"><i class="fa fa-rotate-right"></i> Refresh</button>
+                        <button class="btn-primary" onclick="exportUsersCsv()"><i class="fa fa-download"></i> Export</button>
+                    </div>
                 </div>
+                <div class="table-wrap">
                 <table>
                     <thead><tr>
                         <th>User</th>
@@ -401,18 +676,24 @@
                         <tr class="loading-row"><td colspan="4">Loading…</td></tr>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
         <!-- Manage bans page (admin only) -->
         <div class="page" id="page-banned">
             <div class="page-title">Manage Bans</div>
-            <div class="page-sub">Members connected with your Discord bot after signing in with Discord.</div>
+            <div class="page-sub">Ban or unban members from Fuse services.</div>
+            <div class="tab-bar">
+                <button class="tab-btn active" id="ban-tab-all" onclick="setBanTab('all', this)">All Members</button>
+                <button class="tab-btn" id="ban-tab-banned" onclick="setBanTab('banned', this)">Banned Only</button>
+            </div>
             <div class="panel-card">
                 <div class="panel-header">
                     <div class="panel-header-title">Discord Members</div>
                     <div class="panel-tools">
                         <input class="search-input" id="ban-search" type="text" placeholder="Search members..." oninput="filterBanMembers()">
+                        <button class="btn-secondary" onclick="loadBanned()"><i class="fa fa-rotate-right"></i> Refresh</button>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -452,6 +733,10 @@
     var isAdmin      = false;
     var allUsers     = [];
     var allBanMembers = [];
+    var allActivity  = [];
+    var bannedList   = [];
+    var banTabFilter = 'all';
+    var SETTINGS_KEY = 'fuse_dashboard_settings';
 
     // ── Helpers ──
     function avatarUrl(u) {
@@ -537,13 +822,260 @@
             .catch(function() { return false; });
     }
 
+    function getSettings() {
+        try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'); } catch (e) { return {}; }
+    }
+
+    function saveSettings() {
+        var s = {
+            compact: document.getElementById('set-compact').checked,
+            avatars: document.getElementById('set-avatars').checked,
+            toasts: document.getElementById('set-toasts').checked
+        };
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+        applySettings();
+    }
+
+    function applySettings() {
+        var s = getSettings();
+        document.body.classList.toggle('compact-tables', !!s.compact);
+        if (document.getElementById('set-compact')) document.getElementById('set-compact').checked = !!s.compact;
+        if (document.getElementById('set-avatars')) document.getElementById('set-avatars').checked = s.avatars !== false;
+        if (document.getElementById('set-toasts')) document.getElementById('set-toasts').checked = s.toasts !== false;
+    }
+
     function showToast(msg, type) {
+        var s = getSettings();
+        if (s.toasts === false) return;
         var t = document.getElementById('toast');
         t.textContent = msg;
         t.className = 'show ' + (type || '');
         clearTimeout(t._timer);
         t._timer = setTimeout(function() { t.className = ''; }, 3000);
     }
+
+    window.copyText = function(text, msg) {
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(function() {
+            showToast(msg || 'Copied', 'green');
+        }).catch(function() { showToast('Copy failed', 'red'); });
+    };
+
+    window.openDiscordProfile = function() {
+        if (!currentUser) return;
+        window.open('https://discord.com/users/' + currentUser.id, '_blank');
+    };
+
+    window.clearLocalData = function() {
+        if (!confirm('Clear all saved dashboard data from this browser?')) return;
+        localStorage.removeItem('fuse_user');
+        localStorage.removeItem('fuse_roles');
+        localStorage.removeItem('fuse_token');
+        localStorage.removeItem('fuse_pending_token');
+        localStorage.removeItem(SETTINGS_KEY);
+        showToast('Local data cleared', 'green');
+        setTimeout(function() { window.location.reload(); }, 800);
+    };
+
+    function timeAgo(iso) {
+        if (!iso) return '—';
+        var diff = Date.now() - new Date(iso).getTime();
+        var mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'Just now';
+        if (mins < 60) return mins + 'm ago';
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + 'h ago';
+        var days = Math.floor(hrs / 24);
+        if (days < 30) return days + 'd ago';
+        return new Date(iso).toLocaleDateString();
+    }
+
+    function updateGreeting(name) {
+        var h = new Date().getHours();
+        var greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+        document.getElementById('greeting-text').textContent = greet + ', ' + (name || 'there');
+        document.getElementById('greeting-sub').textContent = isAdmin
+            ? 'Manage your server, users, and bans from here.'
+            : 'Access your account, tickets, and Fuse services.';
+        document.getElementById('greeting-time').textContent = new Date().toLocaleString();
+    }
+
+    function updateRoleBars(counts, total) {
+        var max = total || 1;
+        var map = { owners: counts.owners, admins: counts.admins, customers: counts.customers, members: counts.members };
+        Object.keys(map).forEach(function(key) {
+            var el = document.getElementById('bar-' + key);
+            if (!el) return;
+            el.textContent = map[key];
+            var fill = el.parentElement.querySelector('.role-bar-fill');
+            if (fill) fill.style.width = Math.round((map[key] / max) * 100) + '%';
+        });
+    }
+
+    function loadAccountPage(user, roles) {
+        var label = getRoleLabel(roles);
+        var name = user.global_name || user.username;
+        document.getElementById('acct-avatar').src = avatarUrl(user);
+        document.getElementById('acct-name').textContent = name;
+        document.getElementById('acct-handle').textContent = '@' + user.username;
+        document.getElementById('acct-id').textContent = user.id;
+        document.getElementById('acct-username').textContent = user.username;
+        document.getElementById('acct-display').textContent = user.global_name || user.username;
+        document.getElementById('acct-role').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+        document.getElementById('acct-lastseen').textContent = new Date().toLocaleString();
+        var badge = document.getElementById('acct-badge');
+        if (label === 'owner')       { badge.textContent = '👑 Owner';    badge.className = 'role-pill pill-owner'; }
+        else if (label === 'admin')  { badge.textContent = '⚡ Admin';    badge.className = 'role-pill pill-admin'; }
+        else if (label === 'customer') { badge.textContent = '✦ Customer'; badge.className = 'role-pill pill-customer'; }
+        else                         { badge.textContent = 'Member';     badge.className = 'role-pill pill-member'; }
+        checkBan(user.id).then(function(banned) {
+            document.getElementById('acct-status').innerHTML = banned
+                ? '<span class="status-badge status-banned"><i class="fa fa-ban" style="font-size:0.65rem;"></i> Banned</span>'
+                : '<span class="status-badge status-active"><i class="fa fa-circle" style="font-size:0.5rem;"></i> Active</span>';
+        });
+    }
+
+    window.loadRecentActivity = function() {
+        var el = document.getElementById('recent-activity');
+        if (!el) return;
+        fetch('/api/users?action=users')
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                var sorted = (users || []).slice().sort(function(a, b) {
+                    return new Date(b.lastSeen || 0) - new Date(a.lastSeen || 0);
+                }).slice(0, 6);
+                if (!sorted.length) {
+                    el.innerHTML = '<div class="empty-state" style="padding:1.5rem 0;">No sign-ins yet</div>';
+                    return;
+                }
+                el.innerHTML = '';
+                sorted.forEach(function(u) {
+                    var av = u.avatar
+                        ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=64'
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    var div = document.createElement('div');
+                    div.className = 'activity-item';
+                    div.innerHTML = '<img class="activity-avatar" src="' + av + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                        '<span class="activity-name">' + (u.global_name || u.username) + '</span>' +
+                        '<span class="activity-time">' + timeAgo(u.lastSeen) + '</span>';
+                    el.appendChild(div);
+                });
+            }).catch(function() {
+                el.innerHTML = '<div class="empty-state" style="padding:1.5rem 0;">Could not load activity</div>';
+            });
+    };
+
+    window.loadActivity = function() {
+        if (!isAdmin) return;
+        var tbody = document.getElementById('activity-tbody');
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Loading activity…</td></tr>';
+        fetch('/api/users?action=users')
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                allActivity = (users || []).slice().sort(function(a, b) {
+                    return new Date(b.lastSeen || 0) - new Date(a.lastSeen || 0);
+                });
+                renderActivity();
+            }).catch(function() {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Failed to load activity</td></tr>';
+            });
+    };
+
+    function renderActivity() {
+        var tbody = document.getElementById('activity-tbody');
+        var q = (document.getElementById('activity-search').value || '').toLowerCase();
+        var roleF = document.getElementById('activity-role-filter').value;
+        var showAvatars = getSettings().avatars !== false;
+        var filtered = allActivity.filter(function(u) {
+            var label = u.role_label || getRoleLabel(u.roles);
+            if (roleF !== 'all' && label !== roleF) return false;
+            var name = ((u.global_name || '') + ' ' + (u.username || '') + ' ' + u.id).toLowerCase();
+            return name.indexOf(q) > -1;
+        });
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No matching activity</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        filtered.forEach(function(u) {
+            var label = u.role_label || getRoleLabel(u.roles);
+            var badge = roleBadgeInfo(label);
+            var av = showAvatars && u.avatar
+                ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=64'
+                : '';
+            var tr = document.createElement('tr');
+            tr.dataset.uid = u.id;
+            tr.innerHTML =
+                '<td><div class="user-cell">' +
+                    (showAvatars ? '<img class="user-cell-avatar" src="' + (av || 'https://cdn.discordapp.com/embed/avatars/0.png') + '">' : '') +
+                    '<div><div class="user-cell-name">' + (u.global_name || u.username) + '</div>' +
+                    '<div class="user-cell-handle">@' + u.username + '</div></div></div></td>' +
+                '<td><span class="badge-sm ' + badge.cls + '">' + badge.txt + '</span></td>' +
+                '<td>' + (u.lastSeen ? timeAgo(u.lastSeen) : '—') + '</td>' +
+                '<td><span class="info-value mono" style="font-size:0.72rem;">' + u.id + '</span></td>' +
+                '<td><div class="action-group">' +
+                    '<button class="action-btn btn-ghost btn-copy" data-id="' + u.id + '">Copy ID</button>' +
+                '</div></td>';
+            tr.querySelector('.btn-copy').addEventListener('click', function() {
+                copyText(u.id, 'ID copied');
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    window.filterActivity = function() { renderActivity(); };
+
+    function downloadCsv(filename, rows) {
+        var csv = rows.map(function(r) {
+            return r.map(function(c) { return '"' + String(c || '').replace(/"/g, '""') + '"'; }).join(',');
+        }).join('\n');
+        var blob = new Blob([csv], { type: 'text/csv' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        showToast('Exported ' + filename, 'green');
+    }
+
+    window.exportUsersCsv = function() {
+        if (!allUsers.length) { showToast('No users to export', 'red'); return; }
+        var rows = [['Name', 'Username', 'Discord ID', 'Role', 'Joined', 'Status']];
+        var bannedMap = {};
+        bannedList.forEach(function(b) { bannedMap[b.id] = true; });
+        allUsers.forEach(function(u) {
+            rows.push([
+                u.global_name || u.username,
+                u.username,
+                u.id,
+                getRoleLabel(u.roles),
+                u.joined_at ? new Date(u.joined_at).toLocaleDateString() : '',
+                bannedMap[u.id] ? 'Banned' : 'Active'
+            ]);
+        });
+        downloadCsv('fuse-members.csv', rows);
+    };
+
+    window.exportActivityCsv = function() {
+        if (!allActivity.length) { showToast('No activity to export', 'red'); return; }
+        var rows = [['Name', 'Username', 'Discord ID', 'Role', 'Last Seen']];
+        allActivity.forEach(function(u) {
+            rows.push([
+                u.global_name || u.username,
+                u.username,
+                u.id,
+                u.role_label || getRoleLabel(u.roles),
+                u.lastSeen || ''
+            ]);
+        });
+        downloadCsv('fuse-activity.csv', rows);
+    };
+
+    window.setBanTab = function(tab, btn) {
+        banTabFilter = tab;
+        document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        if (btn) btn.classList.add('active');
+        renderBanMembers(allBanMembers, bannedList);
+    };
 
     // ── Login ──
     window.loginWithDiscord = function() {
@@ -568,6 +1100,10 @@
 
         if (name === 'users') loadUsers();
         if (name === 'banned') loadBanned();
+        if (name === 'activity') loadActivity();
+        if (name === 'account' && currentUser) loadAccountPage(currentUser, currentRoles);
+        if (name === 'settings') applySettings();
+        document.getElementById('sidebar').classList.remove('open');
     };
 
     // ── Filter users table ──
