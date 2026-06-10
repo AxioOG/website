@@ -2867,8 +2867,16 @@
             </nav>
 
             <div class="nav-actions">
-                
-                <button type="button" id="nav-signup-btn" class="nav-signup">Log In</button>
+                <!-- Shown when logged OUT -->
+                <button type="button" id="nav-signup-btn" class="nav-signup" style="display:flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+                    Log In
+                </button>
+                <!-- Shown when logged IN -->
+                <a id="nav-user-pill" href="/dashboard" style="display:none;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:4px 12px 4px 4px;text-decoration:none;cursor:pointer;transition:background 0.2s;">
+                    <img id="nav-avatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+                    <span id="nav-username" style="font-family:'Montserrat',sans-serif;font-size:0.82rem;font-weight:700;color:#fff;white-space:nowrap;"></span>
+                </a>
                 <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
                     <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
@@ -3082,9 +3090,9 @@
         // Use canonical /dashboard as the OAuth redirect target
         var DISCORD_REDIRECT  = window.location.origin + '/dashboard';
         var GUILD_ID          = '1305642236880617482';
-        var ROLE_ADMIN1       = '1471974431579574538';
-        var ROLE_ADMIN2       = '1482165881315524688';
-        var ROLE_CUSTOMER     = '1489330191498084413';
+        var ROLE_OWNER        = '1507374058247815218';
+        var ROLE_ADMIN        = '1510902432681689128';
+        var ROLE_CUSTOMER     = '1512219971197862020';
 
         function getAvatarUrl(user) {
             return user.avatar
@@ -3094,9 +3102,17 @@
 
         function getRoleLabel(roles) {
             if (!roles) return null;
-            if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
+            if (roles.indexOf(ROLE_OWNER) > -1) return 'owner';
+            if (roles.indexOf(ROLE_ADMIN) > -1) return 'admin';
             if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
             return null;
+        }
+
+        function checkBan(userId) {
+            return fetch('/api/users?action=check-ban&id=' + encodeURIComponent(userId))
+                .then(function(r) { return r.json(); })
+                .then(function(res) { return !!res.banned; })
+                .catch(function() { return false; });
         }
 
         function applyUI(user, roles) {
@@ -3109,6 +3125,16 @@
             if (pu) pu.textContent = name;
             if (pt) pt.textContent = '@' + user.username;
 
+            // Update nav pill
+            var pill = document.getElementById('nav-user-pill');
+            var navAvatar = document.getElementById('nav-avatar');
+            var navUsername = document.getElementById('nav-username');
+            var loginBtn = document.getElementById('nav-signup-btn');
+            if (navAvatar) navAvatar.src = avatarUrl;
+            if (navUsername) navUsername.textContent = name;
+            if (pill) pill.style.display = 'flex';
+            if (loginBtn) loginBtn.style.display = 'none';
+
             localStorage.setItem('fuse_user', JSON.stringify(user));
             localStorage.setItem('fuse_roles', JSON.stringify(roles || []));
         }
@@ -3118,13 +3144,25 @@
             localStorage.removeItem('fuse_roles');
             localStorage.removeItem('fuse_token');
             localStorage.removeItem('fuse_pending_token');
+            // Reset nav
+            var pill = document.getElementById('nav-user-pill');
+            var loginBtn = document.getElementById('nav-signup-btn');
+            if (pill) pill.style.display = 'none';
+            if (loginBtn) loginBtn.style.display = '';
         }
 
         // Restore session instantly from localStorage
         (function() {
             var savedUser = localStorage.getItem('fuse_user');
             if (savedUser) {
-                try { applyUI(JSON.parse(savedUser), JSON.parse(localStorage.getItem('fuse_roles') || '[]')); }
+                try {
+                    var u = JSON.parse(savedUser);
+                    var roles = JSON.parse(localStorage.getItem('fuse_roles') || '[]');
+                    checkBan(u.id).then(function(banned) {
+                        if (banned) { clearUI(); return; }
+                        applyUI(u, roles);
+                    });
+                }
                 catch(e) { clearUI(); }
             }
         })();
@@ -3145,8 +3183,31 @@
                     headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function(r) { return r.ok ? r.json() : {}; })
-                .then(function(m) { applyUI(user, m.roles || []); })
-                .catch(function() { applyUI(user, []); });
+                .then(function(m) {
+                    var roles = m.roles || [];
+                    checkBan(user.id).then(function(banned) {
+                        if (banned) {
+                            sessionStorage.setItem('fuse_banned', '1');
+                            clearUI();
+                            window.location.href = '/dashboard';
+                            return;
+                        }
+                        applyUI(user, roles);
+                        window.location.href = '/dashboard';
+                    });
+                })
+                .catch(function() {
+                    checkBan(user.id).then(function(banned) {
+                        if (banned) {
+                            sessionStorage.setItem('fuse_banned', '1');
+                            clearUI();
+                            window.location.href = '/dashboard';
+                            return;
+                        }
+                        applyUI(user, []);
+                        window.location.href = '/dashboard';
+                    });
+                });
             })
             .catch(function(e) { console.error('Discord error:', e); });
         })();
