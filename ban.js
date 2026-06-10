@@ -3,7 +3,7 @@
 // and also tracks in a persistent way via the function
 
 const GUILD_ID    = '1305642236880617482';
-const BOT_TOKEN   = 'MTQ2MDM0MDY5NTU3ODU3NTA0MQ.GW9sZG.9oUBCXdOyftHqpwC7d-lOPeD7ea834Y8L3v7hY';
+const BOT_TOKEN   = 'MTQ2MDM0MDY5NTU3ODU3NTA0MQ.GVVO7O.zwHCmRVyA9KDp0MQiMx9uyElWNwhQL6tdfKD84';
 const DISCORD_API = 'https://discord.com/api/v10';
 
 // In-memory ban store (persists as long as function is warm)
