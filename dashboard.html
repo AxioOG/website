@@ -12,254 +12,222 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { width: 100%; min-height: 100%; }
+        body { font-family: 'DM Sans', sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: #000;
-            color: #fff;
-            min-height: 100vh;
-        }
-
-        /* ── Nav ── */
-        .dash-nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 64px;
-            background: rgba(0,0,0,0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-        }
-        .dash-nav-brand {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 800;
-            text-decoration: none;
-        }
-        .dash-nav-brand span:first-child { color: #4197fa; }
-        .dash-nav-brand span:last-child  { color: #fff; }
-
-        .dash-nav-right {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .btn-logout {
-            padding: 0.42rem 1rem;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 8px;
-            color: rgba(255,255,255,0.7);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 0.82rem;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        .btn-logout:hover { background: rgba(255,50,50,0.15); color: #ff6b6b; border-color: rgba(255,50,50,0.3); }
-
-        /* ── Loading screen ── */
+        /* ── Loading ── */
         #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1.25rem;
-            z-index: 999;
+            position: fixed; inset: 0; background: #0a0a0a;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; z-index: 9999;
         }
-        .loading-spinner {
-            width: 42px;
-            height: 42px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #5865F2;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
+        .spinner { width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.08); border-top-color: #5865F2; border-radius: 50%; animation: spin 0.65s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: rgba(255,255,255,0.5);
-        }
+        .loading-label { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; }
 
-        /* ── Main ── */
-        .dash-main {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 96px 2rem 4rem;
+        /* ── Not logged in ── */
+        #screen-login {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; text-align: center; gap: 1rem; padding: 2rem;
         }
+        #screen-login h2 { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; }
+        #screen-login p { color: rgba(255,255,255,0.38); font-size: 0.9rem; }
+        .btn-discord {
+            display: inline-flex; align-items: center; gap: 9px; padding: 12px 28px;
+            background: #5865F2; color: #fff; font-family: 'Montserrat', sans-serif;
+            font-weight: 700; font-size: 0.9rem; border-radius: 10px; border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.15s; text-decoration: none;
+        }
+        .btn-discord:hover { background: #4752C4; transform: translateY(-2px); }
+
+        /* ── Sidebar layout ── */
+        #app { display: none; min-height: 100vh; }
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; width: 240px;
+            background: #111; border-right: 1px solid rgba(255,255,255,0.07);
+            display: flex; flex-direction: column; z-index: 50; overflow-y: auto;
+        }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 10px; padding: 1.25rem 1.25rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07); text-decoration: none;
+        }
+        .sidebar-brand-text { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 800; }
+        .sidebar-brand-text .blue { color: #4197fa; }
+        .sidebar-brand-text .white { color: #fff; }
+
+        .sidebar-user {
+            display: flex; align-items: center; gap: 10px;
+            padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.12); }
+        .sidebar-user-info { min-width: 0; }
+        .sidebar-user-name { font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-user-role { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+        .sidebar-nav { flex: 1; padding: 0.75rem 0.75rem; display: flex; flex-direction: column; gap: 2px; }
+        .nav-section-label { font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.22); letter-spacing: 0.12em; text-transform: uppercase; padding: 0.75rem 0.5rem 0.35rem; }
+        .nav-btn {
+            display: flex; align-items: center; gap: 10px; padding: 0.6rem 0.75rem;
+            border-radius: 8px; border: none; background: none; color: rgba(255,255,255,0.5);
+            font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer;
+            transition: background 0.15s, color 0.15s; text-align: left; width: 100%; text-decoration: none;
+        }
+        .nav-btn i { width: 16px; text-align: center; font-size: 0.8rem; }
+        .nav-btn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+        .nav-btn.active { background: rgba(65,151,250,0.15); color: #4197fa; }
+        .nav-btn.active i { color: #4197fa; }
+
+        .sidebar-footer { padding: 0.75rem; border-top: 1px solid rgba(255,255,255,0.07); }
+        .btn-signout {
+            width: 100%; display: flex; align-items: center; gap: 9px; padding: 0.6rem 0.75rem;
+            border-radius: 8px; border: none; background: rgba(255,50,50,0.08);
+            color: rgba(255,100,100,0.7); font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+            cursor: pointer; transition: background 0.15s, color 0.15s;
+        }
+        .btn-signout:hover { background: rgba(255,50,50,0.18); color: #ff6b6b; }
+
+        /* ── Main content ── */
+        .main { margin-left: 240px; padding: 2rem; min-height: 100vh; }
+
+        /* ── Pages ── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── Page header ── */
+        .page-title { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 0.35rem; }
+        .page-sub { color: rgba(255,255,255,0.35); font-size: 0.85rem; margin-bottom: 1.75rem; }
+
+        /* ── Stats row ── */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.75rem; }
+        .stat-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 1.25rem; display: flex; flex-direction: column; gap: 6px;
+        }
+        .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+        .stat-value { font-family: 'Montserrat', sans-serif; font-size: 1.9rem; font-weight: 800; color: #fff; line-height: 1; }
+        .stat-icon { font-size: 1.1rem; margin-bottom: 2px; }
+        .stat-blue   { color: #4197fa; }
+        .stat-green  { color: #36b43c; }
+        .stat-red    { color: #ff6b6b; }
+        .stat-purple { color: #a78bfa; }
 
         /* ── Profile card ── */
         .profile-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 20px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1.75rem;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 1.75rem; display: flex; align-items: center; gap: 1.5rem;
+            margin-bottom: 1.5rem; position: relative; overflow: hidden;
         }
         .profile-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse 60% 80% at 10% 50%, rgba(65,151,250,0.06) 0%, transparent 70%);
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 50% 100% at 0% 50%, rgba(65,151,250,0.07) 0%, transparent 70%);
             pointer-events: none;
         }
-        .profile-avatar-wrap { position: relative; flex-shrink: 0; }
-        .profile-avatar {
-            width: 88px;
-            height: 88px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255,255,255,0.15);
-            display: block;
+        .profile-avatar-big { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.12); flex-shrink: 0; }
+        .profile-name-big { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 3px; }
+        .profile-handle-big { font-size: 0.82rem; color: rgba(255,255,255,0.38); margin-bottom: 10px; }
+        .role-pill {
+            display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+            border-radius: 999px; font-family: 'Montserrat', sans-serif; font-size: 0.68rem;
+            font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
         }
-        .profile-discord-badge {
-            position: absolute;
-            bottom: 0; right: 0;
-            width: 26px; height: 26px;
-            background: #5865F2;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #000;
-        }
-        .profile-discord-badge svg { width: 13px; height: 13px; }
-        .profile-info { flex: 1; min-width: 0; }
-        .profile-name {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: #fff;
-            line-height: 1.15;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .profile-handle {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.38);
-            margin-bottom: 12px;
-        }
-        .profile-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-        .badge-admin   { background: rgba(252,128,233,0.15); color: #fc80e9; border: 1px solid rgba(252,128,233,0.3); }
-        .badge-customer{ background: rgba(65,151,250,0.15);  color: #4197fa; border: 1px solid rgba(65,151,250,0.3); }
-        .badge-member  { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.12); }
+        .pill-admin    { background: rgba(252,128,233,0.12); color: #fc80e9; border: 1px solid rgba(252,128,233,0.25); }
+        .pill-customer { background: rgba(65,151,250,0.12);  color: #4197fa; border: 1px solid rgba(65,151,250,0.25); }
+        .pill-member   { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.1); }
 
-        /* ── Quick links grid ── */
-        .dash-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
+        /* ── Quick links ── */
+        .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+        .quick-card {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; padding: 1.25rem; text-decoration: none; color: #fff;
+            transition: background 0.2s, transform 0.18s, border-color 0.2s; display: flex; flex-direction: column; gap: 0.65rem;
         }
-        .dash-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-decoration: none;
-            color: #fff;
-            transition: background 0.2s, border-color 0.2s, transform 0.18s;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .dash-card:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.16);
-            transform: translateY(-3px);
-        }
-        .dash-card-icon {
-            width: 42px; height: 42px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-        }
-        .icon-store    { background: rgba(65,151,250,0.15);  color: #4197fa; }
-        .icon-tickets  { background: rgba(252,128,233,0.15); color: #fc80e9; }
-        .icon-status   { background: rgba(0,200,80,0.15);    color: #36b43c; }
-        .icon-discord  { background: rgba(88,101,242,0.15);  color: #5865F2; }
-        .dash-card-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 800;
-        }
-        .dash-card-sub {
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.38);
-            line-height: 1.4;
-        }
+        .quick-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.14); transform: translateY(-3px); }
+        .quick-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .qi-blue   { background: rgba(65,151,250,0.15);  color: #4197fa; }
+        .qi-pink   { background: rgba(252,128,233,0.15); color: #fc80e9; }
+        .qi-green  { background: rgba(54,180,60,0.15);   color: #36b43c; }
+        .qi-indigo { background: rgba(88,101,242,0.15);  color: #5865F2; }
+        .quick-label { font-family: 'Montserrat', sans-serif; font-size: 0.88rem; font-weight: 800; }
+        .quick-sub { font-size: 0.73rem; color: rgba(255,255,255,0.35); }
 
-        /* ── Not logged in ── */
-        #not-logged-in {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            gap: 1rem;
-            padding: 2rem;
+        /* ── Users table (admin) ── */
+        .panel-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; overflow: hidden;
         }
-        #not-logged-in h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 800;
+        .panel-header {
+            padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
         }
-        #not-logged-in p {
-            color: rgba(255,255,255,0.4);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .panel-header-title { font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-weight: 800; }
+        .search-input {
+            padding: 0.45rem 0.85rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; outline: none;
+            transition: border-color 0.2s; width: 200px;
         }
-        .btn-discord-login {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            padding: 12px 26px;
-            background: #5865F2;
-            color: #fff;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 0.88rem;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s;
-            text-decoration: none;
-        }
-        .btn-discord-login:hover { background: #4752C4; transform: translateY(-2px); }
+        .search-input:focus { border-color: rgba(65,151,250,0.5); }
+        .search-input::placeholder { color: rgba(255,255,255,0.25); }
 
-        @media (max-width: 600px) {
-            .profile-card { flex-direction: column; text-align: center; }
-            .profile-avatar-wrap { align-self: center; }
-            .profile-name { font-size: 1.25rem; }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { border-bottom: 1px solid rgba(255,255,255,0.07); }
+        th { padding: 0.75rem 1.25rem; font-family: 'Montserrat', sans-serif; font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.1em; text-align: left; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: rgba(255,255,255,0.03); }
+        td { padding: 0.75rem 1.25rem; font-size: 0.85rem; color: rgba(255,255,255,0.75); vertical-align: middle; }
+
+        .user-cell { display: flex; align-items: center; gap: 10px; }
+        .user-cell-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .user-cell-name { font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 700; color: #fff; }
+        .user-cell-handle { font-size: 0.7rem; color: rgba(255,255,255,0.35); }
+
+        .badge-sm {
+            display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px;
+            font-family: 'Montserrat', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .bs-admin    { background: rgba(252,128,233,0.12); color: #fc80e9; }
+        .bs-customer { background: rgba(65,151,250,0.12);  color: #4197fa; }
+        .bs-member   { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+        .bs-banned   { background: rgba(255,50,50,0.12);   color: #ff6b6b; }
+
+        .action-btn {
+            padding: 4px 10px; border-radius: 6px; border: none; cursor: pointer;
+            font-family: 'Montserrat', sans-serif; font-size: 0.68rem; font-weight: 700;
+            transition: background 0.15s, color 0.15s; letter-spacing: 0.03em;
+        }
+        .btn-ban   { background: rgba(255,50,50,0.12); color: #ff6b6b; }
+        .btn-ban:hover { background: rgba(255,50,50,0.25); }
+        .btn-unban { background: rgba(54,180,60,0.12); color: #36b43c; }
+        .btn-unban:hover { background: rgba(54,180,60,0.25); }
+
+        .empty-state { padding: 3rem 1.25rem; text-align: center; color: rgba(255,255,255,0.25); font-size: 0.85rem; }
+        .loading-row td { text-align: center; color: rgba(255,255,255,0.25); padding: 2rem; }
+
+        /* ── Toast ── */
+        #toast {
+            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+            background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            padding: 0.75rem 1.25rem; font-family: 'Montserrat', sans-serif; font-size: 0.82rem; font-weight: 700;
+            opacity: 0; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s; pointer-events: none;
+        }
+        #toast.show { opacity: 1; transform: translateY(0); }
+        #toast.green { border-color: rgba(54,180,60,0.4); color: #36b43c; }
+        #toast.red   { border-color: rgba(255,50,50,0.4); color: #ff6b6b; }
+
+        /* ── Responsive ── */
+        @media (max-width: 800px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.25s; }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 1rem; }
+            .mobile-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+            .mobile-menu-btn { display: flex; }
+        }
+        @media (min-width: 801px) {
+            .mobile-top { display: none; }
+        }
+        .mobile-menu-btn {
+            display: none; width: 36px; height: 36px; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+            color: #fff; font-size: 1rem; cursor: pointer; border: none;
         }
     </style>
 </head>
@@ -267,199 +235,454 @@
 
 <!-- Loading -->
 <div id="loading-screen">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Signing you in…</div>
+    <div class="spinner"></div>
+    <div class="loading-label">Signing you in…</div>
 </div>
 
-<!-- Not logged in fallback -->
-<div id="not-logged-in">
+<!-- Not logged in -->
+<div id="screen-login">
     <h2>Sign in required</h2>
     <p>You need to sign in with Discord to view your dashboard.</p>
-    <button class="btn-discord-login" onclick="loginWithDiscord()">
+    <button class="btn-discord" onclick="loginWithDiscord()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
         Sign in with Discord
     </button>
 </div>
 
-<!-- Dashboard content (hidden until auth confirmed) -->
-<div id="dash-content" style="display:none;">
-    <nav class="dash-nav">
-        <a class="dash-nav-brand" href="/"><span>fuse</span><span>bypass</span></a>
-        <div class="dash-nav-right">
-            <button class="btn-logout" id="logout-btn"><i class="fa fa-sign-out-alt"></i> Sign Out</button>
+<!-- App -->
+<div id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <a class="sidebar-brand" href="/">
+            <div class="sidebar-brand-text"><span class="blue">fuse</span><span class="white">bypass</span></div>
+        </a>
+        <div class="sidebar-user">
+            <img id="sb-avatar" class="sidebar-avatar" src="" alt="">
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="sb-name">—</div>
+                <div class="sidebar-user-role" id="sb-role">—</div>
+            </div>
         </div>
-    </nav>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">General</div>
+            <button class="nav-btn active" data-page="overview" onclick="showPage('overview', this)">
+                <i class="fa fa-home"></i> Overview
+            </button>
+            <a class="nav-btn" href="/">
+                <i class="fa fa-arrow-left"></i> Back to Site
+            </a>
+            <a class="nav-btn" href="/tickets">
+                <i class="fa fa-ticket-alt"></i> Support Tickets
+            </a>
+            <div class="nav-section-label admin-only" style="display:none;">Admin</div>
+            <button class="nav-btn admin-only" data-page="users" onclick="showPage('users', this)" style="display:none;">
+                <i class="fa fa-users"></i> User List
+            </button>
+            <button class="nav-btn admin-only" data-page="banned" onclick="showPage('banned', this)" style="display:none;">
+                <i class="fa fa-ban"></i> Banned Users
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-signout" id="logout-btn"><i class="fa fa-sign-out-alt"></i> Sign Out</button>
+        </div>
+    </aside>
 
-    <main class="dash-main">
-        <!-- Profile -->
-        <div class="profile-card">
-            <div class="profile-avatar-wrap">
-                <img id="dash-avatar" class="profile-avatar" src="" alt="avatar">
-                <div class="profile-discord-badge">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+    <!-- Main -->
+    <main class="main">
+        <!-- Mobile top bar -->
+        <div class="mobile-top">
+            <button class="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div style="font-family:'Montserrat',sans-serif;font-size:0.9rem;font-weight:800;">Dashboard</div>
+        </div>
+
+        <!-- Overview page -->
+        <div class="page active" id="page-overview">
+            <div class="page-title">Overview</div>
+            <div class="page-sub">Welcome back to your Fuse dashboard.</div>
+
+            <!-- Profile card -->
+            <div class="profile-card">
+                <img id="pf-avatar" class="profile-avatar-big" src="" alt="">
+                <div>
+                    <div class="profile-name-big" id="pf-name">—</div>
+                    <div class="profile-handle-big" id="pf-handle">—</div>
+                    <span class="role-pill pill-member" id="pf-badge">Member</span>
                 </div>
             </div>
-            <div class="profile-info">
-                <div class="profile-name" id="dash-name">Loading…</div>
-                <div class="profile-handle" id="dash-handle"></div>
-                <span class="profile-badge badge-member" id="dash-badge">Member</span>
+
+            <!-- Stats (admin sees all, regular user sees subset) -->
+            <div class="stats-row" id="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon stat-blue"><i class="fa fa-users"></i></div>
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value stat-blue" id="stat-users">—</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-green"><i class="fa fa-shopping-bag"></i></div>
+                    <div class="stat-label">Customers</div>
+                    <div class="stat-value stat-green" id="stat-customers">—</div>
+                </div>
+                <div class="stat-card admin-only" style="display:none;">
+                    <div class="stat-icon stat-red"><i class="fa fa-ban"></i></div>
+                    <div class="stat-label">Banned</div>
+                    <div class="stat-value stat-red" id="stat-banned">—</div>
+                </div>
+                <div class="stat-card admin-only" style="display:none;">
+                    <div class="stat-icon stat-purple"><i class="fa fa-shield-halved"></i></div>
+                    <div class="stat-label">Admins</div>
+                    <div class="stat-value stat-purple" id="stat-admins">—</div>
+                </div>
+            </div>
+
+            <!-- Quick links -->
+            <div class="quick-grid">
+                <a class="quick-card" href="/">
+                    <div class="quick-icon qi-blue"><i class="fa fa-home"></i></div>
+                    <div class="quick-label">Home</div>
+                    <div class="quick-sub">Back to main site</div>
+                </a>
+                <a class="quick-card" href="/#store">
+                    <div class="quick-icon qi-blue"><i class="fa fa-shopping-bag"></i></div>
+                    <div class="quick-label">Store</div>
+                    <div class="quick-sub">Browse Fuse products</div>
+                </a>
+                <a class="quick-card" href="/tickets">
+                    <div class="quick-icon qi-pink"><i class="fa fa-ticket-alt"></i></div>
+                    <div class="quick-label">Tickets</div>
+                    <div class="quick-sub">Open support ticket</div>
+                </a>
+                <a class="quick-card" href="/#status">
+                    <div class="quick-icon qi-green"><i class="fa fa-circle-check"></i></div>
+                    <div class="quick-label">Status</div>
+                    <div class="quick-sub">Product availability</div>
+                </a>
+                <a class="quick-card" href="https://discord.gg/yVUxWkrPT9" target="_blank" rel="noopener">
+                    <div class="quick-icon qi-indigo"><i class="fab fa-discord"></i></div>
+                    <div class="quick-label">Discord</div>
+                    <div class="quick-sub">Join community</div>
+                </a>
             </div>
         </div>
 
-        <!-- Quick links -->
-        <div class="dash-grid">
-            <a class="dash-card" href="/">
-                <div class="dash-card-icon icon-store"><i class="fa fa-home"></i></div>
-                <div class="dash-card-title">Home</div>
-                <div class="dash-card-sub">Back to the main site</div>
-            </a>
-            <a class="dash-card" href="/?page=store">
-                <div class="dash-card-icon icon-store"><i class="fa fa-shopping-bag"></i></div>
-                <div class="dash-card-title">Store</div>
-                <div class="dash-card-sub">Browse and purchase Fuse products</div>
-            </a>
-            <a class="dash-card" href="/tickets">
-                <div class="dash-card-icon icon-tickets"><i class="fa fa-ticket-alt"></i></div>
-                <div class="dash-card-title">Support Tickets</div>
-                <div class="dash-card-sub">Open or view your support tickets</div>
-            </a>
-            <a class="dash-card" href="/?page=status">
-                <div class="dash-card-icon icon-status"><i class="fa fa-circle-check"></i></div>
-                <div class="dash-card-title">Status</div>
-                <div class="dash-card-sub">Check product availability</div>
-            </a>
-            <a class="dash-card" href="https://discord.gg/yVUxWkrPT9" target="_blank" rel="noopener">
-                <div class="dash-card-icon icon-discord"><i class="fab fa-discord"></i></div>
-                <div class="dash-card-title">Discord</div>
-                <div class="dash-card-sub">Join our community server</div>
-            </a>
+        <!-- Users page (admin only) -->
+        <div class="page" id="page-users">
+            <div class="page-title">User List</div>
+            <div class="page-sub">All users who have signed in to Fuse.</div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-title">Registered Users</div>
+                    <input class="search-input" id="user-search" type="text" placeholder="Search by name…" oninput="filterUsers()">
+                </div>
+                <table>
+                    <thead><tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Last Seen</th>
+                        <th>Actions</th>
+                    </tr></thead>
+                    <tbody id="users-tbody">
+                        <tr class="loading-row"><td colspan="4">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Banned page (admin only) -->
+        <div class="page" id="page-banned">
+            <div class="page-title">Banned Users</div>
+            <div class="page-sub">Users who have been suspended from Fuse.</div>
+            <div class="panel-card">
+                <div class="panel-header">
+                    <div class="panel-header-title">Banned Users</div>
+                </div>
+                <table>
+                    <thead><tr>
+                        <th>User</th>
+                        <th>Reason</th>
+                        <th>Actions</th>
+                    </tr></thead>
+                    <tbody id="banned-tbody">
+                        <tr class="loading-row"><td colspan="3">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 </div>
 
+<!-- Toast -->
+<div id="toast"></div>
+
 <script>
-    var DISCORD_CLIENT_ID = '1460340695578575041';
-    var DISCORD_REDIRECT  = window.location.origin + '/dashboard';
-    var GUILD_ID          = '1305642236880617482';
-    var ROLE_ADMIN1       = '1471974431579574538';
-    var ROLE_ADMIN2       = '1482165881315524688';
-    var ROLE_CUSTOMER     = '1489330191498084413';
+(function() {
+    // ── Config ──
+    var CLIENT_ID    = '1460340695578575041';
+    var REDIRECT_URI = window.location.origin + '/dashboard';
+    var GUILD_ID     = '1305642236880617482';
+    var ROLE_ADMIN1  = '1471974431579574538';
+    var ROLE_ADMIN2  = '1482165881315524688';
+    var ROLE_CUSTOMER= '1489330191498084413';
 
-    function loginWithDiscord() {
-        localStorage.removeItem('fuse_token');
-        localStorage.removeItem('fuse_pending_token');
-        var p = new URLSearchParams({
-            client_id: DISCORD_CLIENT_ID,
-            redirect_uri: DISCORD_REDIRECT,
-            response_type: 'token',
-            scope: 'identify guilds.members.read'
-        });
-        window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
-    }
+    var currentUser  = null;
+    var currentRoles = [];
+    var isAdmin      = false;
+    var allUsers     = [];
 
-    function getAvatarUrl(user) {
-        return user.avatar
-            ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png?size=128'
-            : 'https://cdn.discordapp.com/embed/avatars/0.png';
+    // ── Helpers ──
+    function avatarUrl(u) {
+        return u.avatar
+            ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=128'
+            : 'https://cdn.discordapp.com/embed/avatars/' + (parseInt(u.discriminator || '0') % 5) + '.png';
     }
 
     function getRoleLabel(roles) {
-        if (!roles) return 'member';
+        if (!roles || !roles.length) return 'member';
         if (roles.indexOf(ROLE_ADMIN1) > -1 || roles.indexOf(ROLE_ADMIN2) > -1) return 'admin';
         if (roles.indexOf(ROLE_CUSTOMER) > -1) return 'customer';
         return 'member';
     }
 
-    function showDashboard(user, roles) {
-        var name = user.global_name || user.username;
-        var avatarUrl = getAvatarUrl(user);
-        var roleLabel = getRoleLabel(roles);
+    function showToast(msg, type) {
+        var t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'show ' + (type || '');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function() { t.className = ''; }, 3000);
+    }
 
-        document.getElementById('dash-avatar').src = avatarUrl;
-        document.getElementById('dash-name').textContent = name;
-        document.getElementById('dash-handle').textContent = '@' + user.username;
+    // ── Login ──
+    window.loginWithDiscord = function() {
+        localStorage.removeItem('fuse_token');
+        localStorage.removeItem('fuse_pending_token');
+        var p = new URLSearchParams({
+            client_id: CLIENT_ID,
+            redirect_uri: REDIRECT_URI,
+            response_type: 'token',
+            scope: 'identify guilds.members.read'
+        });
+        window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
+    };
 
-        var badge = document.getElementById('dash-badge');
-        if (roleLabel === 'admin') {
-            badge.textContent = '⚡ Admin';
-            badge.className = 'profile-badge badge-admin';
-        } else if (roleLabel === 'customer') {
-            badge.textContent = '✦ Customer';
-            badge.className = 'profile-badge badge-customer';
+    // ── Page switching ──
+    window.showPage = function(name, btn) {
+        document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+        document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+        var pg = document.getElementById('page-' + name);
+        if (pg) pg.classList.add('active');
+        if (btn) btn.classList.add('active');
+
+        if (name === 'users') loadUsers();
+        if (name === 'banned') loadBanned();
+    };
+
+    // ── Filter users table ──
+    window.filterUsers = function() {
+        var q = document.getElementById('user-search').value.toLowerCase();
+        var rows = document.querySelectorAll('#users-tbody tr[data-uid]');
+        rows.forEach(function(r) {
+            var name = (r.dataset.name || '').toLowerCase();
+            r.style.display = name.indexOf(q) > -1 ? '' : 'none';
+        });
+    };
+
+    // ── Show dashboard ──
+    function boot(user, roles) {
+        currentUser  = user;
+        currentRoles = roles || [];
+        isAdmin = currentRoles.indexOf(ROLE_ADMIN1) > -1 || currentRoles.indexOf(ROLE_ADMIN2) > -1;
+        var label = getRoleLabel(currentRoles);
+        var name  = user.global_name || user.username;
+        var av    = avatarUrl(user);
+
+        // Sidebar
+        document.getElementById('sb-avatar').src = av;
+        document.getElementById('sb-name').textContent = name;
+        document.getElementById('sb-role').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+
+        // Profile card
+        document.getElementById('pf-avatar').src = av;
+        document.getElementById('pf-name').textContent = name;
+        document.getElementById('pf-handle').textContent = '@' + user.username;
+        var badge = document.getElementById('pf-badge');
+        if (label === 'admin')    { badge.textContent = '⚡ Admin';    badge.className = 'role-pill pill-admin'; }
+        else if (label === 'customer') { badge.textContent = '✦ Customer'; badge.className = 'role-pill pill-customer'; }
+        else                      { badge.textContent = 'Member';     badge.className = 'role-pill pill-member'; }
+
+        // Show admin sections
+        if (isAdmin) {
+            document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = ''; });
+            loadStats();
         } else {
-            badge.textContent = 'Member';
-            badge.className = 'profile-badge badge-member';
+            // Still load basic stats for non-admin
+            loadStatsBasic();
         }
 
+        // Register user in backend
+        registerUser(user, currentRoles);
+
+        // Show app
         document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('dash-content').style.display = 'block';
+        document.getElementById('app').style.display = 'block';
     }
 
-    function showNotLoggedIn() {
+    function showLogin() {
         document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('not-logged-in').style.display = 'flex';
+        document.getElementById('screen-login').style.display = 'flex';
     }
 
-    // ── Step 1: grab token from URL hash (fresh OAuth redirect) ──
-    (function() {
-        var h = window.location.hash.substring(1);
-        if (h) {
-            var p = new URLSearchParams(h);
-            var t = p.get('access_token');
-            if (t) {
-                localStorage.setItem('fuse_pending_token', t);
-                // Clean the URL
-                history.replaceState(null, '', '/dashboard');
-            }
-        }
-    })();
-
-    // ── Step 2: process pending token or existing session ──
-    (function() {
-        var pending = localStorage.getItem('fuse_pending_token');
-        if (pending) {
-            localStorage.removeItem('fuse_pending_token');
-            localStorage.setItem('fuse_token', pending);
-
-            fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me', {
-                headers: { 'Authorization': 'Bearer ' + pending }
+    // ── Register user on backend ──
+    function registerUser(user, roles) {
+        var label = getRoleLabel(roles);
+        fetch('/api/users?action=register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: user.id,
+                username: user.username,
+                global_name: user.global_name || user.username,
+                avatar: user.avatar,
+                roles: roles,
+                role_label: label,
+                lastSeen: new Date().toISOString()
             })
+        }).catch(function() {});
+    }
+
+    // ── Stats ──
+    function loadStats() {
+        fetch('/api/users?action=users')
             .then(function(r) { return r.json(); })
-            .then(function(user) {
-                localStorage.setItem('fuse_user', JSON.stringify(user));
-                fetch('https://corsproxy.io/?' + 'https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
-                    headers: { 'Authorization': 'Bearer ' + pending }
-                })
-                .then(function(r) { return r.ok ? r.json() : {}; })
-                .then(function(m) {
-                    var roles = m.roles || [];
-                    localStorage.setItem('fuse_roles', JSON.stringify(roles));
-                    showDashboard(user, roles);
-                })
-                .catch(function() {
-                    localStorage.setItem('fuse_roles', '[]');
-                    showDashboard(user, []);
+            .then(function(users) {
+                allUsers = users || [];
+                var admins = users.filter(function(u) {
+                    return u.roles && (u.roles.indexOf(ROLE_ADMIN1) > -1 || u.roles.indexOf(ROLE_ADMIN2) > -1);
                 });
-            })
-            .catch(function() { showNotLoggedIn(); });
-            return;
-        }
+                var customers = users.filter(function(u) {
+                    return u.roles && u.roles.indexOf(ROLE_CUSTOMER) > -1;
+                });
+                document.getElementById('stat-users').textContent     = users.length;
+                document.getElementById('stat-customers').textContent = customers.length;
+                document.getElementById('stat-admins').textContent    = admins.length;
+            }).catch(function() {
+                document.getElementById('stat-users').textContent = '—';
+            });
+        fetch('/api/users?action=banned')
+            .then(function(r) { return r.json(); })
+            .then(function(banned) {
+                document.getElementById('stat-banned').textContent = (banned || []).length;
+            }).catch(function() {});
+    }
 
-        // Try restoring from saved session
-        var savedUser = localStorage.getItem('fuse_user');
-        var savedToken = localStorage.getItem('fuse_token');
-        if (savedUser && savedToken) {
-            try {
-                var user = JSON.parse(savedUser);
-                var roles = JSON.parse(localStorage.getItem('fuse_roles') || '[]');
-                showDashboard(user, roles);
-                return;
-            } catch(e) {}
-        }
+    function loadStatsBasic() {
+        fetch('/api/users?action=users')
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                var customers = (users || []).filter(function(u) {
+                    return u.roles && u.roles.indexOf(ROLE_CUSTOMER) > -1;
+                });
+                document.getElementById('stat-users').textContent     = (users || []).length;
+                document.getElementById('stat-customers').textContent = customers.length;
+            }).catch(function() {});
+    }
 
-        // No session found
-        showNotLoggedIn();
-    })();
+    // ── Load users table ──
+    function loadUsers() {
+        var tbody = document.getElementById('users-tbody');
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="4">Loading…</td></tr>';
+        fetch('/api/users?action=users')
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                allUsers = users || [];
+                if (!users || users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No users yet</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                users.forEach(function(u) {
+                    var label = u.role_label || getRoleLabel(u.roles);
+                    var av = u.avatar
+                        ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=64'
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    var lastSeen = u.lastSeen ? new Date(u.lastSeen).toLocaleDateString() : '—';
+                    var badgeCls = label === 'admin' ? 'bs-admin' : label === 'customer' ? 'bs-customer' : 'bs-member';
+                    var badgeTxt = label === 'admin' ? '⚡ Admin' : label === 'customer' ? '✦ Customer' : 'Member';
+                    var tr = document.createElement('tr');
+                    tr.dataset.uid = u.id;
+                    tr.dataset.name = (u.global_name || u.username || '').toLowerCase();
+                    tr.innerHTML =
+                        '<td><div class="user-cell">' +
+                            '<img class="user-cell-avatar" src="' + av + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                            '<div><div class="user-cell-name">' + (u.global_name || u.username) + '</div>' +
+                            '<div class="user-cell-handle">@' + (u.username || u.id) + '</div></div>' +
+                        '</div></td>' +
+                        '<td><span class="badge-sm ' + badgeCls + '">' + badgeTxt + '</span></td>' +
+                        '<td>' + lastSeen + '</td>' +
+                        '<td><button class="action-btn btn-ban" onclick="banUser(\'' + u.id + '\',\'' + (u.global_name || u.username) + '\')">Ban</button></td>';
+                    tbody.appendChild(tr);
+                });
+            }).catch(function() {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Failed to load users</td></tr>';
+            });
+    }
+
+    // ── Load banned table ──
+    function loadBanned() {
+        var tbody = document.getElementById('banned-tbody');
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="3">Loading…</td></tr>';
+        fetch('/api/users?action=banned')
+            .then(function(r) { return r.json(); })
+            .then(function(banned) {
+                if (!banned || banned.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No banned users</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                banned.forEach(function(u) {
+                    var av = u.avatar
+                        ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=64'
+                        : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                    var tr = document.createElement('tr');
+                    tr.innerHTML =
+                        '<td><div class="user-cell">' +
+                            '<img class="user-cell-avatar" src="' + av + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
+                            '<div><div class="user-cell-name">' + (u.global_name || u.username || u.id) + '</div>' +
+                            '<div class="user-cell-handle">@' + (u.username || u.id) + '</div></div>' +
+                        '</div></td>' +
+                        '<td>' + (u.reason || 'No reason given') + '</td>' +
+                        '<td><button class="action-btn btn-unban" onclick="unbanUser(\'' + u.id + '\',\'' + (u.global_name || u.username) + '\')">Unban</button></td>';
+                    tbody.appendChild(tr);
+                });
+            }).catch(function() {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Failed to load</td></tr>';
+            });
+    }
+
+    // ── Ban / Unban ──
+    window.banUser = function(id, name) {
+        if (!confirm('Ban ' + name + '?')) return;
+        fetch('/api/users?action=ban', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, username: name, reason: 'Banned by admin' })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { showToast(name + ' banned', 'red'); loadUsers(); loadStats(); }
+            else showToast('Failed to ban', 'red');
+        }).catch(function() { showToast('Error', 'red'); });
+    };
+
+    window.unbanUser = function(id, name) {
+        if (!confirm('Unban ' + name + '?')) return;
+        fetch('/api/users?action=unban&id=' + id, { method: 'DELETE' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { showToast(name + ' unbanned', 'green'); loadBanned(); loadStats(); }
+            else showToast('Failed to unban', 'red');
+        }).catch(function() { showToast('Error', 'red'); });
+    };
 
     // ── Logout ──
     document.getElementById('logout-btn').addEventListener('click', function() {
@@ -469,6 +692,66 @@
         localStorage.removeItem('fuse_pending_token');
         window.location.href = '/';
     });
+
+    // ── MAIN AUTH FLOW ──
+    // Step 1: Check URL hash for fresh OAuth token
+    var freshToken = null;
+    var hash = window.location.hash.substring(1);
+    if (hash) {
+        var hp = new URLSearchParams(hash);
+        var ht = hp.get('access_token');
+        if (ht) {
+            freshToken = ht;
+            // Clean URL immediately
+            history.replaceState(null, '', window.location.pathname);
+        }
+    }
+
+    if (freshToken) {
+        // Fresh login — fetch Discord profile
+        localStorage.setItem('fuse_token', freshToken);
+        fetch('https://discord.com/api/v10/users/@me', {
+            headers: { 'Authorization': 'Bearer ' + freshToken }
+        })
+        .then(function(r) {
+            if (!r.ok) throw new Error('auth failed');
+            return r.json();
+        })
+        .then(function(user) {
+            // Try to get guild roles
+            return fetch('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
+                headers: { 'Authorization': 'Bearer ' + freshToken }
+            })
+            .then(function(r) { return r.ok ? r.json() : {}; })
+            .then(function(m) {
+                var roles = m.roles || [];
+                localStorage.setItem('fuse_user', JSON.stringify(user));
+                localStorage.setItem('fuse_roles', JSON.stringify(roles));
+                boot(user, roles);
+            })
+            .catch(function() {
+                localStorage.setItem('fuse_user', JSON.stringify(user));
+                localStorage.setItem('fuse_roles', '[]');
+                boot(user, []);
+            });
+        })
+        .catch(function() { showLogin(); });
+
+    } else {
+        // Try restoring saved session
+        var savedUser  = localStorage.getItem('fuse_user');
+        var savedToken = localStorage.getItem('fuse_token');
+        if (savedUser && savedToken) {
+            try {
+                var u = JSON.parse(savedUser);
+                var r = JSON.parse(localStorage.getItem('fuse_roles') || '[]');
+                boot(u, r);
+            } catch(e) { showLogin(); }
+        } else {
+            showLogin();
+        }
+    }
+})();
 </script>
 </body>
 </html>
