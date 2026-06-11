@@ -739,6 +739,15 @@
     var SETTINGS_KEY = 'fuse_dashboard_settings';
 
     // ── Helpers ──
+    function escHtml(s) {
+        return String(s || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     function avatarUrl(u) {
         return u.avatar
             ? 'https://cdn.discordapp.com/avatars/' + u.id + '/' + u.avatar + '.png?size=128'
@@ -773,31 +782,34 @@
 
     function fetchMembersList() {
         var token = localStorage.getItem('fuse_token');
-        if (!token) {
-            return Promise.reject(new Error('No Discord session — sign out, then sign in with Discord again.'));
-        }
 
+        // Primary: server-side bot fetch (returns ALL members, no token scope needed)
         return fetch('/api/members?action=list', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ access_token: token })
+            body: JSON.stringify({ access_token: token || '' })
         }).then(function(r) {
             return r.text().then(function(text) {
                 var data = {};
-                try { data = text ? JSON.parse(text) : {}; } catch (e) {
-                    throw new Error('Members API returned invalid data — redeploy the web folder to Netlify.');
+                try { data = text ? JSON.parse(text) : {}; } catch(e) {
+                    throw new Error('Members API returned invalid JSON — check your Netlify function deployment.');
                 }
                 if (!r.ok) {
-                    throw new Error(data.error || ('Members request failed (' + r.status + ')'));
+                    var msg = data.error || ('Members API error: ' + r.status);
+                    throw new Error(msg);
                 }
-                if (!Array.isArray(data.members)) {
-                    throw new Error(data.error || 'Members API returned an unexpected response.');
+                // Normalise: some endpoints return { members: [...] }, others return [...]
+                if (Array.isArray(data)) {
+                    return { members: data };
                 }
-                return data;
+                if (Array.isArray(data.members)) {
+                    return data;
+                }
+                throw new Error(data.error || 'Unexpected response from members API — redeploy your Netlify functions.');
             });
         }).catch(function(err) {
             if (err && err.message === 'Failed to fetch') {
-                throw new Error('Cannot reach /api/members — redeploy the full web folder to Netlify (serverless functions required).');
+                throw new Error('Cannot reach /api/members — make sure the Netlify serverless function is deployed.');
             }
             throw err;
         });
@@ -1080,12 +1092,14 @@
     // ── Login ──
     window.loginWithDiscord = function() {
         localStorage.removeItem('fuse_token');
+        localStorage.removeItem('fuse_user');
+        localStorage.removeItem('fuse_roles');
         localStorage.removeItem('fuse_pending_token');
         var p = new URLSearchParams({
             client_id: CLIENT_ID,
             redirect_uri: REDIRECT_URI,
             response_type: 'token',
-            scope: 'identify guilds.members.read'
+            scope: 'identify guilds guilds.members.read'
         });
         window.location.href = 'https://discord.com/oauth2/authorize?' + p.toString();
     };
@@ -1107,22 +1121,41 @@
     };
 
     // ── Filter users table ──
+    // ── Filter users table ──
     window.filterUsers = function() {
-        var q = document.getElementById('user-search').value.toLowerCase();
-        var rows = document.querySelectorAll('#users-tbody tr[data-uid]');
+        var q       = (document.getElementById('user-search').value || '').toLowerCase();
+        var roleF   = document.getElementById('user-role-filter').value;
+        var statusF = document.getElementById('user-status-filter').value;
+        var rows    = document.querySelectorAll('#users-tbody tr[data-uid]');
+        var visible = 0;
         rows.forEach(function(r) {
-            var name = (r.dataset.name || '').toLowerCase();
-            r.style.display = name.indexOf(q) > -1 ? '' : 'none';
+            var name   = (r.dataset.name   || '').toLowerCase();
+            var role   = (r.dataset.role   || '');
+            var status = (r.dataset.status || '');
+            var show = true;
+            if (q      && name.indexOf(q) === -1)     show = false;
+            if (roleF   !== 'all' && role !== roleF)   show = false;
+            if (statusF !== 'all' && status !== statusF) show = false;
+            r.style.display = show ? '' : 'none';
+            if (show) visible++;
         });
+        // Show empty state if nothing matches
+        var existing = document.querySelector('#users-tbody .filter-empty');
+        if (!visible && rows.length > 0) {
+            if (!existing) {
+                var colSpan = document.querySelector('#users-tbody tr[data-uid] td') ? document.querySelector('#users-tbody tr[data-uid]').querySelectorAll('td').length : 4;
+                var emptyRow = document.createElement('tr');
+                emptyRow.className = 'filter-empty';
+                emptyRow.innerHTML = '<td colspan="' + colSpan + '" class="empty-state">No members match your filters</td>';
+                document.getElementById('users-tbody').appendChild(emptyRow);
+            }
+        } else if (existing) {
+            existing.remove();
+        }
     };
 
     window.filterBanMembers = function() {
-        var q = document.getElementById('ban-search').value.toLowerCase();
-        var rows = document.querySelectorAll('#banned-tbody tr[data-uid]');
-        rows.forEach(function(r) {
-            var name = (r.dataset.name || '').toLowerCase();
-            r.style.display = name.indexOf(q) > -1 ? '' : 'none';
-        });
+        renderBanMembers(allBanMembers, bannedList);
     };
 
     function showBanned() {
@@ -1164,9 +1197,21 @@
         if (isAdmin) {
             document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = ''; });
             loadStats();
+            document.getElementById('overview-admin-widgets').style.display = '';
+            loadRecentActivity();
         } else {
             // Still load basic stats for non-admin
             loadStatsBasic();
+        }
+
+        // Greeting
+        updateGreeting(name);
+
+        // Customer banner
+        var label2 = getRoleLabel(currentRoles);
+        if (label2 === 'customer' || label2 === 'owner' || label2 === 'admin') {
+            var cc = document.getElementById('customer-card');
+            if (cc) cc.style.display = '';
         }
 
         // Register user in backend
@@ -1204,27 +1249,29 @@
     function loadStats() {
         fetchMembersList()
             .then(function(res) {
-                var members = res.members || [];
-                allUsers = members;
-                var owners = members.filter(function(u) {
-                    return u.roles && u.roles.indexOf(ROLE_OWNER) > -1;
-                });
-                var admins = members.filter(function(u) {
-                    return u.roles && u.roles.indexOf(ROLE_ADMIN) > -1;
-                });
-                var customers = members.filter(function(u) {
-                    return u.roles && u.roles.indexOf(ROLE_CUSTOMER) > -1;
-                });
-                document.getElementById('stat-users').textContent       = members.length;
-                document.getElementById('stat-customers').textContent   = customers.length;
-                document.getElementById('stat-admins').textContent      = owners.length + admins.length;
+                var members   = res.members || [];
+                allUsers      = members;
+                var owners    = members.filter(function(u) { return u.roles && u.roles.indexOf(ROLE_OWNER) > -1; });
+                var admins    = members.filter(function(u) { return u.roles && u.roles.indexOf(ROLE_ADMIN) > -1; });
+                var customers = members.filter(function(u) { return u.roles && u.roles.indexOf(ROLE_CUSTOMER) > -1; });
+                var regularMembers = members.length - owners.length - admins.length - customers.length;
+                document.getElementById('stat-users').textContent     = members.length;
+                document.getElementById('stat-customers').textContent = customers.length;
+                document.getElementById('stat-admins').textContent    = owners.length + admins.length;
+                updateRoleBars({
+                    owners:    owners.length,
+                    admins:    admins.length,
+                    customers: customers.length,
+                    members:   Math.max(0, regularMembers)
+                }, members.length);
             }).catch(function() {
                 document.getElementById('stat-users').textContent = '—';
             });
         fetch('/api/users?action=banned')
             .then(function(r) { return r.json(); })
             .then(function(banned) {
-                document.getElementById('stat-banned').textContent = (banned || []).length;
+                bannedList = banned || [];
+                document.getElementById('stat-banned').textContent = bannedList.length;
             }).catch(function() {});
     }
 
@@ -1248,9 +1295,10 @@
         Promise.all([fetchMembersList(), fetchBannedList()])
             .then(function(results) {
                 var memberRes = results[0] || {};
-                var banned = results[1] || [];
-                var members = memberRes.members || [];
-                allUsers = members;
+                var banned    = results[1] || [];
+                var members   = memberRes.members || [];
+                allUsers  = members;
+                bannedList = banned;
                 var bannedMap = {};
                 banned.forEach(function(u) { bannedMap[u.id] = true; });
 
@@ -1260,31 +1308,45 @@
                 }
                 tbody.innerHTML = '';
                 members.forEach(function(u) {
-                    var label = getRoleLabel(u.roles);
-                    var badge = roleBadgeInfo(label);
-                    var isBannedMember = !!bannedMap[u.id];
-                    var joined = u.joined_at ? new Date(u.joined_at).toLocaleDateString() : '—';
-                    var displayName = u.global_name || u.username || u.id;
+                    var label        = getRoleLabel(u.roles);
+                    var badge        = roleBadgeInfo(label);
+                    var isBanned     = !!bannedMap[u.id];
+                    var joined       = u.joined_at ? new Date(u.joined_at).toLocaleDateString() : '—';
+                    var displayName  = u.global_name || u.username || u.id;
+                    var roleLabelVal = document.getElementById('user-role-filter').value;
+                    var statusVal    = document.getElementById('user-status-filter').value;
+
                     var tr = document.createElement('tr');
-                    tr.dataset.uid = u.id;
-                    tr.dataset.name = (displayName + ' ' + (u.username || '') + ' ' + u.id).toLowerCase();
+                    tr.dataset.uid    = u.id;
+                    tr.dataset.name   = (displayName + ' ' + (u.username || '') + ' ' + u.id).toLowerCase();
+                    tr.dataset.role   = label;
+                    tr.dataset.status = isBanned ? 'banned' : 'active';
+
+                    // Avatar
+                    var avatarHtml = '<img class="user-cell-avatar" src="' + memberAvatarUrl(u, 64) + '" '
+                        + 'onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'" alt="">';
+
                     tr.innerHTML =
                         '<td><div class="user-cell">' +
-                            '<img class="user-cell-avatar" src="' + memberAvatarUrl(u, 64) + '" onerror="this.src=\'https://cdn.discordapp.com/embed/avatars/0.png\'">' +
-                            '<div><div class="user-cell-name">' + displayName + '</div>' +
-                            '<div class="user-cell-handle">@' + (u.username || u.id) + '</div></div>' +
+                            avatarHtml +
+                            '<div><div class="user-cell-name">' + escHtml(displayName) + '</div>' +
+                            '<div class="user-cell-handle">@' + escHtml(u.username || u.id) + '</div></div>' +
                         '</div></td>' +
                         '<td><span class="badge-sm ' + badge.cls + '">' + badge.txt + '</span></td>' +
                         '<td>' + joined + '</td>' +
                         '<td></td>';
+
                     var actionTd = tr.lastElementChild;
                     var btn = document.createElement('button');
-                    btn.className = 'action-btn ' + (isBannedMember ? 'btn-unban' : 'btn-ban');
-                    btn.textContent = isBannedMember ? 'Unban' : 'Ban';
-                    btn.addEventListener('click', function() {
-                        if (isBannedMember) unbanUser(u.id, displayName);
-                        else banMember(u);
-                    });
+                    btn.className  = 'action-btn ' + (isBanned ? 'btn-unban' : 'btn-ban');
+                    btn.textContent = isBanned ? 'Unban' : 'Ban';
+                    // Capture current ban state at render time
+                    (function(uid, uname, isBannedNow) {
+                        btn.addEventListener('click', function() {
+                            if (isBannedNow) unbanUser(uid, uname);
+                            else banMember(u);
+                        });
+                    })(u.id, displayName, isBanned);
                     actionTd.appendChild(btn);
                     tbody.appendChild(tr);
                 });
@@ -1301,12 +1363,13 @@
         tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Loading...</td></tr>';
         Promise.all([fetchMembersList(), fetchBannedList()])
             .then(function(results) {
-                var memberRes = results[0] || {};
-                var banned = results[1] || [];
-                allBanMembers = memberRes.members || [];
-                renderBanMembers(allBanMembers, banned);
+                var memberRes  = results[0] || {};
+                var banned     = results[1] || [];
+                allBanMembers  = memberRes.members || [];
+                bannedList     = banned;
+                renderBanMembers(allBanMembers, bannedList);
             }).catch(function(err) {
-                tbody.innerHTML = memberLoadErrorHtml(err);
+                tbody.innerHTML = memberLoadErrorHtml(err, 5);
             });
     }
 
@@ -1315,40 +1378,53 @@
         var bannedMap = {};
         (banned || []).forEach(function(u) { bannedMap[u.id] = u; });
 
-        if (!members || members.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No Discord members found</td></tr>';
+        var q = (document.getElementById('ban-search') ? document.getElementById('ban-search').value : '').toLowerCase();
+
+        // Apply tab filter
+        var visible = (members || []).filter(function(u) {
+            if (banTabFilter === 'banned' && !bannedMap[u.id]) return false;
+            if (q) {
+                var nm = ((u.global_name || '') + ' ' + (u.username || '') + ' ' + u.id).toLowerCase();
+                if (nm.indexOf(q) === -1) return false;
+            }
+            return true;
+        });
+
+        if (!visible.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">' +
+                (banTabFilter === 'banned' ? 'No banned members found' : 'No members found') +
+                '</td></tr>';
             return;
         }
 
         tbody.innerHTML = '';
-        members.forEach(function(u) {
-            var displayName = u.global_name || u.username || u.id;
-            var username = u.username || u.id;
-            var isBannedMember = !!bannedMap[u.id];
-            var joined = u.joined_at ? new Date(u.joined_at).toLocaleDateString() : '-';
-            var tr = document.createElement('tr');
-            tr.dataset.uid = u.id;
-            tr.dataset.name = (displayName + ' ' + username + ' ' + u.id).toLowerCase();
+        visible.forEach(function(u) {
+            var displayName  = u.global_name || u.username || u.id;
+            var username     = u.username || u.id;
+            var isBanned     = !!bannedMap[u.id];
+            var joined       = u.joined_at ? new Date(u.joined_at).toLocaleDateString() : '-';
+            var tr           = document.createElement('tr');
+            tr.dataset.uid   = u.id;
+            tr.dataset.name  = (displayName + ' ' + username + ' ' + u.id).toLowerCase();
 
-            var memberTd = document.createElement('td');
-            var userCell = document.createElement('div');
+            // Member cell
+            var memberTd  = document.createElement('td');
+            var userCell  = document.createElement('div');
             userCell.className = 'user-cell';
-
-            var avatar = document.createElement('img');
+            var avatar    = document.createElement('img');
             avatar.className = 'user-cell-avatar';
-            avatar.src = memberAvatarUrl(u, 64);
-            avatar.alt = displayName + ' avatar';
+            avatar.src    = memberAvatarUrl(u, 64);
+            avatar.alt    = '';
             avatar.onerror = function() { this.src = 'https://cdn.discordapp.com/embed/avatars/0.png'; };
-
-            var identity = document.createElement('div');
-            var nameEl = document.createElement('div');
-            nameEl.className = 'user-cell-name';
-            nameEl.textContent = displayName;
-            var idEl = document.createElement('div');
-            idEl.className = 'user-cell-handle';
-            idEl.textContent = u.id;
+            var identity  = document.createElement('div');
+            var nameEl    = document.createElement('div');
+            nameEl.className    = 'user-cell-name';
+            nameEl.textContent  = displayName;
+            var handleEl  = document.createElement('div');
+            handleEl.className  = 'user-cell-handle';
+            handleEl.textContent = '@' + username;
             identity.appendChild(nameEl);
-            identity.appendChild(idEl);
+            identity.appendChild(handleEl);
             userCell.appendChild(avatar);
             userCell.appendChild(identity);
             memberTd.appendChild(userCell);
@@ -1359,27 +1435,30 @@
             var joinedTd = document.createElement('td');
             joinedTd.textContent = joined;
 
-            var statusTd = document.createElement('td');
-            var status = document.createElement('span');
+            var statusTd  = document.createElement('td');
+            var status    = document.createElement('span');
             status.className = 'status-inline';
-            var dot = document.createElement('span');
-            dot.className = 'status-dot-sm' + (isBannedMember ? ' banned' : '');
-            var label = document.createElement('span');
-            label.textContent = isBannedMember ? 'Banned' : 'Active';
+            var dot       = document.createElement('span');
+            dot.className = 'status-dot-sm' + (isBanned ? ' banned' : '');
+            var statusLabel = document.createElement('span');
+            statusLabel.textContent = isBanned ? 'Banned' : 'Active';
             status.appendChild(dot);
-            status.appendChild(label);
+            status.appendChild(statusLabel);
             statusTd.appendChild(status);
 
-            var actionTd = document.createElement('td');
-            var actions = document.createElement('div');
+            var actionTd  = document.createElement('td');
+            var actions   = document.createElement('div');
             actions.className = 'ban-actions';
-            var btn = document.createElement('button');
-            btn.className = 'action-btn ' + (isBannedMember ? 'btn-unban' : 'btn-ban');
-            btn.textContent = isBannedMember ? 'Unban' : 'Ban';
-            btn.addEventListener('click', function() {
-                if (isBannedMember) unbanUser(u.id, displayName);
-                else banMember(u);
-            });
+            var btn       = document.createElement('button');
+            btn.className = 'action-btn ' + (isBanned ? 'btn-unban' : 'btn-ban');
+            btn.textContent = isBanned ? 'Unban' : 'Ban';
+            // Capture closure values
+            (function(uid, uname, isBannedNow, userObj) {
+                btn.addEventListener('click', function() {
+                    if (isBannedNow) unbanUser(uid, uname);
+                    else banMember(userObj);
+                });
+            })(u.id, displayName, isBanned, u);
             actions.appendChild(btn);
             actionTd.appendChild(actions);
 
@@ -1390,8 +1469,6 @@
             tr.appendChild(actionTd);
             tbody.appendChild(tr);
         });
-
-        filterBanMembers();
     }
 
     // ── Ban / Unban ──
@@ -1404,22 +1481,26 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(res) {
-            if (res.success) { showToast(name + ' banned', 'red'); loadUsers(); loadBanned(); loadStats(); }
-            else showToast('Failed to ban', 'red');
-        }).catch(function() { showToast('Error', 'red'); });
+            if (res.success) {
+                showToast(name + ' banned', 'red');
+                loadUsers();
+                loadBanned();
+                loadStats();
+            } else showToast(res.error || 'Failed to ban', 'red');
+        }).catch(function() { showToast('Error banning user', 'red'); });
     };
 
     window.banMember = function(user) {
         var name = user.global_name || user.username || user.id;
-        if (!confirm('Ban ' + name + '?')) return;
+        if (!confirm('Ban ' + name + ' from Fuse services?')) return;
         fetch('/api/users?action=ban', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: user.id,
-                username: user.username,
-                global_name: user.global_name || user.username,
-                avatar: user.avatar,
+                username: user.username || user.id,
+                global_name: user.global_name || user.username || user.id,
+                avatar: user.avatar || null,
                 discriminator: user.discriminator || '0',
                 roles: user.roles || [],
                 reason: 'Banned by admin',
@@ -1428,27 +1509,34 @@
         })
         .then(function(r) { return r.json(); })
         .then(function(res) {
-            if (res.success) { showToast(name + ' banned', 'red'); loadBanned(); loadUsers(); loadStats(); }
-            else showToast('Failed to ban', 'red');
-        }).catch(function() { showToast('Error', 'red'); });
+            if (res.success) {
+                showToast(name + ' banned', 'red');
+                loadBanned();
+                loadUsers();
+                loadStats();
+            } else showToast(res.error || 'Failed to ban', 'red');
+        }).catch(function() { showToast('Error banning user', 'red'); });
     };
 
     window.unbanUser = function(id, name) {
         if (!confirm('Unban ' + name + '?')) return;
-        fetch('/api/users?action=unban&id=' + id, { method: 'DELETE' })
+        fetch('/api/users?action=unban&id=' + encodeURIComponent(id), { method: 'DELETE' })
         .then(function(r) { return r.json(); })
         .then(function(res) {
-            if (res.success) { showToast(name + ' unbanned', 'green'); loadBanned(); loadUsers(); loadStats(); }
-            else showToast('Failed to unban', 'red');
-        }).catch(function() { showToast('Error', 'red'); });
+            if (res.success) {
+                showToast(name + ' unbanned', 'green');
+                loadBanned();
+                loadUsers();
+                loadStats();
+            } else showToast(res.error || 'Failed to unban', 'red');
+        }).catch(function() { showToast('Error unbanning user', 'red'); });
     };
 
     // ── Logout ──
     document.getElementById('logout-btn').addEventListener('click', function() {
-        localStorage.removeItem('fuse_user');
-        localStorage.removeItem('fuse_roles');
-        localStorage.removeItem('fuse_token');
-        localStorage.removeItem('fuse_pending_token');
+        ['fuse_user','fuse_roles','fuse_token','fuse_pending_token'].forEach(function(k) {
+            localStorage.removeItem(k);
+        });
         window.location.href = '/';
     });
 
@@ -1459,37 +1547,55 @@
         return;
     }
 
-    // Step 1: Check URL hash for fresh OAuth token
+    // Step 1: Check URL hash OR query string for fresh OAuth token
     var freshToken = null;
+
+    // Check hash fragment (standard Discord implicit flow)
     var hash = window.location.hash.substring(1);
     if (hash) {
         var hp = new URLSearchParams(hash);
         var ht = hp.get('access_token');
-        if (ht) {
-            freshToken = ht;
-            // Clean URL immediately
-            history.replaceState(null, '', window.location.pathname);
-        }
+        if (ht) { freshToken = ht; }
+    }
+
+    // Also check query string (some proxy setups forward it there)
+    if (!freshToken) {
+        var qp = new URLSearchParams(window.location.search);
+        var qt = qp.get('access_token');
+        if (qt) { freshToken = qt; }
+    }
+
+    // Clean URL immediately so token doesn't linger in history
+    if (freshToken) {
+        history.replaceState(null, '', window.location.pathname);
     }
 
     if (freshToken) {
-        // Fresh login — fetch Discord profile
+        // Save token first so fetchMembersList works right away
         localStorage.setItem('fuse_token', freshToken);
+
+        // Fetch Discord profile
         fetch('https://discord.com/api/v10/users/@me', {
             headers: { 'Authorization': 'Bearer ' + freshToken }
         })
         .then(function(r) {
-            if (!r.ok) throw new Error('auth failed');
+            if (!r.ok) throw new Error('Discord auth failed — please try signing in again.');
             return r.json();
         })
         .then(function(user) {
-            // Try to get guild roles
+            // Try to fetch guild member roles via Discord API
             return fetch('https://discord.com/api/v10/users/@me/guilds/' + GUILD_ID + '/member', {
                 headers: { 'Authorization': 'Bearer ' + freshToken }
             })
-            .then(function(r) { return r.ok ? r.json() : {}; })
+            .then(function(r) {
+                if (r.status === 403) {
+                    // guilds.members.read not granted or user not in guild
+                    return {};
+                }
+                return r.ok ? r.json() : {};
+            })
             .then(function(m) {
-                var roles = m.roles || [];
+                var roles = (m && Array.isArray(m.roles)) ? m.roles : [];
                 return checkBan(user.id).then(function(banned) {
                     if (banned) { showBanned(); return; }
                     localStorage.setItem('fuse_user', JSON.stringify(user));
@@ -1506,7 +1612,11 @@
                 });
             });
         })
-        .catch(function() { showLogin(); });
+        .catch(function(err) {
+            console.error('OAuth boot error:', err);
+            localStorage.removeItem('fuse_token');
+            showLogin();
+        });
 
     } else {
         // Try restoring saved session
@@ -1515,12 +1625,34 @@
         if (savedUser && savedToken) {
             try {
                 var u = JSON.parse(savedUser);
-                var r = JSON.parse(localStorage.getItem('fuse_roles') || '[]');
-                checkBan(u.id).then(function(banned) {
-                    if (banned) { showBanned(); return; }
-                    boot(u, r);
+                var r2 = JSON.parse(localStorage.getItem('fuse_roles') || '[]');
+                // Re-verify the token is still valid before booting
+                fetch('https://discord.com/api/v10/users/@me', {
+                    headers: { 'Authorization': 'Bearer ' + savedToken }
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error('token expired');
+                    return res.json();
+                })
+                .then(function(freshUser) {
+                    return checkBan(freshUser.id).then(function(banned) {
+                        if (banned) { showBanned(); return; }
+                        // Update stored user with fresh data
+                        localStorage.setItem('fuse_user', JSON.stringify(freshUser));
+                        boot(freshUser, r2);
+                    });
+                })
+                .catch(function() {
+                    // Token expired — clear stale data and show login
+                    localStorage.removeItem('fuse_token');
+                    localStorage.removeItem('fuse_user');
+                    localStorage.removeItem('fuse_roles');
+                    showLogin();
                 });
-            } catch(e) { showLogin(); }
+            } catch(e) {
+                localStorage.removeItem('fuse_user');
+                showLogin();
+            }
         } else {
             showLogin();
         }
