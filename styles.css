@@ -63,7 +63,7 @@
 .float-badge {
   animation-fill-mode: both !important;
 }
-.float-badge-left  { animation: floatLeft  5.5s ease-in-out infinite, badgeEntrance 0.7s 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+.float-badge-left  { animation: floatLeft  5.5s ease-in-out infinite, badgeEntrance 0.7s 0.3s cubic-bezier(0.22,1,0.70,1) both; }
 .float-badge-right { animation: floatRight 6s   ease-in-out infinite, badgeEntrance 0.7s 0.5s cubic-bezier(0.22,1,0.36,1) both; }
 .float-badge-right2{ animation: floatRight2 7s  ease-in-out infinite, badgeEntrance 0.7s 0.7s cubic-bezier(0.22,1,0.36,1) both; }
 
@@ -77,8 +77,8 @@
   background: linear-gradient(
     135deg,
     #ffffff 0%,
-    #703f44 60%,
-    #d30000 100%
+    #4197FA 60%,
+    #165aa7 100%
   ) !important;
   background-size: 300% 300% !important;
   -webkit-background-clip: text !important;
